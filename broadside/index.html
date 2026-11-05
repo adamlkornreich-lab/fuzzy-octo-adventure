@@ -1,0 +1,61 @@
+<!DOCTYPE html><html lang="en"><head><script src="../assets/poy-config.js"></script><script src="../assets/poy.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no"><title>Broadside 3D · Pirates of Ybor</title><link rel="icon" href="../assets/watermark.png"><meta name="theme-color" content="#0b1a26">
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Alegreya:wght@400;700&display=swap" rel="stylesheet">
+<style>:root{--brass:#e0b056;--ink:#f3ead7}html,body{margin:0;height:100%;background:#0b1a26;overflow:hidden;color:var(--ink);font:17px/1.4 Alegreya,Georgia,serif;touch-action:none;-webkit-user-select:none;user-select:none}
+#c{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
+.hud{position:fixed;top:max(10px,env(safe-area-inset-top));left:56px;right:12px;display:flex;justify-content:space-between;gap:10px;pointer-events:none;font:400 clamp(1.3rem,4vw,2rem)/1 "Pirata One",Georgia,serif;text-shadow:0 2px 6px #000b}
+.hud b{font-weight:400;color:var(--brass)}
+.card{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(#0008,#000b);padding:16px;z-index:5}
+.card>div{max-width:440px;width:100%;background:#0f2433ee;border:1px solid #e0b05666;border-radius:18px;padding:24px 22px;text-align:center;box-shadow:0 20px 60px #0009}
+h1{font:400 clamp(2.6rem,10vw,3.6rem)/1 "Pirata One",Georgia,serif;color:var(--brass);margin:0 0 8px}p{margin:0 0 14px;color:#e6dcc6}
+.go{display:block;width:100%;min-height:54px;border:0;border-radius:12px;background:var(--brass);color:#1b1305;font:700 1.15rem Alegreya,Georgia,serif;cursor:pointer;text-decoration:none;line-height:54px}.go:focus-visible{outline:3px solid #3fb6a8;outline-offset:2px}
+.alt{display:block;margin-top:12px;color:var(--brass)}[hidden]{display:none!important}
+#float{position:fixed;left:0;top:0;pointer-events:none;font:400 1.7rem "Pirata One",Georgia,serif;color:#ffd97a;text-shadow:0 2px 6px #000;transition:transform .9s ease-out,opacity .9s}
+.hint{position:fixed;left:0;right:0;bottom:max(16px,env(safe-area-inset-bottom));text-align:center;text-shadow:0 2px 5px #000;pointer-events:none;opacity:.9}
+</style></head><body><canvas id="c" aria-label="Three-dimensional sea battle. Tap the water to fire."></canvas>
+<div class="hud" aria-live="off"><span>Score <b id="sc">0</b></span><span>Time <b id="tm">60</b></span><span>Best <b id="be">0</b></span></div><div class="hint" id="hint">Tap the water just ahead of a ship to fire</div>
+<div class="card" id="start"><div><h1>Broadside</h1><p>Enemy ships are running the bay. Tap the water and your cannons fire there. Lead your target, because the ball takes a moment to land. Sink all you can in 60 seconds, and watch for the gold galleon.</p><button class="go" id="go" type="button">Fire the first shot</button><a class="alt" href="../index.html">Back to the ship</a></div></div>
+<div class="card" id="over" hidden><div><h1 id="ot">Battle over</h1><p id="os" aria-live="polite"></p><button class="go" id="again" type="button">Sail again</button><a class="alt" href="../index.html">Back to the ship</a></div></div>
+<script src="../assets/poy3d.js"></script><script>
+(function(){var $=function(i){return document.getElementById(i)},c=$('c'),E;try{E=P3D.create(c,{fog:.0000085,maxDpr:2})}catch(x){}
+if(!E){$('start').querySelector('p').textContent='This game needs 3D graphics, which this browser has switched off. Try it in a current browser, or play the rest of the arcade.';$('go').hidden=true;return}
+var gl=E.gl,M=P3D.M,rnd=P3D.rnd,v=P3D.v;
+function shipMesh(sc,fl){var b=new P3D.Builder();P3D.ship(b,sc,{sideOn:true,flag:fl});return b.mesh(gl)}
+var red=shipMesh([.72,.2,.16],[.05,.04,.05,.6]),blk=shipMesh([.13,.12,.15],[.9,.9,.85,.6]),gold=shipMesh([.98,.76,.28],[1,.8,.2,0]);
+/* your own rail and cannon, in front of the camera */
+var b=new P3D.Builder(),wood=[.34,.2,.1];b.box([0,-.3,0],[70,1.6,3],wood);for(var i=-34;i<34;i+=2.4)b.box([i,.9,-.3],[.5,1.1,.5],[.26,.15,.08]);b.box([0,1.5,-.3],[70,.28,.8],[.22,.12,.06]);var rail=b.mesh(gl);
+b=new P3D.Builder();b.cyl([0,0,1.6],[0,0,-2.3],.4,.27,[.08,.08,.09],14);b.cyl([0,0,-2.1],[0,0,-2.4],.36,.36,[.15,.15,.16],14);b.ball([0,0,1.7],.33,[.08,.08,.09],8);var gun=b.mesh(gl);
+b=new P3D.Builder();b.box([0,-.9,.2],[1.5,.9,2.6],[.33,.19,.1]);[-.85,.85].forEach(function(x){b.cyl([x,-1.25,1],[x+.001,-1.25,1.3],.5,.5,[.2,.11,.06],10)});var cart=b.mesh(gl);
+b=new P3D.Builder();b.ball([0,0,0],.5,[.05,.05,.06],8);var ballM=b.mesh(gl);
+var ships=[],balls=[],parts=[],score=0,time=60,best=0,play=false,shake=0,spawn=0,last=0,aim=[0,0,-80],muz=[0,5.2,7],elapsed=0,raf=0;try{best=+localStorage.getItem('poy_broadside_best')||0}catch(x){}$('be').textContent=best;
+var AC;function snd(f,d,type,vol,slide){try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();var o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,AC.currentTime);if(slide)o.frequency.exponentialRampToValueAtTime(slide,AC.currentTime+d);g.gain.setValueAtTime(vol,AC.currentTime);g.gain.exponentialRampToValueAtTime(.001,AC.currentTime+d);o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+d)}catch(x){}}
+function boom(){snd(120,.5,'sawtooth',.22,30);snd(60,.7,'sine',.5,22)}function bang(){snd(90,.9,'sawtooth',.28,20);snd(420,.35,'square',.08,60)}function splashS(){snd(700,.3,'triangle',.05,120)}
+function spawnShip(){var r=Math.random(),kind=elapsed>8&&r<.11?'gold':r<.5?'red':'black',dir=Math.random()<.5?1:-1,z=-48-Math.random()*100,sp=(4.5+Math.random()*4.5+elapsed*.09)*(kind==='gold'?1.7:1);ships.push({x:-dir*(Math.abs(z)*.95+30),z:z,dir:dir,sp:sp,kind:kind,hit:0,bobs:Math.random()*6,sc:kind==='gold'?1.05:1.2})}
+function reset(){ships=[];balls=[];parts=[];score=0;time=60;elapsed=0;spawn=0;for(var i=0;i<3;i++){spawnShip();ships[i].x=(i-1)*34*ships[i].dir}$('sc').textContent=0;$('tm').textContent=60;$('hint').hidden=false}
+function fire(px,py){if(!play)return;var p=E.pick(px,py);if(!p||p[2]>6){return}p[2]=Math.max(p[2],-260);if(balls.length>=4)return;var d=v.nor(v.sub(p,muz)),dist=Math.hypot(p[0]-muz[0],p[2]-muz[2]),T=Math.min(.55+dist*.0065,1.5);balls.push({a:muz.slice(),p:p,t:0,T:T,pk:5+dist*.08});aim=p;shake=.32;bang();$('hint').hidden=true;for(var i=0;i<14;i++)parts.push({p:v.add(muz,v.scl(d,2.4)),v:[d[0]*8+(Math.random()-.5)*5,d[1]*8+Math.random()*3,d[2]*8+(Math.random()-.5)*5],l:.5,L:.5,s:1+Math.random()*1.6,c:[1,.7,.3],g:0})}
+function burst(p,n,col,spd,sz,up){for(var i=0;i<n;i++){var a=Math.random()*6.283,r=Math.random()*spd;parts.push({p:p.slice(),v:[Math.cos(a)*r,up*(.4+Math.random()),Math.sin(a)*r],l:.7+Math.random()*.8,L:1.4,s:sz*(.6+Math.random()),c:col,g:18})}}
+function pop(text,px,py){var f=document.createElement('div');f.id='float';f.textContent=text;f.style.transform='translate('+px+'px,'+py+'px)';document.body.appendChild(f);requestAnimationFrame(function(){f.style.transform='translate('+px+'px,'+(py-70)+'px)';f.style.opacity=0});setTimeout(function(){f.remove()},950)}
+function land(bl){var hit=null,bd=1e9;ships.forEach(function(s){if(s.hit)return;var dx=(bl.p[0]-s.x),dz=(bl.p[2]-s.z),dd=(dx*dx)/(9.5*9.5)+(dz*dz)/(5.5*5.5);if(dd<1&&dd<bd){bd=dd;hit=s}});
+ if(hit){hit.hit=.001;var pts=hit.kind==='gold'?5:1;score+=pts;$('sc').textContent=score;var q=E.project([hit.x,6,hit.z]);pop(hit.kind==='gold'?'+5 Gold galleon!':'+1 Sunk!',q.x-40,q.y-20);boom();burst([hit.x,3,hit.z],44,[1,.55,.15],13,3.2,16);burst([hit.x,2,hit.z],22,[.35,.3,.3],6,4,10);shake=.55}
+ else{splashS();burst(bl.p,20,[.85,.95,1],4,1.3,12)}}
+function frame(now){raf=0;var realDt=(now-last)/1000,dt=Math.min(realDt,.05);last=now;var t=now/1000;
+ if(play){time-=Math.min(realDt,.25);elapsed+=dt;spawn-=dt;if(spawn<=0&&ships.filter(function(s){return !s.hit}).length<7){spawnShip();spawn=Math.max(.9,2.2-elapsed*.02)}var show=Math.max(0,Math.ceil(time));if(+$('tm').textContent!==show)$('tm').textContent=show;if(time<=0)end()}
+ ships.forEach(function(s){s.x+=s.dir*s.sp*dt;if(s.hit)s.hit+=dt});ships=ships.filter(function(s){return s.hit<3&&Math.abs(s.x)<Math.abs(s.z)*1.1+70});
+ balls=balls.filter(function(bl){bl.t+=dt;if(bl.t>=bl.T){land(bl);return false}return true});
+ parts=parts.filter(function(p){p.l-=dt;p.v[1]-=p.g*dt;p.p=v.add(p.p,v.scl(p.v,dt));return p.l>0&&p.p[1]>-.5});
+ shake=Math.max(0,shake-dt*1.3);var sx=(Math.sin(t*51)*shake*.32),sy=(Math.cos(t*43)*shake*.22),roll=Math.sin(t*.6)*.5,hv=Math.sin(t*.8)*.35,aspect=c.clientWidth/Math.max(c.clientHeight,1),fov=aspect<.9?1.0:.72;
+ var eye=[sx+roll*.5,8.2+hv+sy,27],at=[roll*.8,5.8+hv*.7+sy,-30];E.camera(eye,at,fov);E.sky(t);E.sea(t);E.lights=[[0,6,20],[0,-99,0],[0,-99,0],[0,-99,0],[0,-99,0],[0,-99,0]];E.lightC=[.5,.3,.14];E.begin(t);
+ ships.forEach(function(s){var y=Math.sin(t*1.1+s.bobs)*.28+.1,tilt=Math.sin(t*.9+s.bobs)*.03,sink=0;if(s.hit){sink=s.hit*s.hit*1.9;tilt=s.hit*.3*s.dir}var m=M.trs([s.x,y-sink-.8,s.z],s.dir>0?Math.PI:0,tilt,s.sc);E.draw(s.kind==='gold'?gold:s.kind==='red'?red:blk,m)});
+ balls.forEach(function(bl){var f=bl.t/bl.T,pos=[bl.a[0]+(bl.p[0]-bl.a[0])*f,bl.a[1]+(bl.p[1]-bl.a[1])*f+Math.sin(f*Math.PI)*bl.pk,bl.a[2]+(bl.p[2]-bl.a[2])*f];bl.pos=pos;E.draw(ballM,M.trs(pos,0,0,1.1))});
+ var rm=M.trs([sx*.4,2.2+hv*.32,15.5],0,Math.sin(t*.6)*.006);E.draw(rail,rm);
+ var yaw=Math.atan2(aim[0]-muz[0],-(aim[2]-muz[2])),gm=M.mul(M.trs([0,5.2+hv*.32,10],-yaw,0),[1,0,0,0,0,Math.cos(.13),Math.sin(.13),0,0,-Math.sin(.13),Math.cos(.13),0,0,0,0,1]);E.draw(cart,M.trs([0,5.2+hv*.32,10],-yaw,0));E.draw(gun,gm);
+ var pl=parts.map(function(p){var a=Math.max(p.l/p.L,0);return[p.p[0],p.p[1],p.p[2],p.s,p.c[0],p.c[1],p.c[2],a]});balls.forEach(function(bl){if(bl.pos)pl.push([bl.pos[0],bl.pos[1],bl.pos[2],1.8,1,.65,.25,.7])});E.points(pl);
+ document.documentElement.setAttribute('data-3d-frame','1');
+ if(!document.hidden)raf=requestAnimationFrame(frame)}
+function end(){play=false;var nb=score>best;if(nb){best=score;try{localStorage.setItem('poy_broadside_best',best)}catch(x){}$('be').textContent=best}$('ot').textContent=score>=15?'Scourge of the bay':score>=7?'Well fired, Captain':'Battle over';$('os').textContent='Your score: '+score+'.'+(nb?' A new best!':'');$('over').hidden=false}
+function start(){$('start').hidden=true;$('over').hidden=true;reset();play=true;last=performance.now()}
+$('go').onclick=start;$('again').onclick=start;
+c.addEventListener('pointerdown',function(e){e.preventDefault();fire(e.clientX,e.clientY)});
+reset();last=performance.now();document.addEventListener('visibilitychange',function(){if(!document.hidden&&!raf){last=performance.now();raf=requestAnimationFrame(frame)}});raf=requestAnimationFrame(frame);
+window.__bs={fire:fire,ships:function(){return ships},score:function(){return score},project:E.project,setTime:function(x){time=x}};
+})();
+</script><script src="../assets/ship.js" data-root="../" data-mode="game" defer></script></body></html>

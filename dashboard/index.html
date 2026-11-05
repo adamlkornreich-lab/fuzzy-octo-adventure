@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta name="robots" content="noindex"><script src="../assets/poy-config.js"></script><script src="../assets/poy.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Captain's Dashboard</title>
+<link rel="icon" href="../assets/watermark.png">
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Alegreya:wght@400;700&family=Alegreya+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: a ship's bridge at sunset. Poster up top, then one long deck of panels. */
+:root{--bg:#120b2e;--bg2:#1d1145;--panel:#21174e;--line:#463a80;--ink:#fbf1da;--mute:#c3bbdc;--gold:#ffc94d;--rum:#f76f3e;--pink:#ea4a55;--sea:#4fd1c0;--dark:#1b1305;
+--display:"Pirata One",Georgia,serif;--body:Alegreya,Georgia,serif;--ui:"Alegreya Sans",system-ui,sans-serif;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#120b2e}}
+:root[data-theme="dark"]{--bg:#120b2e}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.55 var(--body)}
+a{color:var(--gold)}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance}
+button,input{font:inherit}
+button{cursor:pointer;min-height:44px;border-radius:10px;border:0;padding:10px 16px}
+:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+
+.hero{background:linear-gradient(180deg,#100a2e 0,#2c1458 26%,#6d1c74 50%,#c92f6a 72%,#f76f3e 90%,#fb9633 100%);position:relative;overflow:hidden}
+.hero-in{max-width:1080px;margin:0 auto;padding:36px 16px 40px;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:28px;align-items:center}
+.kicker{font:700 .82rem var(--ui);letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:0 0 8px}
+h1{font-size:clamp(3rem,10vw,5.6rem);line-height:.95;color:#fff;text-shadow:0 4px 0 #6d1c74,0 8px 24px #0008}
+.lede{font-size:1.2rem;margin:14px 0 0;max-width:34ch}
+.poster{width:100%;max-width:370px;justify-self:center;display:block;border-radius:10px;border:4px solid var(--gold);box-shadow:0 18px 50px #0009;height:auto}
+.spark{position:absolute;color:#fff;font-size:22px;pointer-events:none;animation:tw 3.2s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:1;transform:scale(1.1)}}
+
+.crown{background:var(--gold);color:var(--dark);text-align:center;padding:14px 16px;font:400 clamp(1.35rem,4.4vw,1.9rem)/1.15 var(--display)}
+
+.jump{position:sticky;top:0;z-index:30;background:#120b2ef2;border-bottom:1px solid var(--line);display:flex;gap:4px;overflow-x:auto;padding:6px 12px;scrollbar-width:none}
+.jump a{font:700 .9rem var(--ui);text-decoration:none;color:var(--ink);padding:9px 12px;border-radius:8px;white-space:nowrap}
+.jump a:hover{background:#ffffff1c}
+
+main{max-width:1080px;margin:0 auto;padding:8px 16px calc(150px + env(safe-area-inset-bottom,0px))}
+section{padding-top:44px}
+h2{font-size:clamp(2rem,6vw,2.8rem);color:var(--gold);line-height:1.05}
+.sub{color:var(--mute);margin:6px 0 18px;max-width:62ch}
+
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:24px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+.stat b{display:block;font:400 2.5rem/1 var(--display);color:var(--sea)}
+.stat.zero b{color:var(--rum)}
+.stat span{font:500 .92rem/1.3 var(--ui);color:var(--mute);display:block;margin-top:5px}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.filters button{background:var(--panel);color:var(--ink);border:1px solid var(--line);font:700 .92rem var(--ui)}
+.filters button[aria-pressed="true"]{background:var(--gold);color:var(--dark);border-color:var(--gold)}
+.fleet{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.cart{display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;text-decoration:none;color:var(--ink);transition:transform .15s,border-color .15s}
+.cart:hover{transform:translateY(-3px);border-color:var(--gold)}
+.cart img{width:100%;height:auto;aspect-ratio:8/5;object-fit:cover;display:block;background:var(--bg2)}
+.cart div{padding:10px 12px 12px}
+.cart b{font:400 1.32rem/1.1 var(--display);color:var(--gold);display:block}
+.cart small{font:500 .88rem/1.35 var(--ui);color:var(--mute);display:block;margin-top:4px}
+
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
+.box h3{font-size:1.6rem;color:var(--gold);margin-bottom:8px}
+.goods{list-style:none;padding:0;margin:0}
+.goods li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.goods span{font:500 .92rem var(--ui);color:var(--mute);text-align:right}
+.field{display:block;margin-bottom:12px;font:500 .95rem var(--ui)}
+.field output{float:right;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.field input{width:100%;accent-color:var(--gold);margin-top:6px;min-height:28px}
+.take{font:400 clamp(2.4rem,8vw,3.4rem)/1 var(--display);color:var(--sea);margin:8px 0 4px;font-variant-numeric:tabular-nums}
+.fine{font:500 .86rem/1.4 var(--ui);color:var(--mute);margin:6px 0 0}
+.steps{margin:0;padding-left:22px}.steps li{margin:6px 0}
+.btn{display:inline-block;font:700 .95rem var(--ui);background:var(--rum);color:#fff;text-decoration:none;padding:12px 16px;border-radius:10px;margin:12px 8px 0 0}
+.btn.alt{background:transparent;border:2px solid var(--gold);color:var(--gold);padding:10px 14px}
+
+.ports{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.port{background:var(--panel);border:1px solid var(--line);border-top:4px solid var(--gold);border-radius:10px;padding:14px}
+.port b{font:400 1.45rem/1.1 var(--display);display:block}
+.port p{font:500 .92rem/1.4 var(--ui);color:var(--mute);margin:6px 0}
+.port a{font:700 .9rem var(--ui);overflow-wrap:anywhere}
+
+.quiz{background:linear-gradient(135deg,#2c1458,#6d1c74);border:2px solid var(--gold);border-radius:14px;padding:20px}
+.qtop{display:flex;justify-content:space-between;font:700 .9rem var(--ui);color:var(--gold);gap:12px}
+.quiz h3{font-size:clamp(1.5rem,5vw,2rem);line-height:1.15;margin:10px 0 14px}
+.opts{display:grid;gap:8px}
+.opts button{background:#120b2ecc;color:var(--ink);text-align:left;border:1px solid var(--line)}
+.opts button.ok{background:var(--sea);color:#06231f}
+.opts button.no{background:var(--pink);color:#fff}
+.fact{min-height:3.1em;margin:12px 0 0}
+.quiz .next{background:var(--gold);color:var(--dark);font-weight:700;margin-top:6px}
+
+.scroll{background:#e9d9ae;color:#2b1d0e;border-radius:6px 6px 18px 18px;padding:20px;box-shadow:0 0 0 4px #b78f45 inset}
+.scroll h3{font-size:2rem;color:#7a2e12}.scroll p{margin:6px 0}
+.scroll button{background:var(--rum);color:#fff;font-weight:700;margin-top:8px}
+
+footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font:500 .9rem/1.6 var(--ui);color:var(--mute)}
+.pp-wm{position:fixed;right:calc(10px + env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:40;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:3px;opacity:.72;filter:drop-shadow(0 0 9px rgba(255,214,120,.65))}
+.pp-wm img{width:min(92px,20vw);aspect-ratio:1;object-fit:cover;object-position:50% 52%;border-radius:50%;border:2px solid var(--gold)}
+.pp-wm span{font:600 9.5px/1.2 var(--ui);color:#fff;text-shadow:0 1px 3px #000;text-align:center;max-width:150px}
+@media (max-width:760px){.hero-in{grid-template-columns:minmax(0,1fr)}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.cols{grid-template-columns:minmax(0,1fr)}.poster{max-width:300px}}
+@media (prefers-reduced-motion:reduce){.spark{animation:none;opacity:.7}.cart{transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <span class="spark" style="top:9%;left:5%">✦</span><span class="spark" style="top:30%;left:48%;animation-delay:1s">✦</span><span class="spark" style="top:12%;right:6%;animation-delay:2s">✦</span><span class="spark" style="bottom:12%;left:32%;animation-delay:.6s">✦</span>
+  <div class="hero-in">
+    <div>
+      <p class="kicker">Gaspar's Grotto · Ybor City, Florida</p>
+      <h1>Captain's Dashboard</h1>
+      <p class="lede">The whole fleet on one deck: every game, every port and the course to the first doubloon.</p>
+      <div class="stats">
+        <div class="stat"><b id="nGames">23</b><span>games and arcades aboard</span></div>
+        <div class="stat"><b>8</b><span>ports of call</span></div>
+        <div class="stat zero"><b>0 of 4</b><span>stores live so far</span></div>
+        <div class="stat zero"><b>Closed</b><span>the till: sign-in and purchases not switched on yet</span></div>
+      </div>
+    </div>
+    <img class="poster" src="../assets/poster.jpg" width="800" height="933" alt="Pirates of Ybor poster: Pops the bar cat and Pippy the chihuahua in pirate hats on the dock at sunset.">
+  </div>
+</header>
+<div class="crown">👑 Crowned by Atara, our future · Blessed by Pippy 🐾</div>
+<nav class="jump" aria-label="On this page">
+  <a href="#fleet">The Fleet</a><a href="#till">The Till</a><a href="#ports">Ports of Call</a><a href="#screen">Silver Screen</a><a href="#forge">Game Forge</a>
+</nav>
+
+<main>
+<section id="fleet" aria-labelledby="h-fleet" style="padding-top:28px">
+  <h2 id="h-fleet">The Fleet</h2>
+  <p class="sub">Original games published by Adam Kornreich / R.A. Consulting. Tap one to play.</p>
+  <div class="filters" id="filters" role="group" aria-label="Filter games"></div>
+  <div class="fleet" id="carts"></div>
+</section>
+
+<section id="till" aria-labelledby="h-till">
+  <h2 id="h-till">The Till</h2>
+  <p class="sub">What the ship sells, and what it could bring in. No money has come in yet; the till opens when the apps launch.</p>
+  <div class="cols">
+    <div class="box">
+      <h3>Treasure for sale</h3>
+      <ul class="goods">
+        <li><b>Crew Pass</b><span>monthly subscription</span></li>
+        <li><b>Ybor Links course pack</b><span>one purchase, $2.99</span></li>
+        <li><b>Tournament entry</b><span>buy each time</span></li>
+      </ul>
+      <h3 style="margin-top:18px">Open the till</h3>
+      <ol class="steps">
+        <li>Accounts and scores (Supabase)</li>
+        <li>Purchases (RevenueCat)</li>
+        <li>Store accounts: Apple, Google Play, Amazon, Samsung</li>
+        <li>Build the apps (Codemagic) and submit</li>
+      </ol>
+      
+    </div>
+    <div class="box">
+      <h3>Doubloon calculator</h3>
+      <label class="field">Players a month <output id="oP"></output><input id="iP" type="range" min="100" max="100000" step="100" value="5000"></label>
+      <label class="field">Share who buy the Crew Pass <output id="oS"></output><input id="iS" type="range" min="0.5" max="15" step="0.5" value="3"></label>
+      <label class="field">Crew Pass price <output id="oD"></output><input id="iD" type="range" min="0.99" max="14.99" step="1" value="4.99"></label>
+      <label class="field">Store's cut <output id="oC"></output><input id="iC" type="range" min="0" max="30" step="1" value="30"></label>
+      <div class="take" id="take" aria-live="polite"></div>
+      <p class="fine">Monthly take from the Crew Pass alone. This is a what-if you control, not a forecast. Move the sliders and check each store's current fee before you plan on a number.</p>
+    </div>
+  </div>
+</section>
+
+<section id="ports" aria-labelledby="h-ports">
+  <h2 id="h-ports">Ports of Call</h2>
+  <p class="sub">The companies and crews behind the ship.</p>
+  <div class="ports">
+    <div class="port"><b>Gaspar's Grotto</b><p>Pirate bar and restaurant in Historic Ybor City, with live music and Sunday brunch.</p><a href="https://gasparsgrotto.com" rel="noopener" target="_blank">gasparsgrotto.com</a></div>
+    <div class="port"><b>Devastation Ent</b><p>DJ Boucher and Lita. Tampa worldwide.</p></div>
+    <div class="port"><b>Fire Fox Games</b><p>Games.</p><a href="https://firefoxgames.com" rel="noopener" target="_blank">firefoxgames.com</a></div>
+    <div class="port"><b>RE:Kalibrate</b><p>Customer intelligence for commercial buildings: leasing, amenities, parking and tenant retention.</p><a href="https://rekalibrate.com" rel="noopener" target="_blank">rekalibrate.com</a></div>
+    <div class="port"><b>BetterParking</b><p>Parking.</p><a href="https://betterparking.com" rel="noopener" target="_blank">betterparking.com</a></div>
+    <div class="port"><b>FitPoint Partners</b><p>Tampa. Mark Brenner.</p><a href="https://fitpointpartners.com" rel="noopener" target="_blank">fitpointpartners.com</a></div>
+    <div class="port"><b>Saturn Partners</b><p>St. Petersburg. Ed Lafferty.</p></div>
+    <div class="port"><b>Kornreich &amp; Associates</b><p>Part of the foundation this ship was built on.</p></div>
+  </div>
+</section>
+
+<section id="screen" aria-labelledby="h-screen">
+  <h2 id="h-screen">Silver Screen Spyglass</h2>
+  <p class="sub">Cool facts about the stars of pirate movies. Guess first, then read the fact.</p>
+  <div class="quiz">
+    <div class="qtop"><span id="qN"></span><span id="qS"></span></div>
+    <h3 id="qT"></h3>
+    <div class="opts" id="qO"></div>
+    <p class="fact" id="qF" aria-live="polite"></p>
+    <button class="next" id="qX" type="button">Next reel</button>
+  </div>
+  <p class="fine">Trivia only. These stars aren't connected with Pirates of Ybor and don't endorse it. See the <a href="../no-endorsement/index.html">no-endorsement notice</a>.</p>
+</section>
+
+<section id="forge" aria-labelledby="h-forge">
+  <h2 id="h-forge">Game Forge</h2>
+  <p class="sub">Need the next idea? Spin up a game concept.</p>
+  <div class="scroll" aria-live="polite">
+    <h3 id="gN"></h3><p id="gD"></p><p id="gT"></p>
+    <button id="gA" type="button">Forge another</button>
+  </div>
+</section>
+
+<footer>
+  © 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.<br>
+  Questions or permissions: <a href="mailto:adamlkornreich@gmail.com">adamlkornreich@gmail.com</a><br>
+  <a href="../privacy/index.html">Privacy</a> · <a href="../support/index.html">Support</a> · <a href="../delete-my-data/index.html">Delete My Data</a> · <a href="../no-endorsement/index.html">No Endorsement</a>
+</footer>
+</main>
+<div class="pp-wm" aria-hidden="true"><img src="../assets/poster.jpg" alt=""><span>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy</span></div>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+
+/* Fleet */
+var G=[
+["Game Room Arcade","The full arcade and marketplace","arcade/index.html","arcade.png","arcade"],
+["Andy Seavy Golf Club","Drives, putts, sand and water","golf/index.html","golf.png","sport"],
+["Tavern Games","Darts, pong and bar classics","tavern/index.html","tavern.png","bar"],
+["The Tavern Hall","Every bar game under one roof","tavern-hall/index.html","hall.png","bar"],
+["Tavern Arcade","Quick cabinet games","tavern-arcade/index.html","arcade.png","arcade"],
+["Tavern Tournament","Bar night bracket play","tournament/index.html","tournament.png","bar"],
+["Pirate Trivia","Pirates, Tampa, Ybor and more","trivia/index.html","trivia.png","brain"],
+["Name That Reel","Movie trivia","play/index.html","reel.png","brain"],
+["Chess & Checkers","Dedicated to our future masters","game-deck/index.html","chess.png","brain"],
+["Shere's Revenge & Classics","Swashbuckling and old favorites","classics/index.html","shere.png","arcade"],
+["Whack-a-Kraken","Bonk it before it sinks you","kraken/index.html","kraken.png","arcade"],
+["The Playhouse","Games and the Movie Machine","playhouse/index.html","playhouse.png","arcade"],
+["Gaspar's Grotto Arcade","The Grotto's own cabinet","grotto-arcade/index.html","grotto.png","bar"],
+["The Pour-Off","21 and over: fastest pours win","pour-off/index.html","pour.png","bar"],
+["Eric's Quiet Hour","An intense tale, read slow and calm, with sound","crew-games/index.html#eric","eric.svg","crew"],
+["Emily vs. Bad Customers","You know who you are","crew-games/index.html#emily","emily.svg","crew"],
+["No Drama Deck","Lorenz, Doug and Vanessa keep moving and stay positive","crew-games/index.html#nodrama","nodrama.svg","crew"],
+["DJ Boucher: Heartbeat of Tampa","Keep the vibe with Lita. Devastation, Tampa worldwide","crew-games/index.html#boucher","boucher.svg","crew"],
+["Ashlee Rae's Crosswords","Four puzzles in Waldo's gallery","crew-games/index.html#ashley","ashley.svg","brain"],
+["Tabby's Lanes","Ten-frame bowling with game-day shifts","crew-games/index.html#tabby","tabby.svg","sport"],
+["Race to the Altar","Landon and Stephania run for it, wedding march and all","crew-games/index.html#altar","altar.svg","crew"],
+["Boucher & Lita's Spin-Off","Join the crew, fill the floor, chase the Golden Record","crew-games/index.html#spinoff","spinoff.svg","crew"],
+["Ashlee Rae's Tire Toss","Thread a football through the swinging tire","crew-games/index.html#tire","tire.svg","sport"]];
+var F=[["all","All"],["arcade","Arcade"],["bar","Tavern"],["brain","Brains"],["sport","Sport"],["crew","Crew Games"]];
+$("nGames").textContent=G.length;
+function drawCarts(f){$("carts").innerHTML=G.filter(function(g){return f==="all"||g[4]===f}).map(function(g){
+return '<a class="cart" href="../'+g[2]+'"><img src="../assets/art/'+g[3]+'" width="960" height="600" alt="" loading="lazy"><div><b>'+g[0].replace(/&/g,"&amp;")+'</b><small>'+g[1]+'</small></div></a>'}).join("")}
+F.forEach(function(x,i){var b=document.createElement("button");b.type="button";b.textContent=x[1];b.setAttribute("aria-pressed",i===0?"true":"false");
+b.onclick=function(){Array.prototype.forEach.call($("filters").children,function(c){c.setAttribute("aria-pressed","false")});b.setAttribute("aria-pressed","true");drawCarts(x[0])};$("filters").appendChild(b)});
+drawCarts("all");
+
+/* Calculator */
+function calc(){var p=+$("iP").value,s=+$("iS").value,d=+$("iD").value,c=+$("iC").value;
+$("oP").textContent=p.toLocaleString("en-US");$("oS").textContent=s+"%";$("oD").textContent="$"+d.toFixed(2);$("oC").textContent=c+"%";
+$("take").textContent="$"+Math.round(p*s/100*d*(1-c/100)).toLocaleString("en-US")+" a month"}
+["iP","iS","iD","iC"].forEach(function(i){$(i).addEventListener("input",calc)});calc();
+
+/* Silver Screen: option 0 is the answer */
+var Q=[
+["Which rock star did Johnny Depp model Captain Jack Sparrow on?",["Keith Richards","Mick Jagger","Ozzy Osbourne"],"Depp modeled Jack on Keith Richards. Richards later played Jack's father, Captain Teague, in At World's End and On Stranger Tides."],
+["Playing Jack Sparrow earned Johnny Depp what first?",["His first Oscar nomination","A knighthood","A Grammy"],"The Curse of the Black Pearl brought Depp his first Oscar nomination, for Best Actor."],
+["Which actor helped shape the pirate \"arr\" with his Long John Silver in Treasure Island (1950)?",["Robert Newton","Errol Flynn","Burt Lancaster"],"Robert Newton came from England's West Country, like Long John Silver, and his accent shaped how we think pirates sound."],
+["Who played the tentacled Davy Jones in Dead Man's Chest?",["Bill Nighy","Geoffrey Rush","Jack Davenport"],"Bill Nighy's performance was motion-captured on set, and the effects won Industrial Light & Magic the Oscar."],
+["Which actor earned an Oscar nomination for playing a pirate opposite Tom Hanks in Captain Phillips?",["Barkhad Abdi","Mahershala Ali","Idris Elba"],"Barkhad Abdi, a Somali American from Minnesota, was nominated for Best Supporting Actor."],
+["Why did Nick Cravat have no lines in The Crimson Pirate?",["His thick Brooklyn accent","He lost his voice","He refused to speak"],"Burt Lancaster's longtime partner played mute because of his Brooklyn accent, and many people assumed he really was."],
+["Who played Long John Silver opposite the Muppets in Muppet Treasure Island?",["Tim Curry","Michael Caine","Tim Roth"],"Tim Curry played Silver. Michael Caine had already played Scrooge for the Muppets."],
+["Which movie made Errol Flynn a swashbuckling star in 1935?",["Captain Blood","The Sea Hawk","Treasure Island"],"Captain Blood was Flynn's breakout, opposite Olivia de Havilland."],
+["Who played Captain Hook opposite Robin Williams in Hook (1991)?",["Dustin Hoffman","Jack Nicholson","Al Pacino"],"Dustin Hoffman wore the hook, with Robin Williams as a grown-up Peter Pan."]];
+var qi=-1,right=0,seen=0;
+function showQ(){qi=(qi+1)%Q.length;var q=Q[qi],done=false;$("qN").textContent="Reel "+(qi+1)+" of "+Q.length;$("qS").textContent=right+" right";$("qT").textContent=q[0];$("qF").textContent="";
+var box=$("qO");box.innerHTML="";q[1].map(function(t,i){return{t:t,i:i,r:Math.random()}}).sort(function(a,b){return a.r-b.r}).forEach(function(o){var b=document.createElement("button");b.type="button";b.textContent=o.t;b.dataset.i=o.i;
+b.onclick=function(){if(done)return;done=true;if(o.i===0){right++;b.className="ok"}else{b.className="no";box.querySelector('[data-i="0"]').className="ok"}$("qS").textContent=right+" right";$("qF").textContent=q[2]};box.appendChild(b)})}
+$("qX").onclick=showQ;showQ();
+
+/* Forge */
+var A=["Cannonball","Doubloon","Parrot","Kraken","Rum Barrel","Lantern","Plank","Compass","Anchor","Cutlass","Crow's Nest"],B=["Rush","Heist","Duel","Derby","Toss","Riddle","Showdown","Scramble","Relay","Bluff"],
+M=["a 60-second trivia sprint","a grid search for hidden items","a turn-based board duel","a throw at a moving target","a memory match against the clock","a bluffing round with secret cards"],
+T=["every wrong answer sinks a plank","the board flips each round","Pops the bar cat steals a point at random","Pippy hides a bonus chest","a storm shuffles the rules halfway through","the tavern crowd votes on a tie"],
+W=["Gaspar's Grotto","the Ybor City docks","Channelside harbor","a haunted galleon","an island off Apollo Beach"];
+function forge(){$("gN").textContent="The "+pick(A)+" "+pick(B);$("gD").textContent="Set at "+pick(W)+": "+pick(M)+".";$("gT").textContent="Twist: "+pick(T)+"."}
+$("gA").onclick=forge;forge();
+})();
+</script>
+<script src="../assets/ship.js" data-root="../" defer></script>
+</body>
+</html>

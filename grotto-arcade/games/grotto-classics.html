@@ -1,0 +1,236 @@
+<!DOCTYPE html><html lang="en"><head><script src="../../assets/poy-config.js"></script><script src="../../assets/poy.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Pirates of Ybor Arcade</title>
+<style>
+:root{--bg:#0b1a2e;--card:#14304f;--gold:#f5c542;--ink:#f4ecd8;--sea:#1e6f9f;--box-sizing:border-box;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#0b1a2e}}
+*{box-sizing:inherit}html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif}
+body{min-height:100vh;padding:14px 14px 70px;max-width:520px;margin:auto}
+h1{color:var(--gold);text-align:center;margin:6px 0 2px;font-size:26px;letter-spacing:1px}
+.sub{text-align:center;opacity:.8;font-size:14px;margin-bottom:12px}
+.coins{text-align:center;color:var(--gold);margin-bottom:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g{background:var(--card);border:2px solid var(--gold);border-radius:14px;padding:14px 8px;text-align:center;cursor:pointer;font:inherit;color:var(--ink)}
+.g b{display:block;font-size:34px}.g span{font-size:14px;color:var(--gold)}.g small{display:block;opacity:.75;font-size:12px;margin-top:3px}
+button.b{background:var(--gold);color:#2a1a00;border:0;border-radius:10px;padding:11px 16px;font:bold 16px Georgia,serif;margin:4px;cursor:pointer}
+button.b:active{transform:scale(.96)}button.alt{background:var(--sea);color:#fff}
+.view{display:none}.view.on{display:block}
+.bar{height:12px;background:#0006;border-radius:6px;overflow:hidden;margin:3px 0}.bar i{display:block;height:100%;background:#e24a4a;transition:width .2s}.bar i.p{background:#4ae27a}
+canvas{width:100%;max-width:360px;display:block;margin:8px auto;border:3px solid var(--gold);border-radius:12px;touch-action:none}
+.c{text-align:center}.msg{min-height:44px;text-align:center;font-size:17px;margin:6px 0}
+.q{background:var(--card);border-radius:10px;padding:12px;margin:6px 0;font-size:18px}
+.opt{display:block;width:100%;text-align:left;margin:6px 0;background:#1d4468;color:var(--ink);border:2px solid transparent;border-radius:10px;padding:11px;font:16px Georgia,serif}
+.ok{border-color:#4ae27a}.no{border-color:#e24a4a}
+.tg{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;max-width:360px;margin:8px auto}
+.tg button{aspect-ratio:1;border:0;border-radius:8px;background:#c9a15a;font-size:20px}
+#wm{position:fixed;right:6px;bottom:30px;width:110px;opacity:.22;pointer-events:none}
+#foot{position:fixed;left:0;right:0;bottom:0;text-align:center;font-size:11px;padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px));background:#0b1a2ee6;color:var(--gold)}
+.sp{animation:tw 2s infinite}@keyframes tw{50%{opacity:.2}}
+</style></head><body>
+<h1>⚓ Pirates of Ybor Arcade</h1>
+<div class="sub">Gaspar’s Grotto Tavern · crowned by Atara, blessed by Pippy</div>
+<div class="coins">🪙 Doubloons: <b id="coins">0</b></div>
+
+<div id="hub" class="view on"><div class="grid">
+<button class="g" onclick="location.href='andy-golf-club.html'"><b>⛳</b><span>Andy Seavy Golf Club</span><small>Pro-tour golf starring Andy</small></button>
+<button class="g" onclick="go('duel')"><b>⚔️</b><span>Shere’s Revenge</span><small>Swashbuckling duel</small></button>
+<button class="g" onclick="go('trivia')"><b>🎬</b><span>Pirate Trivia</span><small>Movies, seas &amp; more</small></button>
+<button class="g" onclick="go('treasure')"><b>🗺️</b><span>Find the Treasure</span><small>Dig for the chest</small></button>
+<button class="g" onclick="go('darts')"><b>🎯</b><span>Tavern Darts</span><small>Three darts, best score</small></button>
+<button class="g" onclick="go('joust')"><b>🐴</b><span>Sea-Horse Jousting</span><small>Unseat rivals into the briny</small></button>
+<button class="g" onclick="go('cannon')"><b>💣</b><span>Cannon Battle</span><small>Sink the merchant ship</small></button>
+<button class="g" onclick="go('tug')"><b>🦑</b><span>Kraken Tug-o’-War</span><small>Out-pull the beast</small></button>
+<button class="g" onclick="go('pippy')"><b>🐕</b><span>Find Pippy</span><small>Hidden chihuahua pirate</small></button>
+<button class="g" onclick="go('tab')"><b>🍺</b><span>Pops’ Bar Tab</span><small>Daily 5 questions, build a streak</small></button>
+</div>
+<div class="c" style="margin-top:14px"><button class="b alt" onclick="alert('NO-ENDORSEMENT NOTICE\n\nNames, movies and brands appear in trivia for fun only. Their appearance does not mean any person or company endorses, sponsors or is affiliated with this Arcade, and we do not endorse anyone named.\n\nPermissions and copyright: adamlkornreich@gmail.com')">🚫 Not Endorsed Notice</button><button class="b alt" onclick="alert('PRIVACY\n\nThis Arcade keeps only your game score and daily streak on your own device. Nothing is sent to us.')">Privacy</button><button class="b alt" onclick="alert('SUPPORT\n\nQuestions and permissions: adamlkornreich@gmail.com')">Support</button><button class="b alt" onclick="try{localStorage.removeItem('popsTab')}catch(e){}coins=0;earn(0);alert('Your saved streak and score were deleted from this device.')">Delete My Data</button></div>
+<p class="c" style="font-size:13px;opacity:.8;margin-top:16px">Credits: Captain Shiller &amp; Co-Navigator Shere and family · Kornreich &amp; Associates · Waldo Nuhel · Mark Brenner · Ed Lafferty</p></div>
+
+<div id="golf" class="view"><div class="c"><b style="color:var(--gold)">Andy Seavy Golf Club</b> · Hole <span id="gh">1</span> · Par <span id="gp">3</span> · Strokes <span id="gs">0</span></div>
+<canvas id="gc" width="360" height="460"></canvas>
+<div class="bar"><i class="p" id="pw" style="width:0"></i></div>
+<div class="msg" id="gm">Tap the course to aim, then press Swing twice (start power, then hit).</div>
+<div class="c"><button class="b" id="gb" onclick="swing()">Swing!</button><button class="b alt" onclick="go('hub')">Hub</button></div></div>
+
+<div id="duel" class="view"><div class="c" style="color:var(--gold)"><b>Shere’s Revenge</b></div>
+<div class="c">🏴‍☠️ You</div><div class="bar"><i class="p" id="hp" style="width:100%"></i></div>
+<div class="c">💀 Captain Blackwater</div><div class="bar"><i id="he" style="width:100%"></i></div>
+<div class="q c" id="dstage" style="font-size:28px;min-height:90px">Ready your blade!</div>
+<div class="msg" id="dm">Watch the enemy’s swing and block the matching side before the steel lands!</div>
+<div class="c"><button class="b alt" onclick="block('L')">⬅️ Left</button><button class="b alt" onclick="block('U')">⬆️ High</button><button class="b alt" onclick="block('R')">Right ➡️</button></div>
+<div class="c"><button class="b" id="ds" onclick="duelStart()">Start Duel</button><button class="b alt" onclick="go('hub')">Hub</button></div></div>
+
+<div id="trivia" class="view"><div class="c" style="color:var(--gold)"><b>Pirate Trivia</b> · <span id="tq">1</span>/8 · Score <span id="ts">0</span></div>
+<div class="q" id="tt"></div><div id="to"></div><div class="c"><button class="b alt" onclick="go('hub')">Hub</button></div></div>
+
+<div id="treasure" class="view"><div class="c" style="color:var(--gold)"><b>Find the Treasure</b> · Digs left <span id="dg">8</span></div>
+<div class="msg" id="tm">Tap a square to dig. 🔥 means close, ❄️ means far.</div><div class="tg" id="tg"></div>
+<div class="c"><button class="b" onclick="tStart()">New Map</button><button class="b alt" onclick="go('hub')">Hub</button></div></div>
+
+<div id="darts" class="view"><div class="c" style="color:var(--gold)"><b>Tavern Darts</b> · Dart <span id="dn">1</span>/3 · Total <span id="dt">0</span></div>
+<canvas id="dc" width="360" height="360"></canvas><div class="msg" id="dmsg">Tap to throw when the sights cross the bullseye.</div>
+<div class="c"><button class="b" onclick="dStart()">Restart</button><button class="b alt" onclick="go('hub')">Hub</button></div></div>
+
+<div id="joust" class="view"><div class="c" style="color:var(--gold)"><b>Sea-Horse Jousting</b></div>
+<div class="c" style="font-size:22px">You: <span id="jm"></span> &nbsp; Rival: <span id="jo"></span></div>
+<div class="q c" id="jst" style="font-size:24px;min-height:80px">🏴‍☠️🐴 ⚔️ 🐴💀</div>
+<div class="bar" style="height:20px;position:relative"><i class="p" id="jpw" style="width:0;background:#f5c542;transition:none"></i><span style="position:absolute;left:60%;width:25%;top:0;bottom:0;border:2px solid #4ae27a;border-radius:4px"></span></div>
+<div class="msg" id="jmsg">Aim opposite the rival’s shield, then strike in the green zone!</div>
+<div class="c"><button class="b alt" onclick="jAim('H')">Aim High</button><button class="b alt" onclick="jAim('L')">Aim Low</button><button class="b" onclick="jStrike()">STRIKE!</button></div>
+<div class="c"><button class="b" onclick="jReset();jNew()">Start Joust</button><button class="b alt" onclick="go('hub')">Hub</button></div></div>
+
+<div id="cannon" class="view"><div class="c" style="color:var(--gold)"><b>Cannon Battle</b> · Shots <span id="cs">6</span> · Sunk <span id="csc">0</span></div>
+<canvas id="cc" width="360" height="260"></canvas>
+<div class="c">Angle <input type="range" id="ang" min="15" max="75" value="45" oninput="cdraw()"> Power <input type="range" id="pwr" min="20" max="100" value="60"></div>
+<div class="msg" id="cm"></div><div class="c"><button class="b" onclick="fire()">🔥 FIRE!</button><button class="b" onclick="cStart()">New Fleet</button><button class="b alt" onclick="go('hub')">Hub</button></div></div>
+
+<div id="tug" class="view"><div class="c" style="color:var(--gold)"><b>Kraken Tug-o’-War</b></div>
+<div class="q c" style="font-size:26px">🏴‍☠️ you pull ➡️ ⛓️ ⬅️ 🦑 kraken</div>
+<div class="bar" style="height:24px"><i class="p" id="tb" style="width:50%;transition:none"></i></div>
+<div class="msg" id="tmg">Tap PULL as fast as you can! Reach the far end before the Kraken drags you under.</div>
+<div class="c"><button class="b" style="font-size:26px;padding:20px 40px" onclick="tugTap()">PULL!</button></div>
+<div class="c"><button class="b alt" onclick="tugStart()">Start</button><button class="b alt" onclick="go('hub')">Hub</button></div></div>
+
+<div id="pippy" class="view"><style>#pg{display:grid;gap:3px;max-width:360px;margin:8px auto}#pg button{aspect-ratio:1;border:0;border-radius:6px;background:#1d4468;font-size:20px;padding:0}</style>
+<div class="c" style="color:var(--gold)"><b>Find Pippy</b> · Found <span id="ps">0</span> · Time <span id="pt">20</span></div>
+<div class="msg" id="pm">Find Pippy 🐕 hiding among the crew! Wrong taps cost 2 seconds.</div><div id="pg"></div>
+<div class="c"><button class="b" onclick="pStart()">Restart</button><button class="b alt" onclick="go('hub')">Hub</button></div></div>
+
+<div id="tab" class="view"><div class="c" style="color:var(--gold)"><b>Pops’ Bar Tab</b> · Streak <span id="bs">0</span> 🔥 · <span id="bq">1</span>/5</div>
+<div class="q" id="bt"></div><div id="bo"></div><div class="c"><button class="b alt" onclick="go('hub')">Hub</button></div></div>
+
+<svg id="wm" viewBox="0 0 120 130" aria-hidden="true"><defs><radialGradient id="gl"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff0"/></radialGradient></defs>
+<path d="M18 52 L26 14 L48 38Z M102 52 L94 14 L72 38Z" fill="#c98a4b"/><circle cx="60" cy="68" r="40" fill="#e0a45e"/>
+<path d="M14 40 Q60 -8 106 40 Q60 26 14 40Z" fill="#222"/><circle cx="60" cy="30" r="5" fill="#f4ecd8"/>
+<circle cx="45" cy="68" r="8" fill="#fff"/><circle cx="45" cy="68" r="4" fill="#222"/><path d="M68 58 L90 82 M90 58 L68 82" stroke="#222" stroke-width="3"/><ellipse cx="79" cy="70" rx="12" ry="10" fill="#222"/>
+<path d="M54 84 L66 84 L60 92Z" fill="#c45a6a"/><path d="M30 118 Q60 128 90 118" stroke="#f5c542" stroke-width="4" fill="none"/>
+<g class="sp"><circle cx="14" cy="22" r="12" fill="url(#gl)"/><circle cx="108" cy="96" r="14" fill="url(#gl)"/><circle cx="100" cy="20" r="9" fill="url(#gl)"/></g></svg>
+<div id="foot">© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy · All rights reserved</div>
+
+<script>
+let coins=0;const $=id=>document.getElementById(id);
+function earn(n){coins+=n;$('coins').textContent=coins}
+function go(v){document.querySelectorAll('.view').forEach(e=>e.classList.remove('on'));$(v).classList.add('on');clearInterval(dT);clearInterval(pT);
+ if(v=='pippy')pStart();if(v=='tab')bStart();if(v=='joust')jReset();if(v=='cannon')cStart();if(v=='tug')tugReset();if(v=='golf')holeLoad(0);if(v=='trivia')tvStart();if(v=='treasure')tStart();if(v=='darts')dStart();if(v=='duel')duelReset()}
+
+/* GOLF */
+const H=[{par:3,tee:[180,420],hole:[180,60],w:[[60,220,240,50]],s:[[130,120,100,40]]},
+{par:4,tee:[60,420],hole:[300,60],w:[[0,250,200,45],[200,120,160,45]],s:[[220,300,90,50],[80,100,90,40]]},
+{par:4,tee:[300,420],hole:[70,70],w:[[100,300,260,40],[0,180,230,40]],s:[[20,250,80,50],[250,140,90,45],[130,90,80,40]]}];
+const gc=$('gc'),g=gc.getContext('2d');let hi=0,ball,vel,aim,st,mode,pw=0,pd=1,pT,last,tot=0;
+function holeLoad(i){hi=i;const h=H[i];ball={x:h.tee[0],y:h.tee[1]};last={...ball};vel=null;aim={x:h.hole[0],y:h.hole[1]};st=0;mode='aim';
+ $('gh').textContent=i+1;$('gp').textContent=h.par;$('gs').textContent=0;$('gb').textContent='Swing!';$('gm').textContent='Tap the course to aim, then press Swing twice (start power, then hit).';gd()}
+function inR(r,x,y){return x>r[0]&&x<r[0]+r[2]&&y>r[1]&&y<r[1]+r[3]}
+function gd(){const h=H[hi];g.fillStyle='#2f8f46';g.fillRect(0,0,360,460);g.fillStyle='#46b25f';g.beginPath();g.arc(h.hole[0],h.hole[1],50,0,7);g.fill();
+ g.fillStyle='#1e6f9f';h.w.forEach(r=>g.fillRect(...r));g.fillStyle='#e8cf8a';h.s.forEach(r=>g.fillRect(...r));
+ g.fillStyle='#000';g.beginPath();g.arc(h.hole[0],h.hole[1],9,0,7);g.fill();g.strokeStyle='#fff';g.lineWidth=2;g.beginPath();g.moveTo(h.hole[0],h.hole[1]);g.lineTo(h.hole[0],h.hole[1]-34);g.stroke();
+ g.fillStyle='#e24a4a';g.fillRect(h.hole[0],h.hole[1]-34,16,10);
+ if(mode!='roll'){g.setLineDash([5,5]);g.strokeStyle='#fff';g.beginPath();g.moveTo(ball.x,ball.y);g.lineTo(aim.x,aim.y);g.stroke();g.setLineDash([])}
+ g.fillStyle='#fff';g.beginPath();g.arc(ball.x,ball.y,7,0,7);g.fill();g.strokeStyle='#333';g.lineWidth=1;g.stroke()}
+gc.onpointerdown=e=>{if(mode!='aim')return;const r=gc.getBoundingClientRect();aim={x:(e.clientX-r.left)*360/r.width,y:(e.clientY-r.top)*460/r.height};gd()};
+function swing(){if(mode=='aim'){mode='power';pw=0;pd=1;$('gb').textContent='HIT!';pT=setInterval(()=>{pw+=pd*3;if(pw>=100||pw<=0)pd*=-1;$('pw').style.width=pw+'%'},20)}
+ else if(mode=='power'){clearInterval(pT);const dx=aim.x-ball.x,dy=aim.y-ball.y,d=Math.hypot(dx,dy)||1,sp=2+pw*.17;vel={x:dx/d*sp,y:dy/d*sp};last={...ball};st++;$('gs').textContent=st;mode='roll';$('gb').textContent='…';roll()}}
+function roll(){const h=H[hi];const f=()=>{ball.x+=vel.x;ball.y+=vel.y;
+ if(ball.x<7||ball.x>353){vel.x*=-1;ball.x=Math.max(7,Math.min(353,ball.x))}if(ball.y<7||ball.y>453){vel.y*=-1;ball.y=Math.max(7,Math.min(453,ball.y))}
+ let fr=.985;if(h.s.some(r=>inR(r,ball.x,ball.y)))fr=.9;
+ if(h.w.some(r=>inR(r,ball.x,ball.y))){mode='aim';$('gm').textContent='💦 Splash! Water trap, +1 penalty stroke.';st++;$('gs').textContent=st;ball={...last};vel=null;$('gb').textContent='Swing!';return gd()}
+ vel.x*=fr;vel.y*=fr;const sp=Math.hypot(vel.x,vel.y),dh=Math.hypot(ball.x-h.hole[0],ball.y-h.hole[1]);
+ gd();
+ if(dh<10&&sp<4.5){const sc=st-h.par;tot+=sc;const n=sc<=-1?'Birdie!':sc==0?'Par!':sc==1?'Bogey':'Walk the plank!';earn(Math.max(5,20-st*3));$('gm').textContent='⛳ In the hole! '+n+' ('+st+' strokes)';
+  $('gb').textContent=hi<2?'Next Hole':'Play Again';mode='done';$('gb').onclick=()=>{$('gb').onclick=swing;holeLoad(hi<2?hi+1:0)};return}
+ if(sp<.15){mode='aim';vel=null;aim={x:h.hole[0],y:h.hole[1]};$('gb').textContent='Swing!';$('gm').textContent=h.s.some(r=>inR(r,ball.x,ball.y))?'🏖️ Stuck in the sand, use more power!':'Tap to aim your next shot.';return gd()}
+ requestAnimationFrame(f)};f()}
+
+/* DUEL */
+let hp,he,dOn,need,dT2,dT;
+function duelReset(){hp=100;he=100;dOn=false;need=null;clearTimeout(dT2);dr();$('dstage').textContent='Ready your blade!';$('dm').textContent='Watch the enemy’s swing and block the matching side before the steel lands!';$('ds').textContent='Start Duel'}
+function dr(){$('hp').style.width=Math.max(0,hp)+'%';$('he').style.width=Math.max(0,he)+'%'}
+function duelStart(){duelReset();dOn=true;$('ds').textContent='Fighting…';next()}
+function next(){if(!dOn)return;$('dstage').textContent='🏴‍☠️ ⚔️ 💀';dT2=setTimeout(()=>{need=['L','U','R'][Math.random()*3|0];$('dstage').textContent={L:'💀 swings from the LEFT! ⬅️',U:'💀 swings HIGH! ⬆️',R:'💀 swings from the RIGHT! ➡️'}[need];
+ const win=Math.max(550,1100-(100-he)*5);dT2=setTimeout(()=>{if(need){need=null;hp-=22;hit('Ouch! Too slow, the cutlass bites.')}},win)},700+Math.random()*900)}
+function block(s){if(!dOn||!need)return;clearTimeout(dT2);if(s==need){he-=25;need=null;hit('Parry and riposte! Shere’s Revenge strikes!',true)}else{need=null;hp-=22;hit('Wrong guard! You take a hit.')}}
+function hit(t,good){dr();$('dm').textContent=t;if(hp<=0){dOn=false;$('dstage').textContent='☠️ Defeated…';$('ds').textContent='Try Again';return}
+ if(he<=0){dOn=false;$('dstage').textContent='🏆 Victory!';$('dm').textContent='Captain Blackwater walks the plank! +25 🪙';earn(25);$('ds').textContent='Duel Again';return}
+ next()}
+
+/* TRIVIA */
+const Q=[["Which pirate movie stars Johnny Depp as Captain Jack Sparrow?",["Pirates of the Caribbean","Hook","Treasure Planet","Cutthroat Island"],0],
+["What flag is the classic pirate symbol called?",["Union Jack","Jolly Roger","Black Pearl","Red Ensign"],1],
+["In Treasure Island, what is Long John Silver’s famous pet?",["Cat","Monkey","Parrot","Dog"],2],
+["Which Florida city is famous for its cigar history and Ybor City?",["Orlando","Miami","Tampa","Naples"],2],
+["Which gasparilla festival tradition features an invasion by pirates?",["A parade and mock invasion","A chess match","A rodeo","A marathon"],0],
+["Which film has the line “Why is the rum gone?”",["Hook","Pirates of the Caribbean","Titanic","Jaws"],1],
+["How many squares are on a chess board?",["49","64","81","100"],1],
+["What is a pirate’s favorite letter?",["Arrr, but really the C","P","R","S"],0]];
+let qi,qs;function tvStart(){qi=0;qs=0;tq()}
+function tq(){if(qi>=Q.length){$('tt').textContent='Voyage over! You scored '+qs+' of '+Q.length+'. +'+qs*3+' 🪙';$('to').innerHTML='<button class="b" onclick="tvStart()">Play Again</button>';earn(qs*3);return}
+ const q=Q[qi];$('tq').textContent=qi+1;$('ts').textContent=qs;$('tt').textContent=q[0];$('to').innerHTML='';
+ q[1].forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;b.onclick=()=>{[...$('to').children].forEach((c,j)=>{c.disabled=true;if(j==q[2])c.classList.add('ok')});if(i==q[2])qs++;else b.classList.add('no');setTimeout(()=>{qi++;tq()},1000)};$('to').appendChild(b)})}
+
+/* TREASURE */
+let tx,ty,digs;function tStart(){tx=Math.random()*6|0;ty=Math.random()*6|0;digs=8;$('dg').textContent=8;$('tm').textContent='Tap a square to dig. 🔥 means close, ❄️ means far.';
+ const t=$('tg');t.innerHTML='';for(let y=0;y<6;y++)for(let x=0;x<6;x++){const b=document.createElement('button');b.onclick=()=>dig(b,x,y);t.appendChild(b)}}
+function dig(b,x,y){if(!digs||b.disabled)return;b.disabled=true;digs--;$('dg').textContent=digs;const d=Math.abs(x-tx)+Math.abs(y-ty);
+ if(!d){b.textContent='💰';$('tm').textContent='Yarrr! You found the chest! +'+(10+digs*3)+' 🪙';earn(10+digs*3);digs=0;return}
+ b.textContent=d<2?'🔥':d<4?'🌤️':'❄️';if(!digs){$('tm').textContent='Out of digs! The chest was at the marked spot.';document.querySelectorAll('#tg button')[ty*6+tx].textContent='💰'}}
+
+/* DARTS */
+const dc=$('dc'),q=dc.getContext('2d');let dn,dtot,cx,cy,t0;
+function dStart(){dn=1;dtot=0;$('dn').textContent=1;$('dt').textContent=0;$('dmsg').textContent='Tap to throw when the sights cross the bullseye.';t0=0;clearInterval(dT);dT=setInterval(dd,16)}
+function pos(t){return[180+Math.sin(t*.031*(1+dn*.35))*140,180+Math.cos(t*.043*(1+dn*.35))*140]}
+function dd(){t0++;[cx,cy]=pos(t0);q.fillStyle='#3a2410';q.fillRect(0,0,360,360);const c=['#f4ecd8','#222','#e24a4a','#222','#4ae27a'];
+ for(let i=0;i<5;i++){q.fillStyle=c[i];q.beginPath();q.arc(180,180,150-i*30,0,7);q.fill()}q.fillStyle='#f5c542';q.beginPath();q.arc(180,180,10,0,7);q.fill();
+ q.strokeStyle='#fff';q.lineWidth=2;q.beginPath();q.moveTo(cx-14,cy);q.lineTo(cx+14,cy);q.moveTo(cx,cy-14);q.lineTo(cx,cy+14);q.stroke();(dc.darts||[]).forEach(p=>{q.fillStyle='#4af';q.beginPath();q.arc(p[0],p[1],5,0,7);q.fill()})}
+dc.onpointerdown=()=>{if(dn>3)return;dc.darts=dc.darts||[];if(dn==1)dc.darts=[];const d=Math.hypot(cx-180,cy-180),s=d<10?50:d<30?25:d<60?15:d<90?10:d<120?5:d<150?2:0;dc.darts.push([cx,cy]);dtot+=s;
+ $('dt').textContent=dtot;$('dmsg').textContent=s==50?'🎯 BULLSEYE! 50!':s?'Hit for '+s+'.':'Missed the board! Arrr.';dn++;
+ if(dn>3){clearInterval(dT);dd();earn(Math.round(dtot/10));$('dmsg').textContent='Final score '+dtot+'! +'+Math.round(dtot/10)+' 🪙'}else $('dn').textContent=dn}
+/* PIPPY */
+let pl,pt,pOn,pscore;
+function pStart(){pl=1;pscore=0;pRound()}
+function pRound(){clearInterval(dT);const n=Math.min(4+pl,9),D=['🦜','🐈','🍺','⚓','🐙','🦀','💀','🗝️','🐟'],w=$('pg'),t=Math.random()*n*n|0;w.style.gridTemplateColumns='repeat('+n+',1fr)';w.innerHTML='';
+ for(let i=0;i<n*n;i++){const b=document.createElement('button');b.textContent=i==t?'🐕':D[Math.random()*D.length|0];b.onclick=()=>{if(!pOn)return;if(i==t){pscore++;pl++;earn(5);pRound()}else pt-=2};w.appendChild(b)}
+ pOn=true;pt=20;$('pm').textContent='Find Pippy 🐕 hiding among the crew! Wrong taps cost 2 seconds.';$('ps').textContent=pscore;
+ dT=setInterval(()=>{pt-=.1;$('pt').textContent=Math.max(0,Math.round(pt));if(pt<=0){clearInterval(dT);pOn=false;$('pm').textContent='Time! You found Pippy '+pscore+' times.'}},100)}
+/* BAR TAB */
+const BP=[["Which ocean is the Bermuda Triangle in?",["Atlantic","Pacific","Indian"],0],["What do pirates call the ship’s kitchen?",["Galley","Brig","Helm"],0],["How many legs does an octopus have?",["6","8","10"],1],["Which piece moves in an L-shape in chess?",["Bishop","Rook","Knight"],2],["What is a pirate’s map mark for treasure?",["A circle","An X","A star"],1],["Which city is home to Ybor City?",["Tampa","Dallas","Boston"],0],["What is the left side of a ship called?",["Starboard","Port","Stern"],1],["What flies on a pirate ship’s mast?",["Jolly Roger","Stars and Stripes","White flag"],0],["Which animal is the classic pirate sidekick?",["Parrot","Penguin","Llama"],0],["Which is a real card game of skill and chance?",["Poker","Pillow","Pebble"],0],["How many players are on a chess side at the start?",["1","2","4"],0],["What do you call a ship’s back end?",["Bow","Stern","Keel"],1]];
+let bi,bsc,bl,bday;
+function bld(){try{return JSON.parse(localStorage.getItem('popsTab'))||{}}catch(e){return{}}}
+function bsv(o){try{localStorage.setItem('popsTab',JSON.stringify(o))}catch(e){}}
+function bStart(){bday=new Date().toISOString().slice(0,10);const st=bld();$('bs').textContent=st.s||0;
+ if(st.d==bday){$('bt').textContent='You’ve settled today’s tab! Streak: '+(st.s||0)+' 🔥. Come back tomorrow.';$('bo').innerHTML='';return}
+ const s=+bday.replace(/-/g,'');bl=[...BP.keys()].sort((a,b)=>((a+1)*s*9301%233)-((b+1)*s*9301%233)).slice(0,5);bi=0;bsc=0;bq()}
+function bq(){if(bi>=5){const st=bld(),y=new Date(Date.now()-864e5).toISOString().slice(0,10),ok=bsc>=3,n=ok?(st.d==y?(st.s||0)+1:1):0;bsv({d:bday,s:n});$('bs').textContent=n;earn(bsc*2);
+ $('bt').textContent=ok?'Tab settled! '+bsc+'/5. Streak: '+n+' 🔥':'Only '+bsc+'/5. Get 3 right to keep a streak. Try again tomorrow.';$('bo').innerHTML='';return}
+ const q=BP[bl[bi]];$('bq').textContent=bi+1;$('bt').textContent=q[0];$('bo').innerHTML='';
+ q[1].forEach((o,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=o;b.onclick=()=>{[...$('bo').children].forEach((c,j)=>{c.disabled=true;if(j==q[2])c.classList.add('ok')});if(i==q[2])bsc++;else b.classList.add('no');setTimeout(()=>{bi++;bq()},900)};$('bo').appendChild(b)})}
+/* JOUST */
+let jo,jm,jsh,jaim,jpos,jdir,jmode;
+function jr(){$('jm').textContent='⚓'.repeat(jm);$('jo').textContent='💀'.repeat(jo)}
+function jReset(){clearInterval(dT);jo=3;jm=3;jmode='idle';jr();$('jpw').style.width=0;$('jst').textContent='🏴‍☠️🐴 ⚔️ 🐴💀';$('jmsg').textContent='Aim opposite the rival’s shield, then strike in the green zone!'}
+function jNew(){jsh=Math.random()<.5?'H':'L';jaim=null;jmode='aim';$('jpw').style.width=0;$('jst').textContent='💀 shield '+(jsh=='H'?'HIGH 🛡️⬆️':'LOW 🛡️⬇️');$('jmsg').textContent='Pick your aim: leave no shield in the way!'}
+function jAim(a){if(jmode!='aim')return;jaim=a;jmode='meter';jpos=0;jdir=1;dT=setInterval(()=>{jpos+=jdir*2.6;if(jpos>=100||jpos<=0)jdir*=-1;$('jpw').style.width=jpos+'%'},16);$('jmsg').textContent='Charge! Tap STRIKE in the green!'}
+function jStrike(){if(jmode!='meter')return;clearInterval(dT);jmode='res';let t;
+ if(jaim!=jsh&&jpos>60&&jpos<85){jo--;t='💥 Clean hit! Rival splashes into the briny!'}else if(jaim==jsh)t='🛡️ Your lance hits the shield. Clang!';else t='Off the mark, a glancing blow.';
+ if(Math.random()<.45){jm--;t+=' The rival’s cutlass-lance clips you!'}jr();$('jmsg').textContent=t;
+ if(jo<=0){$('jst').textContent='🏆 Champion of the Grotto!';earn(25);jmode='idle';return}
+ if(jm<=0){$('jst').textContent='🌊 You’re unseated!';jmode='idle';return}
+ setTimeout(jNew,1500)}
+/* CANNON */
+const cc=$('cc'),k=cc.getContext('2d');let ex,shots,cscore,cb;
+function cStart(){clearInterval(dT);shots=6;cscore=0;cb=0;ex=200+Math.random()*130;$('cs').textContent=6;$('csc').textContent=0;$('cm').textContent='Set angle and power, then FIRE!';cdraw()}
+function cdraw(b){k.fillStyle='#87c5e8';k.fillRect(0,0,360,200);k.fillStyle='#1e6f9f';k.fillRect(0,205,360,60);k.fillStyle='#5a3a1a';k.fillRect(5,190,55,20);
+ const a=$('ang').value*Math.PI/180;k.strokeStyle='#222';k.lineWidth=8;k.beginPath();k.moveTo(40,185);k.lineTo(40+Math.cos(a)*30,185-Math.sin(a)*30);k.stroke();
+ k.font='36px serif';k.fillText('⛵',ex-18,210);if(b){k.fillStyle='#111';k.beginPath();k.arc(b[0],b[1],5,0,7);k.fill()}}
+function fire(){if(!shots||cb)return;shots--;$('cs').textContent=shots;const a=$('ang').value*Math.PI/180,p=$('pwr').value/12;let x=40+Math.cos(a)*30,y=185-Math.sin(a)*30,vx=p*Math.cos(a),vy=-p*Math.sin(a);cb=1;
+ dT=setInterval(()=>{x+=vx;y+=vy;vy+=.18;cdraw([x,y]);
+ if(Math.abs(x-ex)<24&&y>180&&y<220){clearInterval(dT);cb=0;cscore++;earn(8);$('csc').textContent=cscore;$('cm').textContent='💥 Direct hit! The ship takes on water!';ex=200+Math.random()*130;cdraw();return}
+ if(y>215||x>370){clearInterval(dT);cb=0;$('cm').textContent=shots?'💦 Splash! Adjust and fire again.':'Out of cannonballs! You sank '+cscore+'.';cdraw()}},16)}
+/* TUG */
+let tp=50,tOn=false;function tdr(){$('tb').style.width=Math.max(0,Math.min(100,tp))+'%'}
+function tugReset(){clearInterval(dT);tp=50;tOn=false;tdr();$('tmg').textContent='Press Start, then tap PULL as fast as you can!'}
+function tugStart(){tugReset();tOn=true;$('tmg').textContent='PULL! 🦑 is fighting back!';dT=setInterval(()=>{tp-=.3+Math.random()*.3;tdr();tugEnd()},40)}
+function tugTap(){if(!tOn)return;tp+=2.2;tdr();tugEnd()}
+function tugEnd(){if(tp>=100){tOn=false;clearInterval(dT);$('tmg').textContent='🏆 The Kraken is beaten! +20 🪙';earn(20)}else if(tp<=0){tOn=false;clearInterval(dT);$('tmg').textContent='🌊 Dragged to Davy Jones’ locker!'}}
+</script>
+<a href="../index.html" class="arc-back" aria-label="Back to Gaspar's Grotto Arcade">&#9666;</a>
+<style>.arc-back{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:2147483001;background:rgba(13,11,10,.82);color:#e8cf94;border:1px solid rgba(201,169,106,.55);border-left:0;border-radius:0 10px 10px 0;padding:14px 8px 14px max(7px,env(safe-area-inset-left,0px));font:700 18px/1 Georgia,serif;text-decoration:none;-webkit-tap-highlight-color:transparent}.arc-back:focus-visible{outline:3px solid #e8cf94}</style>
+<script>try{window.addEventListener('keydown',function(e){if(e.key==='Escape'||e.key==='Back'||e.keyCode===10009){location.href='../index.html'}})}catch(e){}</script>
+</body></html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html><html lang="en"><head><script src="../assets/poy-config.js"></script><script src="../assets/poy.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Gaspar’s Grotto Game Deck</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1722;--card:#13293a;--gold:#f2b84b;--ink:#f3ead7;--red:#c0392b;--teal:#2a8c9a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 Georgia,serif}
+header{text-align:center;padding:14px 10px 4px}h1{margin:0;color:var(--gold);font-size:1.7rem}header p{margin:4px 0;opacity:.8}
+nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:8px}
+button,.btn{background:var(--card);color:var(--ink);border:1px solid var(--gold);border-radius:8px;padding:8px 12px;font:inherit;cursor:pointer;text-decoration:none}
+button.on{background:var(--gold);color:#1b1305}
+main{max-width:560px;margin:0 auto;padding:10px;text-align:center}
+section{display:none}section.show{display:block}
+input{background:#0b1722;color:var(--ink);border:1px solid var(--teal);border-radius:6px;padding:7px;margin:3px;width:38%}
+.opt{display:block;width:100%;margin:6px 0;text-align:left}
+.grid{display:grid;grid-template-columns:repeat(8,1fr);width:min(100%,416px);margin:8px auto;border:3px solid var(--gold)}
+.sq{aspect-ratio:1;border:0;border-radius:0;padding:0;font-size:min(7.5vw,30px);display:flex;align-items:center;justify-content:center;background:#c9a66b;color:#111}
+.sq.d{background:#6b4a2b}.sq.s{outline:3px solid var(--teal);outline-offset:-3px}.sq.m{box-shadow:inset 0 0 0 100px rgba(42,140,154,.5)}
+.pw{color:#fff;text-shadow:0 0 2px #000}.pb{color:#111}
+.r{color:#e74c3c}.k{color:#222;text-shadow:0 0 2px #fff}
+canvas{width:100%;max-width:480px;background:#0e3b4a;border:3px solid var(--gold);border-radius:10px;touch-action:none}
+.msg{min-height:1.5em;color:var(--gold);margin:6px}
+footer{text-align:center;font-size:.8rem;opacity:.7;padding:16px 10px}
+</style></head><body>
+<header><h1>☠ Gaspar’s Grotto Game Deck</h1><p>Pirates of Ybor · Pops &amp; Pippy approve</p></header>
+<nav id="nav"></nav>
+<main>
+<section id="trivia"><div id="tb"></div></section>
+<section id="chess"><div class="msg" id="cm"></div><div class="grid" id="cg"></div><button onclick="chInit()">New game</button><p>Two players, pass and play. Capture the king to win.</p></section>
+<section id="checkers"><div class="msg" id="km"></div><div class="grid" id="kg"></div><button onclick="kInit()">New game</button><p>Red moves first. Jumps are required.</p></section>
+<section id="treasure"><div class="msg" id="tm"></div><div class="grid" id="tg"></div><button onclick="tInit()">New map</button><p>Find the hidden chest in 10 digs.</p></section>
+<section id="ping"><div class="msg" id="pm">Click the table to serve. Move your mouse or finger to steer the left paddle.</div><canvas id="pc" width="480" height="300"></canvas></section>
+<section id="beer"><div class="msg" id="bm"></div><canvas id="bc" width="360" height="420"></canvas><p>Click once to lock aim, again to lock power.</p><button onclick="bInit()">Rack ’em up</button></section>
+</main>
+<footer>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.</footer>
+<script>
+const $=id=>document.getElementById(id),G=[['trivia','🎬 Movie Trivia'],['chess','♟ Pirate Chess'],['checkers','⚫ Checkers'],['treasure','🗺 Find the Chest'],['ping','🏓 Ping Pong'],['beer','🍺 Beer Pong']];
+let cur=null;
+G.forEach(([id,t])=>{const b=document.createElement('button');b.textContent=t;b.id='n'+id;b.onclick=()=>show(id);$('nav').appendChild(b)});
+function show(id){G.forEach(([g])=>{$(g).classList.toggle('show',g===id);$('n'+g).classList.toggle('on',g===id)});cur=null;({trivia:tvInit,chess:chInit,checkers:kInit,treasure:tInit,ping:pInit,beer:bInit})[id]()}
+(function loop(){cur&&cur();requestAnimationFrame(loop)})();
+const sh=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+/* TRIVIA */
+const Q=[["Gasparilla’s pirate festival takes place in which Florida city?",["Miami","Tampa","Key West","Orlando"],1],["Which film stars Captain Jack Sparrow?",["Hook","Treasure Planet","Pirates of the Caribbean","Muppet Treasure Island"],2],["Who is the one-legged pirate in Treasure Island?",["Long John Silver","Blackbeard","Captain Hook","Redbeard"],0],["Ybor City was famous for making what?",["Cigars","Surfboards","Oranges","Rum"],0],["Who directed Jaws?",["James Cameron","George Lucas","Steven Spielberg","Ridley Scott"],2],["In The Princess Bride, who becomes the Dread Pirate Roberts?",["Fezzik","Westley","Inigo","Humperdinck"],1],["Which Disney villain is a pirate captain with a hook?",["Jafar","Gaston","Captain Hook","Scar"],2],["Which film has the line “I’m the king of the world!”?",["Titanic","Avatar","Jaws","Waterworld"],0],["Which NHL team plays in Tampa?",["Panthers","Lightning","Rays","Predators"],1],["What does X mark on a pirate map?",["The storm","The ship","The spot","The exit"],2],["Blackbeard’s surname is traditionally given as what?",["Teach","Kidd","Bonny","Morgan"],0],["What does the Jolly Roger flag usually show?",["An anchor","A skull and crossbones","A parrot","A compass"],1]];
+let tp,tq,ti,ts;
+function tvInit(){$('tb').innerHTML='<h2>Private trivia</h2><p>Enter two crew names and pass the device between turns.</p><input id="p1" placeholder="Player 1"><input id="p2" placeholder="Player 2"><br><button onclick="tvGo()">Set sail</button>'}
+function tvGo(){tp=[$('p1').value||'Captain',$('p2').value||'First Mate'];ts=[0,0];ti=0;tq=sh(Q).slice(0,10);tvQ()}
+function tvQ(){if(ti>=tq.length){const w=ts[0]==ts[1]?'A tie, ye both walk the plank!':tp[ts[0]>ts[1]?0:1]+' wins the treasure!';$('tb').innerHTML=`<h2>${w}</h2><p>${tp[0]}: ${ts[0]} · ${tp[1]}: ${ts[1]}</p><button onclick="tvInit()">Play again</button>`;return}
+const q=tq[ti];$('tb').innerHTML=`<p>${tp[0]}: ${ts[0]} · ${tp[1]}: ${ts[1]}</p><h3>${tp[ti%2]}’s turn · Q${ti+1}/10</h3><p>${q[0]}</p>`+q[1].map((o,i)=>`<button class="opt" onclick="tvA(${i})">${o}</button>`).join('')}
+function tvA(i){const q=tq[ti],ok=i==q[2];if(ok)ts[ti%2]++;$('tb').innerHTML=`<h3>${ok?'Aye, correct!':'Walk the plank!'}</h3><p>Answer: ${q[1][q[2]]}</p><button onclick="ti++;tvQ()">Next</button>`}
+/* CHESS */
+let cb,ct,cs,cl;const PM={k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'};
+function chInit(){cb='rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR'.split('/').map(r=>r.replace(/\d/g,n=>' '.repeat(n)).split('').map(c=>c==' '?'':c));ct=1;cs=null;cl=[];chR()}
+function mv(r,c){const p=cb[r][c],w=p===p.toUpperCase(),t=p.toLowerCase(),o=[],en=x=>x&&(x===x.toUpperCase())!==w;
+const add=(R,C)=>{if(R<0||R>7||C<0||C>7)return 0;const x=cb[R][C];if(!x){o.push([R,C]);return 1}if(en(x))o.push([R,C]);return 0};
+if(t=='p'){const d=w?-1:1,s=w?6:1;if(!cb[r+d][c]){o.push([r+d,c]);if(r==s&&!cb[r+2*d][c])o.push([r+2*d,c])}for(const e of[-1,1])if(en(cb[r+d][c+e]))o.push([r+d,c+e])}
+else if(t=='n'){for(const[a,e]of[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]])add(r+a,c+e)}
+else if(t=='k'){for(let a=-1;a<2;a++)for(let e=-1;e<2;e++)if(a||e)add(r+a,c+e)}
+else{const D=[];if(t!='b')D.push([1,0],[-1,0],[0,1],[0,-1]);if(t!='r')D.push([1,1],[1,-1],[-1,1],[-1,-1]);for(const[a,e]of D){let R=r+a,C=c+e;while(add(R,C)){R+=a;C+=e}}}
+return o}
+function chR(over){$('cm').textContent=over||(ct?'White':'Black')+' to move';$('cg').innerHTML='';cb.forEach((row,r)=>row.forEach((p,c)=>{const b=document.createElement('button');b.className='sq'+((r+c)%2?' d':'')+(cs&&cs[0]==r&&cs[1]==c?' s':'')+(cl.some(m=>m[0]==r&&m[1]==c)?' m':'');if(p){b.textContent=PM[p.toLowerCase()];b.classList.add(p==p.toUpperCase()?'pw':'pb')}b.onclick=()=>chC(r,c,!!over);$('cg').appendChild(b)}))}
+function chC(r,c,over){if(over)return;const p=cb[r][c];if(cs&&cl.some(m=>m[0]==r&&m[1]==c)){const x=cb[r][c];let q=cb[cs[0]][cs[1]];if(q.toLowerCase()=='p'&&(r==0||r==7))q=ct?'Q':'q';cb[r][c]=q;cb[cs[0]][cs[1]]='';cs=null;cl=[];if(x.toLowerCase()=='k')return chR((ct?'White':'Black')+' captures the king and wins! 🏴‍☠️');ct=1-ct;chR()}
+else if(p&&(p==p.toUpperCase())==!!ct){cs=[r,c];cl=mv(r,c);chR()}}
+/* CHECKERS */
+let B,kt,ks,kl,kd;
+function kInit(){B=Array.from({length:8},(_,r)=>Array.from({length:8},(_,c)=>(r+c)%2?(r<3?'b':r>4?'r':''):''));kt='r';ks=null;kl=null;kR()}
+function cm(r,c,jo){const p=B[r][c],k=p==p.toUpperCase(),red=p.toLowerCase()=='r',ds=k?[-1,1]:[red?-1:1],o=[];for(const dr of ds)for(const dc of[-1,1]){const R=r+dr,C=c+dc;if(R<0||R>7||C<0||C>7)continue;const x=B[R][C];if(!x){if(!jo)o.push([R,C,0])}else if(x.toLowerCase()!=p.toLowerCase()){const R2=R+dr,C2=C+dc;if(R2>=0&&R2<8&&C2>=0&&C2<8&&!B[R2][C2])o.push([R2,C2,1])}}return o}
+function anyJ(){return B.some((row,r)=>row.some((p,c)=>p&&p.toLowerCase()==kt&&cm(r,c,1).some(m=>m[2])))}
+function kMoves(r,c){let m=cm(r,c,!!kl);return anyJ()||kl?m.filter(x=>x[2]):m}
+function kR(over){const n=['r','b'].map(t=>B.flat().filter(p=>p.toLowerCase()==t).length);$('km').textContent=over||(kt=='r'?'Red':'Black')+' to move · Red '+n[0]+' · Black '+n[1];$('kg').innerHTML='';B.forEach((row,r)=>row.forEach((p,c)=>{const b=document.createElement('button');b.className='sq'+((r+c)%2?' d':'')+(ks&&ks[0]==r&&ks[1]==c?' s':'')+(kd&&kd.some(m=>m[0]==r&&m[1]==c)?' m':'');if(p){b.textContent=p==p.toUpperCase()?'♛':'●';b.classList.add(p.toLowerCase()=='r'?'r':'k')}b.onclick=()=>kC(r,c,!!over);$('kg').appendChild(b)}))}
+function kC(r,c,over){if(over)return;const p=B[r][c];if(ks&&kd&&kd.some(m=>m[0]==r&&m[1]==c)){const m=kd.find(m=>m[0]==r&&m[1]==c);let q=B[ks[0]][ks[1]];B[ks[0]][ks[1]]='';if(m[2])B[(r+ks[0])/2][(c+ks[1])/2]='';let pr=0;if(q==q.toLowerCase()&&((q=='r'&&r==0)||(q=='b'&&r==7))){q=q.toUpperCase();pr=1}B[r][c]=q;ks=null;kd=null;if(m[2]&&!pr&&cm(r,c,1).some(x=>x[2])){kl=[r,c];ks=[r,c];kd=kMoves(r,c);return kR()}kl=null;kt=kt=='r'?'b':'r';const opp=B.flat().filter(x=>x.toLowerCase()==kt).length;const can=B.some((row,R)=>row.some((x,C)=>x&&x.toLowerCase()==kt&&kMoves(R,C).length));if(!opp||!can)return kR((kt=='r'?'Black':'Red')+' wins! 🏴‍☠️');kR()}
+else if(!kl&&p&&p.toLowerCase()==kt){ks=[r,c];kd=kMoves(r,c);kR()}}
+/* TREASURE */
+let tc,tl,tdone;
+function tInit(){tc=[Math.floor(Math.random()*8),Math.floor(Math.random()*8)];tl=10;tdone=0;$('tm').textContent='10 digs left. Where be the chest?';$('tg').innerHTML='';for(let r=0;r<8;r++)for(let c=0;c<8;c++){const b=document.createElement('button');b.className='sq'+((r+c)%2?' d':'');b.textContent='';b.onclick=()=>{if(tdone||b.dataset.x)return;b.dataset.x=1;const d=Math.abs(r-tc[0])+Math.abs(c-tc[1]);tl--;if(!d){b.textContent='💰';tdone=1;$('tm').textContent='Ye found the treasure with '+tl+' digs to spare!';return}b.textContent=d<=1?'🔥':d<=3?'♨':d<=5?'🌊':'❄';if(!tl){tdone=1;$('tm').textContent='Out of digs! The chest was at row '+(tc[0]+1)+', column '+(tc[1]+1)+'.'}else $('tm').textContent=(d<=1?'Scorching!':d<=3?'Hot.':d<=5?'Warm.':'Cold.')+' '+tl+' digs left.'};$('tg').appendChild(b)}}
+/* PING PONG */
+let pcx,py,ay,bx,by,vx,vy,sc,pon;
+function pInit(){pcx=$('pc').getContext('2d');py=ay=120;sc=[0,0];pon=0;bx=240;by=150;vx=vy=0;cur=pTick;$('pm').textContent='Click the table to serve.'}
+$('pc').addEventListener('pointermove',e=>{const r=e.target.getBoundingClientRect();py=Math.max(30,Math.min(270,(e.clientY-r.top)*300/r.height))-30});
+$('pc').addEventListener('pointerdown',()=>{if(!pon&&sc[0]<5&&sc[1]<5){pon=1;vx=4;vy=(Math.random()-.5)*5}else if(sc[0]>=5||sc[1]>=5)pInit()});
+function pTick(){const x=pcx;ay+=Math.max(-3.2,Math.min(3.2,by-30-ay));if(pon){bx+=vx;by+=vy;if(by<6||by>294)vy*=-1;if(bx<24&&bx>10&&by>py&&by<py+60){vx=Math.abs(vx)*1.05;vy+=(by-py-30)/8}if(bx>456&&bx<470&&by>ay&&by<ay+60){vx=-Math.abs(vx)*1.05;vy+=(by-ay-30)/10}if(bx<0||bx>480){sc[bx<0?1:0]++;pon=0;bx=240;by=150;vx=vy=0;$('pm').textContent=sc[0]>=5?'You win! Click to restart.':sc[1]>=5?'The crew wins. Click to restart.':'Click to serve.'}}
+x.fillStyle='#0e3b4a';x.fillRect(0,0,480,300);x.strokeStyle='#f3ead7';x.setLineDash([8,8]);x.beginPath();x.moveTo(240,0);x.lineTo(240,300);x.stroke();x.setLineDash([]);x.fillStyle='#f2b84b';x.fillRect(12,py,10,60);x.fillRect(458,ay,10,60);x.fillStyle='#fff';x.beginPath();x.arc(bx,by,7,0,7);x.fill();x.font='28px Georgia';x.fillText(sc[0],200,40);x.fillText(sc[1],265,40)}
+/* BEER PONG */
+let bcx,cups,bph,bax,bpw,bt,bball,bleft,bhit;
+function bInit(){bcx=$('bc').getContext('2d');cups=[];[[180,80],[150,115],[210,115],[120,150],[180,150],[240,150]].forEach(p=>cups.push({x:p[0],y:p[1]}));bph=0;bax=180;bpw=0;bt=0;bball=null;bleft=10;$('bm').textContent='10 balls left. Aim!';cur=bTick}
+$('bc').addEventListener('pointerdown',()=>{if(bph==0)bph=1;else if(bph==1)bph=2;else if(!cups.length||!bleft)bInit()});
+function bTick(){bt+=.05;const x=bcx,s=x=>Math.abs(((bt*x)%2)-1);if(bph==0)bax=40+s(.7)*280;if(bph==1)bpw=s(.9);
+if(bph==2){bball={sx:bax,t:0,ty:330-bpw*280};bph=3}
+if(bph==3){bball.t+=.03;if(bball.t>=1){const hx=bball.sx,hy=bball.ty;const i=cups.findIndex(c=>Math.hypot(c.x-hx,c.y-hy)<20);bleft--;if(i>=0){cups.splice(i,1);$('bm').textContent='Splash! '+cups.length+' cups left, '+bleft+' balls.'}else $('bm').textContent='Miss. '+bleft+' balls left.';if(!cups.length)$('bm').textContent='All cups sunk! Click to play again.';else if(!bleft)$('bm').textContent='Out of balls. Click to retry.';bball=null;bph=cups.length&&bleft?0:4}}
+x.fillStyle='#0e3b4a';x.fillRect(0,0,360,420);x.fillStyle='#6b4a2b';x.fillRect(60,30,240,380);x.fillStyle='#c0392b';cups.forEach(c=>{x.beginPath();x.arc(c.x,c.y,17,0,7);x.fill();x.strokeStyle='#fff';x.stroke()});
+if(bph<=1){x.fillStyle='#f2b84b';x.fillRect(bax-2,380,4,30)}if(bph==1){x.fillStyle='#222';x.fillRect(320,100,16,280);x.fillStyle='#2a8c9a';x.fillRect(320,380-bpw*280,16,bpw*280)}
+if(bball){const t=bball.t,y=400+(bball.ty-400)*t-Math.sin(t*Math.PI)*90;x.fillStyle='#fff';x.beginPath();x.arc(bball.sx,y,7-3*t,0,7);x.fill()}}
+show('trivia');
+</script><script src="../assets/ship.js" data-root="../" defer></script>
+</body></html>

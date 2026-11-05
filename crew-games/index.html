@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="../assets/poy-config.js"></script><script src="../assets/poy.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Crew Games</title>
+<link rel="icon" href="../assets/watermark.png">
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Alegreya:wght@400;700&family=Alegreya+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#120b2e;--panel:#21174e;--line:#463a80;--ink:#fbf1da;--mute:#c3bbdc;--gold:#ffc94d;--rum:#f76f3e;--pink:#ea4a55;--sea:#4fd1c0;--dark:#1b1305;
+--display:"Pirata One",Georgia,serif;--body:Alegreya,Georgia,serif;--ui:"Alegreya Sans",system-ui,sans-serif;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#120b2e}}
+:root[data-theme="dark"]{--bg:#120b2e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.5 var(--body)}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance}
+button{font:inherit;cursor:pointer;min-height:44px;border:0;border-radius:10px;padding:10px 16px;touch-action:manipulation}
+:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+main{max-width:760px;margin:0 auto;padding:22px 16px calc(32px + env(safe-area-inset-bottom,0px))}
+h1{font-size:clamp(2.6rem,9vw,4rem);color:var(--gold);line-height:1}
+.sub{color:var(--mute);margin:6px 0 16px}
+.tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:16px}
+.tabs button{background:var(--panel);color:var(--ink);border:1px solid var(--line);font:700 .92rem/1.2 var(--ui);padding:8px 6px}
+.tabs button[aria-selected="true"]{background:var(--gold);color:var(--dark);border-color:var(--gold)}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-height:440px}
+.stage h2{font-size:2.1rem;color:var(--gold);line-height:1.05;margin-bottom:6px}
+.go{background:var(--rum);color:#fff;font-weight:700;font-size:1.05rem}
+.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.hud{display:flex;justify-content:space-between;gap:10px;font:700 .95rem var(--ui);margin-bottom:10px;font-variant-numeric:tabular-nums}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.tag{font:400 2rem var(--display);color:var(--sea)}
+
+/* Eric */
+.book{background:radial-gradient(circle at 50% 0,#4a3216,#160d05 75%);border-radius:10px;padding:18px;min-height:200px;display:flex;align-items:center;justify-content:center;text-align:center}
+.line{font-size:clamp(1.25rem,4.4vw,1.6rem);line-height:1.45;margin:0;color:#f5e3bd}
+.line span{opacity:0;transition:opacity .45s}.line span.on{opacity:1}
+.calmrow{display:flex;align-items:center;gap:18px;margin-top:16px}
+.candle{position:relative;width:76px;height:76px;flex:none}
+.ring{position:absolute;inset:0;border-radius:50%;background:var(--gold);transform:scale(.25);opacity:.55}
+.ring.ready{background:var(--sea);opacity:.9}
+.flame{position:absolute;inset:0;display:grid;place-items:center;font-size:30px}
+
+/* Emily */
+.bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stool{min-height:128px;background:#160f38;border:1px solid var(--line);border-radius:10px;padding:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink);text-align:center}
+.stool .face{font-size:36px;line-height:1.1}
+.stool small{font:600 .78rem/1.2 var(--ui);min-height:2.4em;margin-top:3px}
+.stool.bad{border-color:var(--pink)}
+.stool.hit{background:var(--sea);color:#06231f}.stool.oops{background:var(--pink);color:#fff}
+
+/* No Drama */
+canvas{display:block;width:100%;max-width:420px;margin:0 auto;border-radius:10px;background:#0e2a44;touch-action:none}
+.meter{height:12px;background:#160f38;border-radius:99px;overflow:hidden;margin-bottom:10px}.meter i{display:block;height:100%;background:var(--sea);width:100%}
+.picks{display:grid;gap:8px;margin-top:12px}
+.picks button{background:#160f38;color:var(--ink);border:1px solid var(--line);text-align:left}
+.picks b{color:var(--gold)}
+.pad{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:420px;margin:10px auto 0}
+.pad button{background:var(--gold);color:var(--dark);font-weight:700;min-height:56px}
+
+/* Boucher */
+.boss{display:flex;gap:14px;align-items:center;margin-bottom:10px}.boss img{width:92px;height:auto;border-radius:50%;flex:none}.boss p{margin:4px 0 0}
+.pads{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:420px;margin:10px auto 0}
+.pads button{min-height:72px;font-weight:700;color:#120b2e;touch-action:none;user-select:none}.pads button:nth-child(1){background:#4fd1c0}.pads button:nth-child(2){background:#ffc94d}.pads button:nth-child(3){background:#f76f3e}
+/* Ashlee */
+.gal{background:#160f38 url(../assets/art/waldo-painting.jpg) center/cover;border-radius:10px;padding:10px;box-shadow:inset 0 0 0 4px #7a5a26,0 8px 24px #0007}
+.galin{background:#120b2ed9;border-radius:8px;padding:16px}
+.xw{display:grid;gap:1px;max-width:560px;margin:0 auto}
+.xw .blank{aspect-ratio:1}
+.cell{position:relative;aspect-ratio:1;background:#fff8e6f2;box-shadow:0 0 0 1px #2b1d0e}
+.cell input{position:absolute;inset:0;width:100%;height:100%;border:0;background:transparent;text-align:center;font:700 clamp(.8rem,3.6vw,1.2rem) var(--ui);color:#1b1305;padding:6% 0 0;text-transform:uppercase;caret-color:transparent;border-radius:0;outline:none}
+.cell small{position:absolute;left:2px;top:0;font:700 8px/1.2 var(--ui);color:#5a3720;z-index:1;pointer-events:none}
+.cell.on{background:#ffe29a}.cell.cur{background:#ffc94d}.cell.bad{background:#f7a6a0}.cell.good input{color:#0c6b5c}
+.xw.solved .cell{background:#fff8e6b0}
+.now{min-height:2.8em;font:700 1rem/1.35 var(--ui);margin:10px 0 0;color:var(--gold)}
+.clues{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}.clues h3{font:400 1.4rem var(--display);color:var(--gold);margin:0 0 4px}
+.clues ol{margin:0;padding-left:24px;font:500 .9rem/1.35 var(--ui)}.clues li{padding:4px 2px;cursor:pointer;border-radius:4px}.clues li.on{background:#ffc94d33}
+.fine{font:500 .82rem/1.4 var(--ui);color:var(--mute);margin:8px 0 0}
+/* Tabby */
+.sheet{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:2px;margin-bottom:8px;max-width:420px;margin-inline:auto}.sheet i{font:700 .72rem/2 var(--ui);font-style:normal;text-align:center;background:#160f38;border:1px solid var(--line);min-height:24px;overflow:hidden;white-space:nowrap}
+.stations{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}.stations button{min-height:110px;font-size:42px;background:#160f38;border:1px solid var(--line);opacity:.45}.stations button.lit{background:var(--gold);opacity:1}
+.stage canvas{max-width:360px}
+@media (max-width:520px){.clues{grid-template-columns:minmax(0,1fr)}}
+#poy-sound-widget{display:none!important}
+.txt{width:100%;min-height:46px;border-radius:10px;border:1px solid var(--line);background:#160f38;color:var(--ink);font:inherit;padding:0 12px;margin-top:4px}.field{font:700 .95rem var(--ui)}
+.decks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.dk{min-height:96px;font-weight:700;color:#120b2e;touch-action:none;user-select:none;filter:saturate(.55) brightness(.75);transition:filter .08s,transform .08s}.dk.lit{filter:none;transform:scale(1.04);box-shadow:0 0 24px #fff8}
+.k0{background:#4fd1c0}.k1{background:#ffc94d}.k2{background:#e77fd0}.k3{background:#f76f3e}
+.floor{font:400 1.4rem var(--display);color:var(--gold);margin:16px 0 6px}.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{font:700 .85rem var(--ui);background:#160f38;border:1px solid var(--line);border-radius:99px;padding:5px 11px}.chip.me{background:var(--gold);color:var(--dark)}.chip.new{border-color:var(--sea);color:var(--sea)}
+.chests{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.chests button{min-height:110px;font-size:46px;background:#160f38;border:1px solid var(--gold)}
+.mc{font:700 1rem/1.35 var(--ui);color:var(--sea);margin:0 0 12px;min-height:2.7em}
+.love{display:flex;justify-content:center;gap:14px;align-items:center;padding:30px 0 10px}.love .big{font-size:60px}.love .hrt{font-size:44px}
+.run{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:420px;margin:10px auto 0}.run button{min-height:74px;font-weight:700;background:#46386f;color:var(--ink);touch-action:none;user-select:none}.run button.now{background:var(--gold);color:var(--dark)}.run #J{grid-column:1/3;background:var(--sea);color:#06231f;min-height:54px}
+footer{margin-top:28px;font:500 .88rem/1.6 var(--ui);color:var(--mute)}footer a{color:var(--gold)}
+body .pp-wm{position:absolute;right:14px;top:60px;bottom:auto;animation:none;z-index:5;pointer-events:none;display:flex;flex-direction:column;align-items:center;gap:3px;opacity:.72;filter:drop-shadow(0 0 9px rgba(255,214,120,.65))}
+.pp-wm img{width:64px;aspect-ratio:1;object-fit:cover;object-position:50% 52%;border-radius:50%;border:2px solid var(--gold)}
+.pp-wm span{font:600 9.5px/1.2 var(--ui);color:#fff;text-shadow:0 1px 3px #000;text-align:center;max-width:140px}
+</style>
+</head>
+<body>
+<main>
+<h1>Crew Games</h1>
+<p class="sub">Nine games, made for the crew.</p>
+<div class="tabs" role="tablist">
+  <button role="tab" id="t-eric" type="button">Eric's Quiet Hour</button>
+  <button role="tab" id="t-emily" type="button">Emily vs. Bad Customers</button>
+  <button role="tab" id="t-nodrama" type="button">No Drama Deck</button>
+  <button role="tab" id="t-boucher" type="button">DJ Boucher</button>
+  <button role="tab" id="t-ashley" type="button">Ashlee Rae's Crosswords</button>
+  <button role="tab" id="t-tabby" type="button">Tabby's Lanes</button>
+  <button role="tab" id="t-altar" type="button">Race to the Altar</button>
+  <button role="tab" id="t-spinoff" type="button" style="grid-column:2/-1">Boucher &amp; Lita's Spin-Off</button>
+  <button role="tab" id="t-tire" type="button" style="grid-column:1/-1">Ashlee Rae's Tire Toss</button>
+</div>
+<p class="mc" id="mc" aria-live="polite"></p>
+<div class="stage" id="stage" role="tabpanel"></div>
+<div class="row"><button class="ghost" id="snd" type="button" aria-pressed="true">Sound on</button><button class="ghost" id="mcb" type="button" aria-pressed="true">Announcer on</button></div>
+<footer>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.<br>
+<a href="../privacy/index.html">Privacy</a> · <a href="../support/index.html">Support</a> · <a href="../no-endorsement/index.html">No Endorsement</a></footer>
+</main>
+<div class="pp-wm" aria-hidden="true"><img src="../assets/poster.jpg" alt=""></div>
+
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)},stage=$("stage"),run=0,timers=[];
+function later(f,ms){var r=run,t=setTimeout(function(){if(r===run)f()},ms);timers.push(t);return t}
+function stop(){run++;timers.forEach(clearTimeout);timers=[];document.onkeydown=null}
+function best(k,v){try{var o=+localStorage.getItem(k)||0;if(v>o){localStorage.setItem(k,v);return v}return o}catch(e){return v}}
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+
+/* ---------- sound, all synthesized ---------- */
+var ac=null,on=true;
+function ctx(){if(!on)return null;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}catch(e){return null}}
+function noise(dur,freq,vol,type,rise){var c=ctx();if(!c)return;var n=c.sampleRate*dur|0,b=c.createBuffer(1,n,c.sampleRate),d=b.getChannelData(0);for(var i=0;i<n;i++)d[i]=Math.random()*2-1;
+var s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain(),t=c.currentTime;s.buffer=b;f.type=type||"lowpass";f.frequency.value=freq;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+(rise||.02));g.gain.exponentialRampToValueAtTime(.0001,t+dur);s.connect(f);f.connect(g);g.connect(c.destination);s.start()}
+function tone(f1,f2,dur,vol,type,at){var c=ctx();if(!c)return;var o=c.createOscillator(),g=c.createGain(),t=c.currentTime+(at||0);o.type=type||"sine";o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur)}
+var FX={waves:function(){noise(3.4,600,.22,"lowpass",1.4)},creak:function(){tone(90,150,.9,.1,"sawtooth");tone(150,80,.8,.07,"sawtooth",.9)},thunder:function(){noise(3,180,.6,"lowpass",.08);tone(60,35,1.8,.3)},heart:function(){[0,.28,1.1,1.38].forEach(function(a){tone(70,40,.2,.5,"sine",a)})},door:function(){tone(120,70,1,.12,"sawtooth");noise(.3,300,.4,"lowpass",.01)},wind:function(){noise(3.2,1100,.14,"bandpass",1.3)},clink:function(){tone(1900,1700,.4,.12,"triangle");tone(2600,2400,.3,.08,"triangle",.1)},splash:function(){noise(1.2,1800,.3,"lowpass",.02)},bell:function(){tone(660,655,2.2,.22);tone(1320,1310,1.4,.08)},page:function(){noise(.28,2400,.13,"highpass",.04)}};
+
+/* ---------- Eric's Quiet Hour ---------- */
+var STORY=[
+["The tide went out at midnight, and it did not come back.","waves"],
+["Old timbers groaned below the deck, one slow breath at a time.","creak"],
+["Somewhere in the hold, something knocked. Once.","door"],
+["The captain closed his eyes, and listened to his own heart.","heart"],
+["The wind came up with no sail to fill.","wind"],
+["Far off, the sky cleared its throat.","thunder"],
+["A single coin rolled the length of the table, and stopped.","clink"],
+["Nobody had touched it.","heart"],
+["He turned the lantern down. He did not run. He read on.","page"],
+["Then the water, all at once, came home.","splash"],
+["And the ship rose, gently, as if nothing had happened.","waves"],
+["The bell rang one time. The hour was over.","bell"]];
+function eric(){var r=run,i=0,calm=0,tries=0,ready=false,p=0;
+ function intro(){stage.innerHTML='<h2>Eric\'s Quiet Hour</h2><p>Eric reads. The tale is intense, and the reader never hurries. Let each line appear, then turn the page only when the candle ring glows green. Rush it and the flame shakes. Sound on is best.</p><button class="go" id="b" type="button">Open the book</button>';$("b").onclick=function(){ctx();draw()}}
+ function draw(){stage.innerHTML='<div class="hud"><span>Page '+(i+1)+' of '+STORY.length+'</span><span>Calm '+calm+'</span></div><div class="book"><p class="line" id="l" aria-live="polite"></p></div><div class="calmrow"><div class="candle"><div class="ring" id="r"></div><div class="flame" id="f">🕯️</div></div><button class="go" id="t" type="button" style="flex:1">Turn the page</button></div>';
+  var w=STORY[i][0].split(" ");$("l").innerHTML=w.map(function(x){return "<span>"+x+" </span>"}).join("");
+  var sp=$("l").children;tries=0;ready=false;FX[STORY[i][1]]();
+  w.forEach(function(_,k){later(function(){sp[k].className="on"},350+k*340)});
+  var start=performance.now()+350+w.length*340;
+  (function tick(){if(r!==run||!$("r"))return;var now=performance.now();if(now>=start){p=(1-Math.cos((now-start)/4200*2*Math.PI))/2;ready=p>.8}else{p=0;ready=false}
+   var e=$("r");e.style.transform="scale("+(.25+p*.75)+")";e.className=ready?"ring ready":"ring";requestAnimationFrame(tick)})();
+  $("t").onclick=function(){if(ready){if(tries===0)calm++;FX.page();i++;if(i>=STORY.length)end();else draw()}else{tries++;tone(220,180,.15,.06,"triangle");var f=$("f");f.textContent="💨";later(function(){if($("f"))f.textContent="🕯️"},700)}};
+ }
+ function end(){var b=best("poy-eric",calm),t=calm>=11?"Unshakable":calm>=8?"Steady Hand":calm>=4?"Still Waters":"Keep Breathing";
+  stage.innerHTML='<h2>The End</h2><p class="tag">'+t+'</p><p>'+calm+' of '+STORY.length+' pages turned on the first calm try. Best: '+b+'.</p><button class="go" id="b" type="button">Read it again</button>';$("b").onclick=function(){eric()}}
+ intro()}
+
+/* ---------- Emily vs. Bad Customers ---------- */
+var BAD=[["😤","I know the owner."],["🫰","Hey. HEY. You."],["🧾","I'll pay next week."],["😠","I want your manager."],["🍽️","I ate it all. It was awful."],["📱","One star. Watch me."],["🥴","Do you know who I am?"],["🙄","It was cheaper last time."]];
+var GOOD=[["😊","Thanks, Emily!"],["🥰","Keep the change."],["😄","You're the best."],["🙂","No rush at all."]];
+function emily(){var r=run,score=0,hearts=3,left=60,seats=[];
+ function intro(){stage.innerHTML='<h2>Emily vs. Bad Customers</h2><p>Emily has had enough. Tap the bad customers to send them down the plank before they complain. Leave the good ones alone. You know who you are.</p><button class="go" id="b" type="button">Start the shift</button>';$("b").onclick=function(){ctx();start()}}
+ function hud(){$("h").textContent="❤️".repeat(Math.max(hearts,0));$("s").textContent="Bounced "+score;$("c").textContent=left+"s"}
+ function start(){playBeat("east");stage.innerHTML='<div class="hud"><span id="h"></span><span id="c"></span><span id="s"></span></div><div class="bar" id="bar"></div>';
+  for(var k=0;k<6;k++){(function(k){var b=document.createElement("button");b.type="button";b.className="stool";b.setAttribute("aria-label","Empty stool");b.innerHTML='<span class="face">🪑</span><small></small>';b.onclick=function(){tap(k)};$("bar").appendChild(b);seats[k]={el:b,who:null}})(k)}
+  hud();(function clock(){later(function(){left--;hud();if(left<=0)return end();clock()},1000)})();spawn()}
+ function clear(k){var s=seats[k];s.who=null;clearTimeout(s.t);s.el.className="stool";s.el.setAttribute("aria-label","Empty stool");s.el.innerHTML='<span class="face">🪑</span><small></small>'}
+ function spawn(){var free=seats.map(function(s,i){return s.who?-1:i}).filter(function(i){return i>=0});
+  if(free.length){var k=pick(free),bad=Math.random()<.7,w=pick(bad?BAD:GOOD),s=seats[k],stay=Math.max(1500,3200-(60-left)*28);s.who=bad?"bad":"good";s.el.className="stool"+(bad?" bad":"");s.el.setAttribute("aria-label",(bad?"Bad customer: ":"Good customer: ")+w[1]);s.el.innerHTML='<span class="face">'+w[0]+'</span><small>'+w[1]+'</small>';if(bad)tone(300,240,.12,.06,"square");
+   s.t=later(function(){if(s.who==="bad"){hearts--;tone(160,90,.4,.14,"sawtooth");flash(k,"oops","Complaint!");if(hearts<=0)return end();hud()}else clear(k)},stay)}
+  later(spawn,Math.max(420,950-(60-left)*9))}
+ function flash(k,c,t){var s=seats[k];clearTimeout(s.t);s.who="x";s.el.className="stool "+c;s.el.innerHTML='<span class="face">'+(c==="hit"?"🏴‍☠️":"💥")+'</span><small>'+t+'</small>';later(function(){clear(k)},380)}
+ function tap(k){var s=seats[k];if(s.who==="bad"){score++;noise(.25,1500,.25,"lowpass",.01);tone(500,120,.3,.1,"triangle");flash(k,"hit","Off the plank!");hud()}else if(s.who==="good"){hearts--;tone(160,90,.4,.14,"sawtooth");flash(k,"oops","Not them!");if(hearts<=0)return end();hud()}}
+ function end(){seats.forEach(function(s){clearTimeout(s.t)});stop();var b=best("poy-emily",score),t=score>=40?"Queen of the Floor":score>=20?"Shift Legend":score>=8?"Holding the Line":"Rough Night";
+  stage.innerHTML='<h2>Shift over</h2><p class="tag">'+t+'</p><p>'+score+' bad customers bounced. Best: '+b+'.</p><button class="go" id="b" type="button">Work another shift</button>';$("b").onclick=function(){stop();emily()}}
+ intro()}
+
+/* ---------- No Drama Deck ---------- */
+var CREW={Lorenz:["🧭","Steady. Momentum drains slower."],Doug:["⚓","Upbeat. Good vibes count double."],Vanessa:["🌟","Unbothered. Shrugs off drama every 12 seconds."]};
+var DRAMA=["Gossip","He said","She said","Reply all","Who did it?","Whatever","Group chat","Let's talk"];
+function nodrama(){
+ function intro(){stage.innerHTML='<h2>No Drama Deck</h2><p>Keep moving. Stay positive. Catch the good vibes, dodge the drama. Stand still in one lane too long and your momentum drains faster. Pick your crew:</p><div class="picks" id="p"></div>';
+  Object.keys(CREW).forEach(function(n){var b=document.createElement("button");b.type="button";b.innerHTML="<b>"+CREW[n][0]+" "+n+"</b> · "+CREW[n][1];b.onclick=function(){ctx();start(n)};$("p").appendChild(b)})}
+ function start(name){playBeat("west");var r=run,W=420,H=520,lane=1,x=lane,items=[],mo=100,dist=0,last=performance.now(),sp=170,moved=last,next=0,shieldAt=0,msg="",msgT=0;
+  stage.innerHTML='<div class="hud"><span>'+CREW[name][0]+" "+name+'</span><span id="d">0 m</span></div><div class="meter"><i id="m"></i></div><canvas id="cv" width="'+W+'" height="'+H+'" aria-label="Three lanes. Move left and right to catch stars and dodge drama."></canvas><div class="pad"><button id="L" type="button">◀ Left</button><button id="R" type="button">Right ▶</button></div>';
+  var g=$("cv").getContext("2d");
+  function mv(d){var n=Math.min(2,Math.max(0,lane+d));if(n!==lane){lane=n;moved=performance.now();tone(420,520,.07,.04,"triangle")}}
+  $("L").onclick=function(){mv(-1)};$("R").onclick=function(){mv(1)};
+  document.onkeydown=function(e){if(e.key==="ArrowLeft"||e.key==="a"){e.preventDefault();mv(-1)}if(e.key==="ArrowRight"||e.key==="d"){e.preventDefault();mv(1)}};
+  $("cv").addEventListener("pointerdown",function(e){var b=e.target.getBoundingClientRect();mv(e.clientX-b.left<b.width/2?-1:1)});
+  function lx(l){return W/6+l*W/3}
+  (function loop(now){if(r!==run||!$("cv"))return;var dt=Math.min(.05,(now-last)/1000);last=now;dist+=sp*dt/10;sp=Math.min(380,170+dist*.35);
+   var drain=(name==="Lorenz"?4.5:7)+dist*.012;if(now-moved>3000)drain*=2.4;mo-=drain*dt;x+=(lane-x)*Math.min(1,dt*14);
+   if(now>next){next=now+Math.max(380,820-dist*.8);var l=Math.floor(Math.random()*3),bad=Math.random()<.5;items.push({l:l,y:-30,bad:bad,t:bad?pick(DRAMA):""})}
+   items.forEach(function(it){it.y+=sp*dt;if(!it.done&&it.y>H-92&&it.y<H-40&&it.l===lane){it.done=true;
+     if(it.bad){if(name==="Vanessa"&&now>shieldAt){shieldAt=now+12000;msg="Not my problem.";msgT=now;tone(700,900,.2,.07,"triangle")}else{mo-=22;msg="No thanks.";msgT=now;tone(170,100,.25,.12,"sawtooth")}}
+     else{mo=Math.min(100,mo+(name==="Doug"?20:10));tone(660,990,.14,.07,"triangle")}}});
+   items=items.filter(function(it){return it.y<H+40&&!it.done});
+   g.fillStyle="#0e2a44";g.fillRect(0,0,W,H);g.strokeStyle="#ffffff22";g.lineWidth=2;g.setLineDash([18,18]);g.lineDashOffset=-dist*10;[W/3,2*W/3].forEach(function(px){g.beginPath();g.moveTo(px,0);g.lineTo(px,H);g.stroke()});g.setLineDash([]);
+   g.textAlign="center";g.textBaseline="middle";items.forEach(function(it){var c=lx(it.l);if(it.bad){g.fillStyle="#ea4a55";g.beginPath();if(g.roundRect)g.roundRect(c-58,it.y-20,116,40,12);else g.rect(c-58,it.y-20,116,40);g.fill();g.fillStyle="#fff";g.font="700 17px sans-serif";g.fillText(it.t,c,it.y+1)}else{g.font="34px serif";g.fillText("⭐",c,it.y)}});
+   g.font="46px serif";g.fillText(CREW[name][0],lx(x),H-62);
+   if(now-msgT<800){g.fillStyle="#ffc94d";g.font="700 20px sans-serif";g.fillText(msg,W/2,60)}
+   if(now-moved>3000){g.fillStyle="#f76f3e";g.font="700 20px sans-serif";g.fillText("Keep moving!",W/2,28)}
+   $("m").style.width=Math.max(0,mo)+"%";$("d").textContent=Math.floor(dist)+" m";
+   if(mo<=0)return end(name,Math.floor(dist));requestAnimationFrame(loop)})(last)}
+ function end(n,d){document.onkeydown=null;var b=best("poy-nodrama",d),t=d>=800?"Zero Drama Legend":d>=400?"Smooth Sailing":d>=150?"Stayin' Positive":"Tomorrow's Another Tide";
+  stage.innerHTML='<h2>Dropped anchor</h2><p class="tag">'+t+'</p><p>'+n+' kept moving for '+d+' m. Best: '+b+' m.</p><div class="row"><button class="go" id="b" type="button">Sail again</button><button class="ghost" id="c" type="button">Change crew</button></div>';$("b").onclick=function(){start(n)};$("c").onclick=intro}
+ intro()}
+
+/* ---------- original synthesized beats ---------- */
+function kick(){tone(120,40,.22,.55)}
+function snare(){noise(.16,2600,.26,"highpass",.005)}
+function clap(){noise(.12,1800,.3,"bandpass",.005);tone(190,150,.08,.08,"triangle")}
+function hat(v){noise(.05,7000,v||.07,"highpass",.003)}
+var BEATS={
+ west:{bpm:92,name:"West Coast",step:function(s){var i=s%16,bar=Math.floor(s/16)%4;
+  if(i===0||i===7||i===10)kick();if(i===4||i===12)clap();if(i%2===0)hat(.06);
+  var bass={0:55,3:55,6:65.4,8:49,11:49,14:58.3};if(bass[i])tone(bass[i]*(bar===3?.89:1),bass[i]*(bar===3?.89:1),.28,.3,"sine");
+  var lead={0:880,6:988,8:1047,12:880};if(bar%2===1&&lead[i]){tone(lead[i],lead[i]*1.06,.5,.035,"sine");tone(lead[i]*1.01,lead[i]*1.05,.45,.02,"sine")}}},
+ east:{bpm:88,name:"East Coast",step:function(s){var i=s%16,bar=Math.floor(s/16)%2;
+  if(i===0||i===5||i===10||(bar&&i===15))kick();if(i===4||i===12)snare();if(i%2===0||i===7)hat(i===6?.1:.05);
+  if(i===0||i===3||(bar&&i===8)){[220,261.6,329.6].forEach(function(f){tone(f,f*.995,.3,.05,"triangle")})}
+  if(i===0||i===10)tone(55,52,.3,.3,"sine")}}};
+var beatRun=-1;function playBeat(st){if(beatRun===run)return;beatRun=run;var r=run,b=BEATS[st],dur=60/b.bpm/4*1000,s=0,t0=performance.now();
+ (function tick(){if(r!==run)return;b.step(s);s++;later(tick,Math.max(0,t0+s*dur-performance.now()))})()}
+function rev(){tone(55,120,.5,.2,"sawtooth");tone(58,125,.5,.14,"square");noise(.5,500,.2,"lowpass",.05)}
+
+/* ---------- DJ Boucher: Heartbeat of Tampa ---------- */
+function boucher(){var LINES=["Boucher: Tampa, make some noise.","Lita: That's the vibe. Keep it cool.","Devastation. Tampa worldwide.","Lita: Everybody's welcome here.","Boucher: Bikes in, hands up.","Tampa's heartbeat, right here."];
+ function intro(){stage.innerHTML='<div class="boss"><img src="../assets/art/devastation.jpg" width="300" height="241" alt="Devastation Ent logo"><div><h2>DJ Boucher: Heartbeat of Tampa</h2><p>World famous decks, motorcycle clubs rolling in, and Lita keeping the vibe cool for everyone. Devastation, Tampa worldwide.</p></div></div><p>Tap each pad as its light hits the line. Stay on the beat and the bikes keep rolling in. Pick the sound:</p><div class="row"><button class="go" id="w" type="button">West Coast set</button><button class="go" id="e" type="button">East Coast set</button></div>';$("w").onclick=function(){ctx();start("west")};$("e").onclick=function(){ctx();start("east")}}
+ function start(st){var r=run,b=BEATS[st],step=60/b.bpm/4,W=420,H=460,LINE=H-54,TR=1.7,now0=performance.now()/1000,t0=now0+TR+.4,total=Math.floor(60/step),notes=[],vibe=60,score=0,combo=0,best2=0,played=0,msg="Lita: Here we go.",msgT=now0,flash=[0,0,0],over=false;
+  var rg=Math.random;for(var s=8;s<total;s+=2){var e=s/total;if(s%8===0||(s%4===0&&e>.08)||(rg()<e*.55))notes.push({s:s,t:t0+s*step,l:s%16===8?1:s%16===0?0:Math.floor(rg()*3)})}
+  stage.innerHTML='<div class="hud"><span>'+b.name+' set</span><span id="cb">Combo 0</span><span id="sc">0</span></div><div class="meter"><i id="m"></i></div><canvas id="cv" width="'+W+'" height="'+H+'" aria-label="DJ deck with three lanes of falling lights."></canvas><div class="pads"><button type="button" data-l="0">Kick</button><button type="button" data-l="1">Clap</button><button type="button" data-l="2">Rev</button></div>';
+  var g=$("cv").getContext("2d"),cv=$("cv");
+  function lx(l){return W/6+l*W/3}
+  function press(l){if(over)return;var t=performance.now()/1000,f=null,d=.14;flash[l]=t;if(l===0)kick();else if(l===1)clap();else rev();notes.forEach(function(n){if(!n.done&&n.l===l&&Math.abs(n.t-t)<d){d=Math.abs(n.t-t);f=n}});
+   if(f){f.done=true;var perfect=d<.06;combo++;best2=Math.max(best2,combo);score+=(perfect?150:100)+combo*2;vibe=Math.min(100,vibe+(perfect?3:2));if(combo%12===0){msg=pick(LINES);msgT=t}}else{combo=0;vibe-=2;msg="Keep it cool...";msgT=t}}
+  Array.prototype.forEach.call(stage.querySelectorAll(".pads button"),function(p){p.addEventListener("pointerdown",function(e){e.preventDefault();press(+p.dataset.l)});p.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();press(+p.dataset.l)}}});
+  document.onkeydown=function(e){var k={"1":0,"2":1,"3":2,ArrowLeft:0,ArrowDown:1,ArrowRight:2}[e.key];if(k!==undefined&&!e.repeat){e.preventDefault();press(k)}};
+  (function loop(){if(r!==run||!$("cv"))return;var t=performance.now()/1000;
+   while(t>=t0+played*step){b.step(played);played++}
+   notes.forEach(function(n){if(!n.done&&t>n.t+.16){n.done=true;n.miss=true;combo=0;vibe-=6}});
+   g.fillStyle="#120b2e";g.fillRect(0,0,W,H);var pulse=Math.max(0,1-((t-t0)/step%4)/1.5);
+   g.fillStyle="rgba(234,74,85,"+(.12+.28*(t>t0?pulse:0))+")";g.fillRect(0,0,W,H);
+   g.strokeStyle="#ffffff22";[W/3,2*W/3].forEach(function(x){g.beginPath();g.moveTo(x,60);g.lineTo(x,H);g.stroke()});
+   var bikes=Math.floor(Math.max(vibe,0)/10);g.font="24px serif";g.textAlign="left";g.textBaseline="middle";for(var i=0;i<bikes;i++)g.fillText("🏍️",6+i*40,22);
+   g.fillStyle="#ffc94d";g.fillRect(0,LINE-2,W,4);
+   [0,1,2].forEach(function(l){var a=Math.max(0,1-(t-flash[l])*5);if(a>0){g.fillStyle="rgba(255,201,77,"+a*.5+")";g.fillRect(l*W/3,LINE-40,W/3,80)}});
+   notes.forEach(function(n){if(n.done)return;var y=LINE-(n.t-t)/TR*LINE;if(y<50||y>H)return;g.fillStyle=["#4fd1c0","#ffc94d","#f76f3e"][n.l];g.beginPath();g.arc(lx(n.l),y,18,0,7);g.fill()});
+   if(t-msgT<1.8){g.fillStyle="#fff";g.font="700 19px sans-serif";g.textAlign="center";g.fillText(msg,W/2,70)}
+   $("m").style.width=Math.max(0,vibe)+"%";$("sc").textContent=score;$("cb").textContent="Combo "+combo;
+   var nx=notes.filter(function(n){return !n.done})[0];cv.dataset.next=nx?nx.l+":"+(nx.t-t).toFixed(3):"";
+   if(vibe<=0||played>=total){over=true;return end(score,best2,vibe>0)}requestAnimationFrame(loop)})()}
+ function end(s,c,ok){document.onkeydown=null;tone(400,60,.6,.15,"sawtooth");var b=best("poy-boucher",s),t=s>=30000?"World Famous":s>=15000?"Heartbeat of Tampa":s>=5000?"Rolling Deep":"Keep Spinning";
+  stage.innerHTML='<div class="boss"><img src="../assets/art/devastation.jpg" width="300" height="241" alt="Devastation Ent logo"><div><h2>'+(ok?"That's the set":"The record stopped")+'</h2><p class="tag">'+t+'</p></div></div><p>Score '+s+', best combo '+c+'. Your best: '+b+'.</p><p>Lita: Thanks for keeping it cool. Devastation, Tampa worldwide.</p><button class="go" id="b" type="button">Spin it again</button>';$("b").onclick=function(){stop();boucher()}}
+ intro()}
+
+/* ---------- Ashlee Rae's Crosswords ---------- */
+var XW=[{"name":"Ybor Nights","w":10,"h":11,"words":[{"a":"BAY","clue":"Tampa ___","x":1,"y":0,"d":"D","n":1},{"a":"STREETCAR","clue":"TECO Line ride to Channelside","x":4,"y":0,"d":"D","n":2},{"a":"TAMPA","clue":"Florida city on the bay","x":4,"y":1,"d":"A","n":3},{"a":"PIPPY","clue":"Our pirate chihuahua","x":7,"y":1,"d":"D","n":4},{"a":"YBOR","clue":"Tampa's historic cigar district","x":1,"y":2,"d":"A","n":5},{"a":"POPS","clue":"The bar cat of Gaspar's Grotto","x":2,"y":4,"d":"D","n":6},{"a":"CUBAN","clue":"Tampa's famous pressed sandwich","x":9,"y":4,"d":"D","n":7},{"a":"GROTTO","clue":"Gaspar's pirate bar","x":0,"y":5,"d":"A","n":8},{"a":"CIGAR","clue":"What Ybor City's factories made famous","x":6,"y":6,"d":"D","n":9},{"a":"GASPARILLA","clue":"Tampa's big pirate festival","x":0,"y":7,"d":"A","n":10},{"a":"ROOSTER","clue":"Wild bird strutting the streets of Ybor","x":0,"y":10,"d":"A","n":11}]},{"name":"High Seas","w":12,"h":11,"words":[{"a":"BLACKBEARD","clue":"Edward Teach's pirate name","x":0,"y":0,"d":"A","n":1},{"a":"CUTLASS","clue":"Short curved pirate sword","x":3,"y":0,"d":"D","n":2},{"a":"ANCHOR","clue":"Heavy thing dropped to stay put","x":7,"y":0,"d":"D","n":3},{"a":"MAST","clue":"Pole that holds the sails","x":0,"y":2,"d":"A","n":4},{"a":"TREASURE","clue":"What X marks","x":10,"y":3,"d":"D","n":5},{"a":"PLANK","clue":"Walk it at sword point","x":1,"y":4,"d":"A","n":6},{"a":"PARROT","clue":"Bird on a pirate's shoulder","x":1,"y":4,"d":"D","n":6},{"a":"KRAKEN","clue":"Giant sea monster","x":6,"y":5,"d":"A","n":7},{"a":"COMPASS","clue":"It points you north","x":0,"y":8,"d":"A","n":8},{"a":"RUM","clue":"Pirate's drink","x":9,"y":8,"d":"A","n":9},{"a":"JOLLYROGER","clue":"Skull and crossbones flag","x":2,"y":10,"d":"A","n":10}]},{"name":"Silver Screen","w":11,"h":12,"words":[{"a":"FLYNN","clue":"Errol, star of Captain Blood","x":1,"y":0,"d":"D","n":1},{"a":"SPARROW","clue":"Captain Jack","x":5,"y":0,"d":"D","n":2},{"a":"MUPPET","clue":"___ Treasure Island","x":3,"y":1,"d":"A","n":3},{"a":"NEVERLAND","clue":"Where Peter Pan lives","x":1,"y":3,"d":"A","n":4},{"a":"DAVYJONES","clue":"Bill Nighy's tentacled captain","x":9,"y":3,"d":"D","n":5},{"a":"HOOK","clue":"Peter Pan's enemy","x":3,"y":5,"d":"A","n":6},{"a":"TEAGUE","clue":"Jack Sparrow's father","x":1,"y":6,"d":"D","n":7},{"a":"PEARL","clue":"The Black ___","x":7,"y":6,"d":"D","n":8},{"a":"BARBOSSA","clue":"Geoffrey Rush's captain","x":0,"y":8,"d":"A","n":9},{"a":"SILVER","clue":"Long John","x":5,"y":10,"d":"A","n":10},{"a":"DEPP","clue":"Johnny, Oscar-nominated pirate","x":0,"y":11,"d":"A","n":11}]},{"name":"The Gallery","w":13,"h":11,"words":[{"a":"FRAME","clue":"It goes around a painting","x":10,"y":0,"d":"D","n":1},{"a":"CHILE","clue":"Waldo Nahuel's home country","x":6,"y":1,"d":"D","n":2},{"a":"COLOR","clue":"A master of light and ___","x":6,"y":1,"d":"A","n":2},{"a":"BRUSH","clue":"Painter's tool","x":2,"y":2,"d":"A","n":3},{"a":"CANVAS","clue":"What a painter paints on","x":1,"y":3,"d":"D","n":4},{"a":"PALETTE","clue":"Board for mixing paint","x":4,"y":4,"d":"D","n":5},{"a":"EASEL","clue":"Stand that holds a painting","x":3,"y":5,"d":"A","n":6},{"a":"WALDO","clue":"Painter of the picture behind this puzzle","x":8,"y":6,"d":"D","n":7},{"a":"MONET","clue":"French painter of water lilies","x":12,"y":6,"d":"D","n":8},{"a":"GALLERY","clue":"Room where art hangs","x":0,"y":7,"d":"A","n":9},{"a":"IMPRESSIONIST","clue":"Waldo Nahuel's style of painting","x":0,"y":10,"d":"A","n":10}]}];
+function ashley(){var pi=0;
+ function menu(){stage.innerHTML='<div class="gal"><div class="galin"><h2>Ashlee Rae\'s Crosswords</h2><p>Puzzles by Ashlee Rae, in the gallery. Pick a puzzle:</p><div class="picks" id="p"></div></div></div><p class="fine">Background: painting by Waldo Nahuel.</p>';
+  XW.forEach(function(z,i){var b=document.createElement("button");b.type="button";b.innerHTML="<b>"+z.name+"</b> · "+z.words.length+" clues";b.onclick=function(){pi=i;play()};$("p").appendChild(b)})}
+ function play(){playBeat("west");var z=XW[pi],cells={},dir="A",cur=null,done=false;
+  z.words.forEach(function(w,wi){for(var i=0;i<w.a.length;i++){var x=w.x+(w.d==="A"?i:0),y=w.y+(w.d==="D"?i:0),k=x+","+y,c=cells[k]||(cells[k]={x:x,y:y,ch:w.a[i],w:[]});c.w.push(wi);if(i===0)c.n=w.n}});
+  stage.innerHTML='<div class="hud"><span>'+z.name+'</span><span id="st"></span></div><div class="gal"><div class="xw" id="xw" style="grid-template-columns:repeat('+z.w+',minmax(0,1fr))"></div></div><p class="now" id="now" aria-live="polite">Tap a square to start.</p><div class="row"><button class="go" id="chk" type="button">Check</button><button class="ghost" id="rev" type="button">Reveal</button><button class="ghost" id="bk" type="button">All puzzles</button></div><div class="clues"><div><h3>Across</h3><ol id="ca"></ol></div><div><h3>Down</h3><ol id="cd"></ol></div></div><p class="fine">Background: painting by Waldo Nahuel. Puzzles by Ashlee Rae.</p>';
+  var box=$("xw");for(var y=0;y<z.h;y++)for(var x=0;x<z.w;x++){var c=cells[x+","+y],d=document.createElement("div");d.className=c?"cell":"blank";if(c){if(c.n)d.innerHTML="<small>"+c.n+"</small>";var inp=document.createElement("input");inp.maxLength=1;inp.autocomplete="off";inp.setAttribute("autocapitalize","characters");inp.setAttribute("aria-label","Row "+(y+1)+" column "+(x+1));c.el=inp;(function(c,inp){
+    inp.onfocus=function(){if(cur!==c&&c.w.every(function(i){return z.words[i].d!==dir}))dir=z.words[c.w[0]].d;cur=c;paint()};
+    inp.onclick=function(){if(c.w.length>1&&cur===c&&inp.dataset.f){dir=dir==="A"?"D":"A";paint()}inp.dataset.f="1"};inp.onblur=function(){inp.dataset.f=""};
+    inp.oninput=function(){var v=inp.value.toUpperCase().replace(/[^A-Z]/g,"");inp.value=v.slice(-1);c.el.parentNode.classList.remove("bad","good");if(v){tone(900,800,.03,.02,"triangle");mv(1);full()}};
+    inp.onkeydown=function(e){var K={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(K){e.preventDefault();var n=cells[(c.x+K[0])+","+(c.y+K[1])];if(n){dir=K[0]?"A":"D";n.el.focus()}}else if(e.key==="Backspace"&&!inp.value){e.preventDefault();mv(-1)}};
+   })(c,inp);d.appendChild(inp)}box.appendChild(d)}
+  function word(){if(!cur)return null;for(var i=0;i<cur.w.length;i++)if(z.words[cur.w[i]].d===dir)return cur.w[i];return cur.w[0]}
+  function mv(s){var dx=dir==="A"?s:0,dy=dir==="D"?s:0,n=cells[(cur.x+dx)+","+(cur.y+dy)];if(n)n.el.focus()}
+  function paint(){var wi=word();Object.keys(cells).forEach(function(k){var c=cells[k];c.el.parentNode.classList.toggle("on",c.w.indexOf(wi)>=0);c.el.parentNode.classList.toggle("cur",c===cur)});
+   var w=z.words[wi];$("now").textContent=w.n+(w.d==="A"?" Across: ":" Down: ")+w.clue;Array.prototype.forEach.call(stage.querySelectorAll(".clues li"),function(l){l.classList.toggle("on",+l.dataset.i===wi)})}
+  function all(fn){Object.keys(cells).forEach(function(k){fn(cells[k])})}
+  function full(){var ok=true;all(function(c){if(c.el.value!==c.ch)ok=false});if(ok&&!done)win()}
+  function win(){done=true;best("poy-ashley-"+pi,1);[523,659,784,1047].forEach(function(f,i){tone(f,f,.3,.08,"triangle",i*.13)});$("st").textContent="Solved!";$("now").textContent="Solved. Nice work, from Ashlee Rae.";box.classList.add("solved")}
+  z.words.forEach(function(w,i){var l=document.createElement("li");l.value=w.n;l.dataset.i=i;l.textContent=w.clue;l.onclick=function(){dir=w.d;cells[w.x+","+w.y].el.focus()};$(w.d==="A"?"ca":"cd").appendChild(l)});
+  $("chk").onclick=function(){var w=0,e=0;all(function(c){if(!c.el.value){e++;return}var ok=c.el.value===c.ch;c.el.parentNode.classList.toggle("bad",!ok);c.el.parentNode.classList.toggle("good",ok);if(!ok)w++});$("st").textContent=w?w+" to fix":e?e+" to go":"";full()};
+  $("rev").onclick=function(){all(function(c){c.el.value=c.ch});full()};$("bk").onclick=menu}
+ menu()}
+
+/* ---------- Tabby's Lanes ---------- */
+function bowlFrame(r){var i=0,f=0;while(f<9&&i<r.length){if(r[i]===10)i++;else if(i+1<r.length)i+=2;else return{f:f,ball:2,fresh:false};f++}
+ if(f<9)return{f:f,ball:1,fresh:true};var t=r.slice(i);if(t.length===0)return{f:9,ball:1,fresh:true};if(t.length===1)return{f:9,ball:2,fresh:t[0]===10};
+ if(t.length===2){if(t[0]===10||t[0]+t[1]===10)return{f:9,ball:3,fresh:(t[0]===10&&t[1]===10)||(t[0]!==10)};return{done:true}}return{done:true}}
+function bowlScore(r){var i=0,s=0;for(var f=0;f<10&&i<r.length;f++){if(r[i]===10){s+=10+(r[i+1]||0)+(r[i+2]||0);i++}else if(r[i]+(r[i+1]||0)===10&&i+1<r.length){s+=10+(r[i+2]||0);i+=2}else{s+=r[i]+(r[i+1]||0);i+=2}}return s}
+var SHIFTS=[["College Game Day",["💻","🍺","🏈","💻"]],["Pro Football Sunday",["🍺","💻","🏈","🍺"]],["Stadium Concert Night",["💻","🍹","🎤","🍺"]],["Back at the Lanes",["💻","💻","🍹","🎳"]]];
+function tabby(){var rolls=[],tips=0,steady=false,sn=0,st="west";
+ function intro(){stage.innerHTML='<h2>Tabby\'s Lanes</h2><p>Tabby stands by everyone. She works computer to computer, bartends the big games and still bowls a clean line. Ten frames, with a quick shift between them. Nail the shift and your aim holds steadier.</p><p>Pick the music:</p><div class="row"><button class="go" id="w" type="button">West Coast</button><button class="go" id="e" type="button">East Coast</button></div>';$("w").onclick=function(){begin("west")};$("e").onclick=function(){begin("east")}}
+ function begin(s){st=s;ctx();rolls=[];tips=0;sn=0;steady=false;playBeat(st);lane()}
+ function lane(){var r=run,W=360,H=540,L=60,R=300,FOUL=480,pins=[],k=0,info=bowlFrame(rolls);
+  for(var row=0;row<4;row++)for(var c=0;c<=row;c++)pins.push({x:180+(c-row/2)*34,y:112-row*26,up:true});
+  stage.innerHTML='<div class="hud"><span>Frame <b id="fr"></b></span><span>Score <b id="sc"></b></span><span>Tips $<b id="tp"></b></span></div><div class="sheet" id="sh"></div><canvas id="cv" width="'+W+'" height="'+H+'" aria-label="Bowling lane. Tap once to set aim, tap again to set power."></canvas><p class="now" id="now" aria-live="polite"></p><div class="pad"><button id="go" type="button" style="grid-column:1/3">Set aim</button></div>';
+  var g=$("cv").getContext("2d"),phase="aim",aim=180,pow=0,ball=null,t=0,last=performance.now(),falling=[],sp=steady?.75:1.5,standing;
+  function sync(){info=bowlFrame(rolls);$("fr").textContent=Math.min(info.done?10:info.f+1,10);$("sc").textContent=bowlScore(rolls);$("tp").textContent=tips;var row="",i=0;for(var f=0;f<10;f++){var a=rolls[i],b=rolls[i+1];if(f<9){if(a===undefined)row+="<i></i>";else if(a===10){row+="<i>X</i>";i++}else{row+="<i>"+(a||"-")+(b===undefined?"":a+b===10?"/":(b||"-"))+"</i>";i+=2}}else{var tx=rolls.slice(i).map(function(v){return v===10?"X":(v||"-")}).join("");row+="<i>"+tx+"</i>"}}$("sh").innerHTML=row}
+  function reset(){pins.forEach(function(p){p.up=true});falling=[]}
+  function roll(){phase="roll";var p=1-Math.abs(pow-.8)/.8;ball={x:aim,y:FOUL,v:520+260*p,hook:(aim<180?1:-1)*(10+18*p),q:.22+.56*p,hit:[],gut:aim<L+12||aim>R-12};$("go").disabled=true;$("now").textContent="";noise(1.2,300,.12,"lowpass",.05)}
+  function knock(p,src){p.up=false;falling.push({x:p.x,y:p.y,t:0,dx:(p.x-src.x)*1.2,dy:(p.y-src.y)*1.2});tone(900+Math.random()*300,300,.08,.16,"square");
+   pins.forEach(function(q){if(q.up&&Math.hypot(q.x-p.x,q.y-p.y)<40&&q.y<=p.y+2&&Math.random()<ball.q)knock(q,p)})}
+  function finish(){var n=pins.filter(function(p){return !p.up&&!p.c}).length;pins.forEach(function(p){if(!p.up)p.c=true});rolls.push(n);var before=info.f;var was=info.ball;info=bowlFrame(rolls);sync();
+   var strike=n===10&&(was===1||info.fresh),say=strike?"Strike!":(pins.every(function(p){return !p.up})?"Spare!":n===0?"Gutter. Tabby's got you.":n+" down.");$("now").textContent=say;if(pins.every(function(p){return !p.up}))[523,784,1047].forEach(function(f,i){tone(f,f,.2,.08,"triangle",i*.1)});
+   later(function(){if(info.done)return end();if(info.f!==before)return shift();if(info.fresh){pins.forEach(function(p){delete p.c});reset()}ball=null;phase="aim";$("go").disabled=false;$("go").textContent="Set aim";sp=steady?.75:1.5;$("now").textContent=""},1300)}
+  $("go").onclick=function(){if(phase==="aim"){phase="power";t=0;$("go").textContent="Set power"}else if(phase==="power"){roll()}};
+  document.onkeydown=function(e){if(e.key===" "||e.key==="Enter"){if(document.activeElement!==$("go")){e.preventDefault();$("go").click()}}};
+  $("cv").addEventListener("pointerdown",function(){$("go").click()});
+  sync();
+  (function loop(n){if(r!==run||!$("cv"))return;var dt=Math.min(.05,(n-last)/1000);last=n;t+=dt;
+   if(phase==="aim")aim=180+Math.sin(t*sp*1.6)*112;$("cv").dataset.s=phase+":"+Math.round(aim)+":"+pow.toFixed(2);
+   if(phase==="power")pow=(1-Math.cos(t*3.4))/2;
+   if(phase==="roll"&&ball){ball.y-=ball.v*dt;if(!ball.gut)ball.x+=ball.hook*dt;else ball.x=ball.x<180?L:R;
+    pins.forEach(function(p){if(p.up&&!ball.gut&&Math.hypot(p.x-ball.x,p.y-ball.y)<21){knock(p,ball);ball.x+=(ball.x-p.x)*.12}});
+    if(ball.y<-20){phase="wait";ball=null;later(finish,420)}}
+   /* pinstripe alley */
+   g.fillStyle="#1c1210";g.fillRect(0,0,W,H);g.strokeStyle="#ffffff14";for(var x=6;x<W;x+=12){g.beginPath();g.moveTo(x,0);g.lineTo(x,H);g.stroke()}
+   g.fillStyle="#d9a765";g.fillRect(L,0,R-L,FOUL+60);g.strokeStyle="#b98a49";for(x=L;x<R;x+=16){g.beginPath();g.moveTo(x,0);g.lineTo(x,FOUL+60);g.stroke()}
+   g.fillStyle="#2a1c16";g.fillRect(L-14,0,14,FOUL+60);g.fillRect(R,0,14,FOUL+60);g.fillStyle="#c92f6a";g.fillRect(L,FOUL,R-L,3);
+   g.fillStyle="#7a4a2a";[-2,-1,0,1,2].forEach(function(i){g.beginPath();g.moveTo(180+i*30,300);g.lineTo(180+i*30-5,310);g.lineTo(180+i*30+5,310);g.fill()});
+   falling=falling.filter(function(f){f.t+=dt;return f.t<.6});g.textAlign="center";g.textBaseline="middle";
+   pins.forEach(function(p){if(p.up)pin(p.x,p.y,1)});falling.forEach(function(f){pin(f.x+f.dx*f.t,f.y+f.dy*f.t,1-f.t/.6)});
+   if(ball){g.fillStyle="#2c1458";g.beginPath();g.arc(ball.x,ball.y,12,0,7);g.fill()}
+   if(phase==="aim"||phase==="power"){g.fillStyle="#2c1458";g.beginPath();g.arc(aim,FOUL+26,12,0,7);g.fill();g.strokeStyle="#c92f6a";g.lineWidth=3;g.beginPath();g.moveTo(aim,FOUL+10);g.lineTo(aim,FOUL-50);g.stroke();g.lineWidth=1}
+   if(phase==="power"){g.fillStyle="#0009";g.fillRect(20,150,18,200);g.fillStyle="#4fd1c0";g.fillRect(20,350-200*.8-14,18,28);g.fillStyle="#ffc94d";g.fillRect(22,350-200*pow-3,14,6)}
+   requestAnimationFrame(loop)})(last);
+  function pin(x,y,a){g.globalAlpha=a;g.fillStyle="#fff";g.beginPath();g.arc(x,y,8,0,7);g.fill();g.fillStyle="#c0392b";g.fillRect(x-7,y-2,14,3);g.globalAlpha=1}
+ }
+ function shift(){var r=run,S=SHIFTS[sn++%SHIFTS.length],got=0,lit=-1,left=6,N=0;document.onkeydown=null;
+  stage.innerHTML='<h2>'+S[0]+'</h2><p>Tabby\'s on shift. Tap whatever lights up.</p><div class="hud"><span>Tips $<b id="tp">'+tips+'</b></span><span id="c">6s</span></div><div class="stations" id="s"></div>';
+  S[1].forEach(function(e,i){var b=document.createElement("button");b.type="button";b.textContent=e;b.setAttribute("aria-label","Station "+(i+1));b.onclick=function(){if(i===lit){got++;tips+=5;$("tp").textContent=tips;tone(1200,1500,.08,.06,"triangle");b.classList.remove("lit");lit=-1}};$("s").appendChild(b)});
+  (function next(){if(r!==run)return;N++;var o=$("s").children;if(lit>=0)o[lit].classList.remove("lit");var n;do{n=Math.floor(Math.random()*4)}while(n===lit);lit=n;o[n].classList.add("lit");if(N<8)later(next,720);else later(function(){steady=got>=6;stage.innerHTML='<h2>Shift done</h2><p class="tag">'+got+' of '+N+'</p><p>'+(steady?"Clean shift. Your aim holds steady next frame.":"Everybody got looked after. Back to the lanes.")+'</p>';later(lane,1100)},720)})();
+  (function clk(){later(function(){left--;if($("c"))$("c").textContent=Math.max(left,0)+"s";if(left>0)clk()},1000)})()}
+ function end(){document.onkeydown=null;var s=bowlScore(rolls),b=best("poy-tabby",s+Math.floor(tips/10)),t=s>=200?"Perfect Host":s>=130?"League Legend":s>=80?"Works the Whole Room":"Still Stands By You";
+  stage.innerHTML='<h2>Last call</h2><p class="tag">'+t+'</p><p>Score '+s+', with $'+tips+' in tips. Your best total: '+b+'.</p><button class="go" id="b" type="button">Another game</button>';$("b").onclick=function(){stop();tabby()}}
+ intro()}
+
+/* ---------- Race to the Altar ---------- */
+function altar(){var MEL=[349,466,466,466,349,523,440,466,349,466,622,622,587,523,466,440,466];
+ function organ(f){[1,1.5,2].forEach(function(m,i){tone(f*m,f*m,.34,i?.035:.09,"triangle")});tone(f/2,f/2,.34,.07,"sine")}
+ function intro(){stage.innerHTML='<h2>Race to the Altar</h2><p>Landon took one look at Stephania and fell head over heels. Now the music has started and they have to run. Alternate the two buttons to run in step. The faster you run, the faster the wedding march plays. Jump the cake and the flowers.</p><p class="fine">One player with two thumbs, or two players on one screen.</p><button class="go" id="b" type="button">Fall in love</button>';$("b").onclick=function(){ctx();story()}}
+ function story(){stage.innerHTML='<div class="love"><span class="big">🤵</span><span class="big hrt">💘</span><span class="big">👰</span></div><p class="tag" style="text-align:center" id="s">Across the room...</p>';[523,659,784].forEach(function(f,i){tone(f,f,.5,.06,"sine",i*.3)});later(function(){$("s").textContent="It's love!"},900);later(function(){$("s").textContent="Quick, the music's starting!"},1800);later(run1,2700)}
+ function run1(){var r=run,W=420,H=250,GOAL=100,d=0,v=0,next=0,mi=0,jy=0,jv=0,t0=performance.now(),last=t0,obs=[],hit=0,wrong=0,trips=0,over=false,scroll=0,msg="",mt=0;
+  for(var q=14;q<GOAL-4;q+=9+Math.random()*7)obs.push({d:q,e:Math.random()<.5?"🎂":"💐"});
+  stage.innerHTML='<div class="hud"><span id="tm">0.0s</span><span id="ds">100 m to go</span></div><canvas id="cv" width="'+W+'" height="'+H+'" aria-label="Landon and Stephania running down the aisle toward the altar."></canvas><div class="run"><button type="button" id="L">🤵 Landon</button><button type="button" id="S">👰 Stephania</button><button type="button" id="J">Jump!</button></div><p class="fine">Keyboard: A and L to run, space to jump.</p>';
+  var g=$("cv").getContext("2d");
+  function step(w){if(over)return;if(performance.now()<hit)return;if(w===next){next=1-next;v=Math.min(v+2.4,13);if(w===1){organ(MEL[mi%MEL.length]);mi++}$(w?"S":"L").classList.remove("now");$(next?"S":"L").classList.add("now")}else{v*=.75;wrong++;tone(180,140,.1,.05,"triangle")}}
+  function jump(){if(!over&&jy===0){jv=300;tone(400,800,.15,.06,"sine")}}
+  [["L",0],["S",1]].forEach(function(x){$(x[0]).addEventListener("pointerdown",function(e){e.preventDefault();step(x[1])});$(x[0]).onkeydown=function(e){if((e.key==="Enter")&&!e.repeat){e.preventDefault();step(x[1])}}});
+  $("J").addEventListener("pointerdown",function(e){e.preventDefault();jump()});
+  document.onkeydown=function(e){if(e.repeat)return;var k=e.key.toLowerCase();if(k==="a")step(0);else if(k==="l")step(1);else if(k===" "){e.preventDefault();jump()}};
+  $("L").classList.add("now");
+  (function loop(n){if(r!==run||!$("cv"))return;var dt=Math.min(.05,(n-last)/1000);last=n;
+   if(n<hit)v=0;else{v=Math.max(0,v-5.5*dt);d+=v*dt}scroll+=v*dt*30;
+   if(jy>0||jv>0){jy=Math.max(0,jy+jv*dt);jv-=800*dt;if(jy===0)jv=0}
+   obs.forEach(function(o){if(!o.done&&Math.abs(o.d-d)<.9){o.done=true;if(jy<25){hit=n+700;trips++;msg="Oops! Keep going!";mt=n;noise(.25,800,.2,"lowpass",.01)}}});
+   var S=W/22,base=H-52,px=90;
+   g.fillStyle="#fff1f4";g.fillRect(0,0,W,H);g.fillStyle="#f6c9d4";for(var i=-1;i<14;i++){var wx=i*60-(scroll%60);g.fillRect(wx,0,6,base-40)}
+   g.font="26px serif";g.textAlign="center";g.textBaseline="middle";for(i=-1;i<9;i++){g.fillText(i%2?"🌸":"💐",i*110-(scroll*1.2%220)+60,base-46)}
+   g.fillStyle="#c92f6a";g.fillRect(0,base+18,W,34);g.fillStyle="#ffd6e2";for(i=-1;i<12;i++)g.fillRect(i*48-(scroll%48),base+32,24,4);
+   var ax=px+(GOAL-d)*S;if(ax<W+60){g.font="64px serif";g.fillText("⛪",ax+26,base-16)}
+   g.font="34px serif";obs.forEach(function(o){if(o.done)return;var x=px+(o.d-d)*S;if(x>-30&&x<W+30)g.fillText(o.e,x,base+4)});
+   g.font="40px serif";var bob=v>1?Math.abs(Math.sin(d*5))*6:0;g.fillText("👰",px-6,base-jy-bob);g.fillText("🤵",px-40,base-jy-bob);g.font="18px serif";g.fillText("💕",px-23,base-34-jy-bob);
+   if(n-mt<900){g.fillStyle="#7a1f3d";g.font="700 18px sans-serif";g.fillText(msg,W/2,26)}
+   var el=(n-t0)/1000;$("tm").textContent=el.toFixed(1)+"s";$("ds").textContent=Math.max(0,Math.ceil(GOAL-d))+" m to go";
+   if(d>=GOAL){over=true;return end(el,trips)}requestAnimationFrame(loop)})(last)}
+ function end(el,tr){document.onkeydown=null;[[392,0],[392,.14],[392,.28],[523,.42],[659,.8],[784,1.2],[1047,1.6]].forEach(function(x){[1,1.25,1.5].forEach(function(m,i){tone(x[0]*m,x[0]*m,.6,i?.04:.08,"triangle",x[1])})});
+  var ms=Math.round(el*1000),bb=null;try{var o=+localStorage.getItem("poy-altar")||0;if(!o||ms<o){localStorage.setItem("poy-altar",ms);bb=ms}else bb=o}catch(e){bb=ms}
+  var t=el<20?"Eloped at Top Speed":el<28?"Love on the Run":el<40?"Right on Time":"Fashionably Late";
+  stage.innerHTML='<div class="love"><span class="big">🤵</span><span class="big hrt">💍</span><span class="big">👰</span></div><h2 style="text-align:center">You may kiss the bride!</h2><p class="tag" style="text-align:center">'+t+'</p><p style="text-align:center">Landon and Stephania made it in '+el.toFixed(1)+' seconds'+(tr?", with "+tr+" trip"+(tr>1?"s":""):", without a single trip")+'. Best: '+(bb/1000).toFixed(1)+'s.</p><div class="row" style="justify-content:center"><button class="go" id="b" type="button">Run it again</button></div>';$("b").onclick=function(){stop();altar()}}
+ intro()}
+
+/* ---------- Boucher & Lita's Spin-Off ---------- */
+function spinoff(){var CREW=["Pops the bar cat","Pippy","Waldo","Ashlee Rae","Tabby","Emily","Eric","Lorenz","Doug","Vanessa","Landon","Stephania","Andy","Steph","Mark Brenner","Ed Lafferty","Captain Eric","Shere","Atara 👑"];
+ var PADS=[["Kick",function(){kick()}],["Clap",function(){clap()}],["Scratch",function(){noise(.18,3000,.25,"bandpass",.01);tone(700,240,.16,.07,"sawtooth")}],["Rev",function(){rev()}]];
+ var save={name:"",team:"",coins:0,gold:0,best:0};try{var sv=JSON.parse(localStorage.getItem("poy-spin")||"{}");Object.keys(save).forEach(function(k){if(sv[k]!==undefined)save[k]=sv[k]})}catch(e){}
+ function store(){try{localStorage.setItem("poy-spin",JSON.stringify(save))}catch(e){}}
+ function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+ function intro(){stage.innerHTML='<div class="boss"><img src="../assets/art/devastation.jpg" width="300" height="241" alt="Devastation Ent logo"><div><h2>Boucher &amp; Lita\'s Spin-Off</h2><p>The whole Ybor crew is on the block. Join the crew, have fun, and you may win the Golden Record jackpot.</p></div></div><p>Boucher and Lita drop a mix. Play it back, pad for pad. Every clean mix brings someone new to the dance floor, and every third one opens a treasure chest.</p><label class="field" for="nm">Your pirate name</label><input class="txt" id="nm" maxlength="24" autocomplete="nickname" value="'+esc(save.name)+'" placeholder="Captain You"><p class="fine" style="margin-top:12px">Join a side:</p><div class="row"><button class="go" id="tb" type="button">Team Boucher</button><button class="go" id="tl" type="button">Team Lita</button></div><p class="fine">Your doubloons: '+save.coins+' · Golden Records: '+save.gold+' · Best crew: '+save.best+'</p>';
+  function go(t){save.name=$("nm").value.trim().slice(0,24)||"Deckhand";save.team=t;store();ctx();party()}$("tb").onclick=function(){go("Boucher")};$("tl").onclick=function(){go("Lita")}}
+ function party(){var r=run,seq=[],pos=0,lives=3,joined=[],coins=0,lock=true,round=0,gold=0;playBeat(save.team==="Lita"?"east":"west");
+  stage.innerHTML='<div class="hud"><span id="lv"></span><span id="co"></span></div><p class="now" id="dj" aria-live="polite"></p><div class="decks" id="dk"></div><h3 class="floor">The dance floor</h3><div class="chips" id="fl"><span class="chip me">'+esc(save.name)+'</span><span class="chip">Boucher</span><span class="chip">Lita</span></div>';
+  PADS.forEach(function(p,i){var b=document.createElement("button");b.type="button";b.textContent=p[0];b.className="dk k"+i;b.addEventListener("pointerdown",function(e){e.preventDefault();hit(i)});b.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();hit(i)}};$("dk").appendChild(b)});
+  document.onkeydown=function(e){var i="1234".indexOf(e.key);if(i>=0&&!e.repeat)hit(i)};
+  function hud(){$("lv").textContent="💿".repeat(Math.max(lives,0));$("co").textContent="🪙 "+coins}
+  function lit(i,ms){var b=$("dk").children[i];b.classList.add("lit");PADS[i][1]();later(function(){b.classList.remove("lit")},ms)}
+  function drop(){lock=true;pos=0;var dj=round%2?"Lita":"Boucher";$("dj").textContent=dj+" drops the mix...";var gap=Math.max(300,620-round*22);$("dk").dataset.s=seq.join("");
+   seq.forEach(function(v,i){later(function(){lit(v,gap*.6)},500+i*gap)});later(function(){lock=false;$("dj").textContent="Your turn, "+save.name+"!"},500+seq.length*gap)}
+  function next(){round++;seq=[];for(var i=0;i<Math.min(2+round,10);i++)seq.push(Math.floor(Math.random()*4));drop()}
+  function hit(i){if(lock)return;lit(i,160);if(i===seq[pos]){pos++;if(pos===seq.length){lock=true;win()}}else{lock=true;lives--;hud();tone(300,70,.5,.14,"sawtooth");$("dj").textContent="Record skipped!";if(lives<=0)return later(end,900);later(drop,1000)}}
+  function win(){coins+=10*seq.length;hud();if(joined.length<CREW.length){var n=CREW[joined.length];joined.push(n);var c=document.createElement("span");c.className="chip new";c.textContent=n;$("fl").appendChild(c);$("dj").textContent=n+" joins the party!"}else $("dj").textContent="The whole crew is dancing!";[659,880].forEach(function(f,i){tone(f,f,.14,.06,"triangle",i*.1)});later(round%3===0?chest:next,900)}
+  function chest(){$("dj").textContent="Treasure time! Pick a chest.";var box=$("dk");box.style.display="none";var w=document.createElement("div");w.className="chests";w.id="ch";[0,1,2].forEach(function(i){var b=document.createElement("button");b.type="button";b.textContent="🧰";b.setAttribute("aria-label","Chest "+(i+1));b.onclick=function(){open1(b)};w.appendChild(b)});box.parentNode.insertBefore(w,box)}
+  function open1(b){if(!$("ch")||$("ch").dataset.o)return;$("ch").dataset.o=1;var jack=Math.random()<.06+joined.length*.012;if(jack){coins+=500;gold++;save.gold++;b.textContent="💿";$("dj").textContent="JACKPOT! The Golden Record, plus 500 doubloons!";[523,659,784,1047,1319].forEach(function(f,i){tone(f,f,.3,.09,"triangle",i*.12)})}else{var a=pick([25,25,50,50,100]);coins+=a;b.textContent="🪙";$("dj").textContent=a+" doubloons!";tone(988,1319,.25,.08,"triangle")}hud();later(function(){$("ch").remove();$("dk").style.display="";next()},1500)}
+  function end(){document.onkeydown=null;save.coins+=coins;save.best=Math.max(save.best,joined.length);store();var t=gold?"Golden Record Holder":joined.length>=12?"King of 7th Avenue":joined.length>=6?"Block Party Starter":"First Round's On You";
+   stage.innerHTML='<h2>That\'s the night, Ybor!</h2><p class="tag">'+t+'</p><p>'+esc(save.name)+' of Team '+save.team+' brought '+joined.length+' to the floor and banked '+coins+' doubloons'+(gold?" and "+gold+" Golden Record"+(gold>1?"s":""):"")+'.</p><p>All-time: '+save.coins+' doubloons · '+save.gold+' Golden Records.</p><p class="fine">Doubloons and Golden Records are free game points with no cash value. No purchase needed.</p><div class="row"><button class="go" id="b" type="button">Run it back</button></div>';$("b").onclick=function(){stop();spinoff()}}
+  hud();next()}
+ intro()}
+
+/* ---------- Ashlee Rae's Tire Toss ---------- */
+function tire(){
+ function intro(){stage.innerHTML='<h2>Ashlee Rae\'s Tire Toss</h2><p>Ashlee Rae has the arm. Ten footballs, one swinging tire. Pull back on the screen to aim at the crosshair, let go to throw, and lead the tire because the ball takes a moment to get there. Thread the center for 3 points, anywhere through the hole for 2. Five in a row earns a bonus.</p><p class="fine">Keyboard: arrows to aim, space to throw.</p><button class="go" id="b" type="button">Grab a football</button>';$("b").onclick=function(){ctx();play()}}
+ function play(){playBeat("west");var r=run,W=420,H=520,PX=210,L=170,START=[210,462],TF=.62,t=0,last=performance.now(),left=10,score=0,streak=0,bestS=0,ball=null,aim={x:210,y:170},drag=null,msg="",mt=0,hits=0;
+  stage.innerHTML='<div class="hud"><span>Footballs <b id="lf"></b></span><span id="st"></span><span>Score <b id="sc"></b></span></div><canvas id="cv" width="'+W+'" height="'+H+'" aria-label="A tire swinging on a rope. Pull back to aim, release to throw."></canvas>';
+  var cv=$("cv"),g=cv.getContext("2d");
+  function hud(){$("lf").textContent=left;$("sc").textContent=score;$("st").textContent=streak>1?"🔥 "+streak+" in a row":""}
+  function lvl(){return 10-left}
+  function tp(tt){var n=Math.min(lvl(),9),w=1.5+n*.2,a=.32+n*.015;var th=a*Math.sin(tt*w);return{x:PX+L*Math.sin(th),y:L*Math.cos(th)+10+(n>5?Math.sin(tt*w*2)*10:0)}}
+  function radii(){var n=lvl();return{i:Math.max(21,32-n*1.1),o:Math.max(36,48-n*1.1)}}
+  function say(x){msg=x;mt=performance.now()}
+  function pt(e){var b=cv.getBoundingClientRect();return{x:(e.clientX-b.left)*W/b.width,y:(e.clientY-b.top)*H/b.height}}
+  function clampAim(){aim.x=Math.max(30,Math.min(W-30,aim.x));aim.y=Math.max(60,Math.min(300,aim.y))}
+  function pull(e){var p=pt(e),d=drag;aim.x=d.ax+(d.x-p.x)*1.6;aim.y=d.ay+(d.y-p.y)*1.6;clampAim()}
+  function throwIt(){if(ball||left<=0)return;left--;hud();ball={t:0,tx:aim.x,ty:aim.y,r:null};noise(.25,1400,.14,"bandpass",.04);tone(500,250,.22,.04,"sine")}
+  cv.addEventListener("pointerdown",function(e){if(ball)return;e.preventDefault();var p=pt(e);drag={x:p.x,y:p.y,ax:aim.x,ay:aim.y,moved:false};try{cv.setPointerCapture(e.pointerId)}catch(_){}});
+  cv.addEventListener("pointermove",function(e){if(drag){pull(e);drag.moved=true}});
+  cv.addEventListener("pointerup",function(e){if(drag){var m=drag.moved;drag=null;if(m)throwIt()}});
+  cv.addEventListener("pointercancel",function(){drag=null});
+  document.onkeydown=function(e){var k=e.key;if(k==="ArrowLeft")aim.x-=14;else if(k==="ArrowRight")aim.x+=14;else if(k==="ArrowUp")aim.y-=14;else if(k==="ArrowDown")aim.y+=14;else if(k===" "){throwIt()}else return;e.preventDefault();clampAim()};
+  function resolve(){var T=tp(t),R=radii(),d=Math.hypot(ball.tx-T.x,ball.ty-T.y);
+   if(d<R.i){var pts=d<R.i*.42?3:2;streak++;hits++;bestS=Math.max(bestS,streak);if(streak%5===0){pts+=5;say("FIVE IN A ROW! +5")}else say(pts===3?"Dead center!":"Right through!");score+=pts;ball.r="in";[659,880,1047].forEach(function(f,i){tone(f,f,.14,.07,"triangle",i*.08)});noise(.2,700,.2,"lowpass",.01)}
+   else if(d<R.o){streak=0;ball.r="rim";say("Off the rubber!");tone(120,60,.3,.3,"sine");noise(.12,400,.25,"lowpass",.01);ball.dx=(ball.tx-T.x)*5;ball.dy=-60}
+   else{streak=0;ball.r="miss";say(pick(["Wide right.","Not even close, Ashlee's laughing.","Short and sweet. Mostly short."]))}hud()}
+  hud();
+  (function loop(n){if(r!==run||!$("cv"))return;var dt=Math.min(.05,(n-last)/1000);last=n;t+=dt;var T=tp(t),R=radii();
+   cv.dataset.s=Math.round(T.x)+":"+Math.round(T.y)+":"+(ball?1:0)+":"+left;
+   var sky=g.createLinearGradient(0,0,0,H);sky.addColorStop(0,"#2c1458");sky.addColorStop(.5,"#c92f6a");sky.addColorStop(.72,"#fb9633");g.fillStyle=sky;g.fillRect(0,0,W,H);
+   g.fillStyle="#fff06a";g.beginPath();g.arc(340,290,44,0,7);g.fill();g.fillStyle="#1b3d2a";g.fillRect(0,330,W,H-330);g.strokeStyle="#ffffff55";g.lineWidth=3;[370,410,455].forEach(function(y){g.beginPath();g.moveTo(0,y);g.lineTo(W,y);g.stroke()});
+   g.fillStyle="#2a170c";g.fillRect(0,0,W,12);g.strokeStyle="#d9c9a3";g.lineWidth=4;g.beginPath();g.moveTo(PX,10);g.lineTo(T.x,T.y-R.o);g.stroke();
+   function tireDraw(){g.strokeStyle="#15110f";g.lineWidth=R.o-R.i;g.beginPath();g.arc(T.x,T.y,(R.o+R.i)/2,0,7);g.stroke();g.strokeStyle="#4a423c";g.lineWidth=2;g.beginPath();g.arc(T.x,T.y,R.i+3,0,7);g.stroke();g.beginPath();g.arc(T.x,T.y,R.o-3,0,7);g.stroke()}
+   function fb(x,y,s,rot){g.save();g.translate(x,y);g.rotate(rot);g.scale(s,s);g.fillStyle="#7a3f1a";g.beginPath();g.ellipse(0,0,24,14,0,0,7);g.fill();g.strokeStyle="#fff";g.lineWidth=2;g.beginPath();g.moveTo(-8,0);g.lineTo(8,0);[-5,0,5].forEach(function(v){g.moveTo(v,-3);g.lineTo(v,3)});g.stroke();g.restore()}
+   if(ball&&ball.r==="in"){var e0=(ball.t-TF)/.4;fb(ball.tx,ball.ty-e0*8,Math.max(.1,.5-e0*.4),ball.t*9)}
+   tireDraw();
+   if(!ball&&left>0){g.strokeStyle="#fff";g.lineWidth=2;g.beginPath();g.arc(aim.x,aim.y,10,0,7);g.moveTo(aim.x-16,aim.y);g.lineTo(aim.x+16,aim.y);g.moveTo(aim.x,aim.y-16);g.lineTo(aim.x,aim.y+16);g.stroke();if(drag){g.setLineDash([6,8]);g.beginPath();g.moveTo(START[0],START[1]);g.lineTo(aim.x,aim.y);g.stroke();g.setLineDash([])}fb(START[0],START[1],1,-.5)}
+   if(ball){ball.t+=dt;if(!ball.r&&ball.t>=TF)resolve();
+    if(!ball.r){var e=ball.t/TF;fb(START[0]+(ball.tx-START[0])*e,START[1]+(ball.ty-START[1])*e-Math.sin(e*3.14)*50,1-.55*e,ball.t*12)}
+    else if(ball.r==="rim"){var q=ball.t-TF;fb(ball.tx+ball.dx*q,ball.ty+ball.dy*q+300*q*q,.5,ball.t*8)}
+    else if(ball.r==="miss"){var m=(ball.t-TF);fb(ball.tx,ball.ty-m*30,Math.max(.1,.45-m*.5),ball.t*9)}
+    if(ball.t>TF+.75){ball=null;if(left<=0)return end(score,hits,bestS)}}
+   if(n-mt<1100){g.fillStyle="#fff";g.font="700 22px sans-serif";g.textAlign="center";g.fillText(msg,W/2,44)}
+   requestAnimationFrame(loop)})(last)}
+ function end(s,h,b0){document.onkeydown=null;var b=best("poy-tire",s),ti=s>=30?"Hall of Fame Arm":s>=18?"Team Captain":s>=8?"Weekend Quarterback":"Stick to the Tailgate";
+  stage.innerHTML='<h2>Final whistle</h2><p class="tag">'+ti+'</p><p>'+h+' of 10 through the tire, for '+s+' points. Longest streak: '+b0+'. Your best: '+b+'.</p><button class="go" id="b" type="button">Throw again</button>';$("b").onclick=function(){stop();tire()}}
+ intro()}
+
+/* ---------- tabs ---------- */
+var GAMES={eric:eric,emily:emily,nodrama:nodrama,boucher:boucher,ashley:ashley,tabby:tabby,altar:altar,spinoff:spinoff,tire:tire};
+var MC={eric:"Y'all, this man reads a book like the book owes him money.",
+emily:"Emily has one nerve left, and you are standing on it. You know who you are.",
+nodrama:"Somebody just said no offense. Run. Nothing good ever came after no offense.",
+boucher:"Boucher plays one song and forty motorcycles show up. That's not a DJ, that's a weather system.",
+ashley:"Seven letters for I don't know either. Just put something. Ashlee's not looking. Okay, she's looking.",
+tabby:"Tabby's got a laptop in one hand, a drink in the other, and a bowling ball somewhere. Don't ask how. Just tip her.",
+tire:"Ashlee Rae threw a football through a tire so hard the tire apologized.",
+spinoff:"Everybody in Ybor is out tonight. Even the chickens. Especially the chickens.",
+altar:"Love at first sight, married by lunch. Landon, tie your shoes, because she is faster than you."};
+var ENDS=["And that's the show, folks. Tell your mother I said hi.","I've seen worse. Not today, but I've seen worse.","Look at you! Somebody call somebody!","Go ahead, run it back. Nobody's watching. Everybody's watching."];
+var mcOn=true,spoken=false;
+function say(x,talk){$("mc").textContent="🎤 "+x;if(!talk||!mcOn||!window.speechSynthesis)return;try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(x);u.rate=1.08;u.pitch=1.05;speechSynthesis.speak(u)}catch(e){}}
+$("mcb").onclick=function(){mcOn=!mcOn;this.textContent=mcOn?"Announcer on":"Announcer off";this.setAttribute("aria-pressed",mcOn?"true":"false");if(!mcOn)try{speechSynthesis.cancel()}catch(e){}};
+try{new MutationObserver(function(){var h=stage.querySelector("h2");var x=h&&h.textContent;if(x&&/The End|Shift over|Dropped anchor|That's the set|The record stopped|Last call|kiss the bride|That's the night|Final whistle/.test(x)&&stage.dataset.mc!==x){stage.dataset.mc=x;say(pick(ENDS),true)}else if(x&&!/The End|Shift over|Dropped anchor|That's the set|The record stopped|Last call|kiss the bride|That's the night|Final whistle/.test(x))stage.dataset.mc=""}).observe(stage,{childList:true})}catch(e){}
+function open(k,talk){stop();say(MC[k],talk);Object.keys(GAMES).forEach(function(n){$("t-"+n).setAttribute("aria-selected",n===k?"true":"false")});try{history.replaceState(null,"","#"+k)}catch(e){}GAMES[k]()}
+Object.keys(GAMES).forEach(function(n){$("t-"+n).onclick=function(){open(n,true)}});
+$("snd").onclick=function(){on=!on;try{window.POYAudio&&POYAudio.enable(on)}catch(e){}this.textContent=on?"Sound on":"Sound off";this.setAttribute("aria-pressed",on?"true":"false")};
+var h=location.hash.slice(1);open(GAMES[h]?h:"eric");
+})();
+</script>
+<script src="../assets/ship.js" data-root="../" defer></script>
+</body>
+</html>

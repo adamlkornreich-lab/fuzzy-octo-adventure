@@ -1,0 +1,515 @@
+<!doctype html><html><head><script src="../assets/poy-config.js"></script><script src="../assets/poy.js"></script><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Pirates of Ybor Playhouse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Barlow+Semi+Condensed:wght@400;500;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: harbor-at-night arcade — sticky brass nav, game cabinets in a wrapping grid, one stage panel per game */
+:root{
+  --ink:#0e1420; --deck:#182235; --deck2:#22304a; --brick:#9a3f2f; --gold:#e2b04a; --gold-dim:#a8822f;
+  --foam:#ece6d6; --sea:#2f8f8a; --muted:#9ba5b6; --line:#2c3a55; --good:#5cc08a; --bad:#e0665a;
+  --display:"Pirata One","Georgia",serif; --body:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+html,body{background:var(--ink);color:var(--foam)}
+body{font-family:var(--body);font-size:17px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 120px;
+  background-image:radial-gradient(1200px 500px at 80% -10%,rgba(47,143,138,.18),transparent 60%),radial-gradient(900px 400px at -10% 0%,rgba(154,63,47,.18),transparent 60%)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--ink)}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3{font-family:var(--display);font-weight:400;text-wrap:balance;margin:0;letter-spacing:.01em}
+h1{font-size:clamp(2.4rem,7vw,4.2rem);line-height:1;color:var(--gold)}
+h2{font-size:2rem;color:var(--gold)}
+h3{font-size:1.45rem}
+p{margin:0}
+button,select,input{font:inherit}
+.btn{background:var(--gold);color:#1b1408;border:0;border-radius:6px;padding:10px 16px;font-weight:700;cursor:pointer;letter-spacing:.02em}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--gold);border:1.5px solid var(--gold-dim)}
+.btn:focus-visible,.tab:focus-visible,.chip:focus-visible,.sq:focus-visible,.cell:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+.btn:disabled{opacity:.45;cursor:default}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:rgba(14,20,32,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);margin:0 calc(-1*max(16px,env(safe-area-inset-left,0px)));padding:10px max(16px,env(safe-area-inset-left,0px))}
+.topin{max-width:1080px;margin:0 auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.brand{font-family:var(--display);font-size:1.5rem;color:var(--gold);margin-right:auto}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+.tab{background:none;border:0;color:var(--muted);padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.82rem}
+.tab[aria-current="page"]{color:var(--ink);background:var(--gold)}
+.hero{display:grid;grid-template-columns:1.4fr 1fr;gap:28px;align-items:center;padding-block:36px 24px}
+.hero p.lede{font-size:1.15rem;color:var(--foam);max-width:58ch;margin-top:12px}
+.hero .meta{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+.pill{font-family:var(--mono);font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);padding:4px 8px;border-radius:99px}
+.crewbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.crewbar select{background:var(--deck);color:var(--foam);border:1px solid var(--line);border-radius:6px;padding:8px}
+.view{padding-block:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin-top:16px}
+.cab{background:linear-gradient(180deg,var(--deck2),var(--deck));border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.cab .tag{font-family:var(--mono);font-size:.72rem;color:var(--sea);text-transform:uppercase;letter-spacing:.1em}
+.cab p{color:var(--muted);font-size:.95rem;flex:1}
+.cab .best{font-family:var(--mono);font-size:.78rem;color:var(--gold-dim)}
+.stage{background:var(--deck);border:1px solid var(--line);border-radius:12px;padding:18px;margin-top:16px}
+.stagehead{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.stagehead h2{margin-right:auto}
+.score{font-family:var(--mono);color:var(--gold);font-variant-numeric:tabular-nums}
+.status{min-height:1.6em;color:var(--foam);font-weight:500}
+/* trivia */
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.opt{background:var(--deck2);color:var(--foam);border:1px solid var(--line);border-radius:8px;padding:12px;text-align:left;cursor:pointer}
+.opt.right{border-color:var(--good);background:rgba(92,192,138,.15)}
+.opt.wrong{border-color:var(--bad);background:rgba(224,102,90,.15)}
+/* treasure */
+.map{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-width:420px;margin:12px auto 0;background:#c9a96a;padding:10px;border-radius:10px;
+  background-image:repeating-linear-gradient(45deg,rgba(0,0,0,.04) 0 6px,transparent 6px 12px)}
+.cell{aspect-ratio:1;max-width:100%;border:1px dashed rgba(60,40,10,.35);background:rgba(255,240,200,.25);border-radius:6px;cursor:pointer;font-size:1.3rem;color:#3a2610;font-weight:700}
+.cell.hot{background:#e0665a}.cell.warm{background:#e2b04a}.cell.cold{background:#6fa6c9}.cell.win{background:var(--good)}
+/* chess */
+.chesswrap{display:grid;grid-template-columns:minmax(0,440px) 1fr;gap:18px;align-items:start}
+.board{display:grid;grid-template-columns:repeat(8,1fr);border:6px solid #5a3a1e;border-radius:6px;max-width:440px;width:100%}
+.sq{aspect-ratio:1;border:0;padding:0;font-size:clamp(1.4rem,5.5vw,2.3rem);line-height:1;cursor:pointer;display:grid;place-items:center}
+.sq.l{background:#e8d3a6}.sq.d{background:#9c6b3e}
+.sq.sel{box-shadow:inset 0 0 0 4px var(--sea)}.sq.hint{box-shadow:inset 0 0 0 4px rgba(47,143,138,.55)}
+.sq.last{box-shadow:inset 0 0 0 4px rgba(226,176,74,.8)}
+.pw{color:#fffaf0;text-shadow:0 0 2px #000,0 1px 2px #000}.pb{color:#151515;text-shadow:0 0 1px #fff8}
+.dedic{font-style:italic;color:var(--muted);margin-top:8px}
+/* golf & movie canvas */
+canvas{display:block;width:100%;max-width:100%;border-radius:10px;touch-action:none;background:#0b1018}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+/* duel */
+.arena{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-top:8px}
+.fighter{text-align:center}
+.fighter .face{font-size:3.4rem;line-height:1;transition:transform .12s}
+.bar{height:12px;background:#0b1018;border-radius:99px;overflow:hidden;border:1px solid var(--line);margin-top:6px}
+.bar i{display:block;height:100%;background:var(--good);transition:width .2s}
+.cue{font-family:var(--display);font-size:2rem;color:var(--gold);text-align:center;min-width:7ch}
+.shake{transform:translateX(-6px) rotate(-6deg)}
+/* movie */
+.mm{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:18px}
+.field{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.field label,.lab{font-size:.78rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700}
+.field select{background:var(--deck2);color:var(--foam);border:1px solid var(--line);border-radius:6px;padding:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--deck2);color:var(--foam);border:1px solid var(--line);border-radius:99px;padding:5px 11px;cursor:pointer;font-size:.9rem}
+.chip[aria-pressed="true"]{background:var(--sea);border-color:var(--sea);color:#06110f;font-weight:700}
+.script{white-space:pre-wrap;background:#0b1018;border:1px solid var(--line);border-radius:8px;padding:12px;font-family:var(--mono);font-size:.82rem;max-height:240px;overflow:auto;margin-top:10px;color:var(--foam)}
+/* crew */
+.crew{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin-top:16px}
+.mate{border-left:3px solid var(--gold-dim);padding:6px 12px;min-width:0}
+.mate b{font-family:var(--display);font-size:1.3rem;font-weight:400;color:var(--foam)}
+.mate span{display:block;color:var(--muted);font-size:.92rem}
+.board2{width:100%;border-collapse:collapse;margin-top:12px;font-variant-numeric:tabular-nums}
+.board2 td,.board2 th{border-bottom:1px solid var(--line);padding:8px;text-align:left}
+.board2 th{color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}
+.note{color:var(--muted);font-size:.9rem;margin-top:12px;max-width:70ch}
+/* watermark */
+.wm{position:fixed;right:calc(10px + env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));width:120px;opacity:.55;pointer-events:none;z-index:4}
+.wm .sp{animation:tw 2.4s ease-in-out infinite}
+.wm .sp:nth-of-type(2){animation-delay:.8s}.wm .sp:nth-of-type(3){animation-delay:1.6s}
+@keyframes tw{0%,100%{opacity:.15;transform:scale(.6)}50%{opacity:1;transform:scale(1)}}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem;display:flex;gap:12px;flex-wrap:wrap;justify-content:space-between}
+@media (max-width:760px){
+  .hero,.chesswrap,.mm{grid-template-columns:1fr}
+  .opts{grid-template-columns:1fr}
+  .wm{width:84px;opacity:.45}
+}
+@media (prefers-reduced-motion:reduce){.wm .sp{animation:none}*{transition:none!important}}
+</style>
+
+<header class="top"><div class="topin">
+  <div class="brand">Pirates of Ybor Playhouse</div>
+  <nav aria-label="Sections">
+    <button class="tab" data-go="arcade">Arcade</button>
+    <button class="tab" data-go="movie">Movie Machine</button>
+    <button class="tab" data-go="crew">The Crew</button>
+    <button class="tab" data-go="crews">Schools &amp; Camps</button>
+  </nav>
+</div></header>
+
+<div class="wrap">
+<section class="hero">
+  <div>
+    <h1>Welcome aboard, matey.</h1>
+    <p class="lede">An arcade, a movie, and a movie-making machine for family, friends, camp crews, schools and colleges. Open it, tap a game, play. Nothing to install.</p>
+    <div class="crewbar">
+      <label class="lab" for="crewSel">Sailing with</label>
+      <select id="crewSel"></select>
+      <label class="lab" for="nameIn">Your name</label>
+      <input id="nameIn" maxlength="20" placeholder="Deckhand" style="background:var(--deck);color:var(--foam);border:1px solid var(--line);border-radius:6px;padding:8px;width:140px">
+    </div>
+    <div class="meta"><span class="pill">5 games</span><span class="pill">Movie Machine</span><span class="pill">Phone + desktop</span></div>
+  </div>
+  <div aria-hidden="true" id="heroArt"></div>
+</section>
+
+<!-- ARCADE -->
+<section class="view" id="v-arcade">
+  <h2>The Arcade</h2>
+  <div class="grid" id="cabs"></div>
+  <div id="stage"></div>
+</section>
+
+<!-- MOVIE -->
+<section class="view" id="v-movie" hidden>
+  <h2>Movie Machine</h2>
+  <p class="note">Pick a cast, a set and a sound. Roll camera and the machine writes and plays a short movie with its own beat.</p>
+  <div class="mm stage">
+    <div>
+      <div class="field"><span class="lab">Cast (pick up to 5)</span><div class="chips" id="castChips"></div></div>
+      <div class="field"><label for="setSel">Set</label><select id="setSel"></select></div>
+      <div class="field"><label for="genSel">Genre</label><select id="genSel"></select></div>
+      <div class="field"><label for="beatSel">Soundtrack flow</label><select id="beatSel"></select></div>
+      <div class="row"><button class="btn" id="roll">Roll camera</button><button class="btn ghost" id="cut">Cut</button></div>
+    </div>
+    <div>
+      <canvas id="screen" width="640" height="360" aria-label="Movie screen"></canvas>
+      <div class="row"><span class="lab">Script</span><button class="btn ghost" id="copyScript" style="padding:4px 10px;font-size:.85rem">Copy script</button><span id="copyMsg" class="note" style="margin:0"></span></div>
+      <div class="script" id="script">Your script appears here after you roll camera.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CREW -->
+<section class="view" id="v-crew" hidden>
+  <h2>The Crew</h2>
+  <p class="note">The people and pets this ship sails for. Pippy and Pops lead the way.</p>
+  <div class="crew" id="crewList"></div>
+</section>
+
+<!-- CREWS -->
+<section class="view" id="v-crews" hidden>
+  <h2>Schools &amp; Camps</h2>
+  <p class="note">Pick your crew at the top of the page and every score you set is tagged with it. Scores stay on this device.</p>
+  <div class="grid" id="crewCards"></div>
+  <h3 style="margin-top:24px">Captain's Log: top scores</h3>
+  <div style="overflow-x:auto"><table class="board2"><thead><tr><th>Game</th><th>Name</th><th>Crew</th><th>Score</th></tr></thead><tbody id="logBody"></tbody></table></div>
+</section>
+
+<footer>
+  <span>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.</span>
+  <span>Contact: adamlkornreich@gmail.com</span>
+</footer>
+</div>
+
+<svg class="wm" viewBox="0 0 200 170" aria-hidden="true" id="wm"></svg>
+
+<script>
+(function(){
+/* ---------- watermark art (original Pops & Pippy) ---------- */
+const WM=`
+<g>
+ <!-- Pops: pirate bar cat -->
+ <ellipse cx="62" cy="128" rx="40" ry="32" fill="#3b3f46"/>
+ <circle cx="62" cy="82" r="30" fill="#4a4f57"/>
+ <path d="M38 66 L34 40 L54 58Z M86 66 L90 40 L70 58Z" fill="#4a4f57"/>
+ <path d="M26 62 Q62 22 98 62 Q62 50 26 62Z" fill="#111"/>
+ <circle cx="62" cy="44" r="5" fill="#fff"/>
+ <circle cx="51" cy="84" r="5" fill="#e2b04a"/><circle cx="51" cy="84" r="2" fill="#111"/>
+ <rect x="66" y="78" width="14" height="11" rx="3" fill="#111"/><path d="M40 72 L90 92" stroke="#111" stroke-width="2"/>
+ <path d="M58 96 Q62 100 66 96" stroke="#ddd" stroke-width="2" fill="none"/>
+ <path d="M30 92 H14 M30 97 H16 M94 92 H110 M94 97 H108" stroke="#bbb" stroke-width="1.5"/>
+ <!-- Pippy: pirate chihuahua -->
+ <ellipse cx="146" cy="138" rx="28" ry="24" fill="#d9a56a"/>
+ <circle cx="146" cy="104" r="22" fill="#e3b47c"/>
+ <path d="M128 96 L112 66 L136 86Z M164 96 L180 66 L156 86Z" fill="#e3b47c"/>
+ <path d="M126 92 Q146 78 166 92 L162 98 Q146 88 130 98Z" fill="#b8302a"/>
+ <circle cx="138" cy="104" r="4" fill="#111"/><circle cx="154" cy="104" r="4" fill="#111"/>
+ <ellipse cx="146" cy="114" rx="4" ry="3" fill="#2a1a10"/>
+ <path d="M130 126 Q146 134 162 126" stroke="#e2b04a" stroke-width="3" fill="none"/>
+</g>
+<g fill="#ffe9a8">
+ <path class="sp" d="M108 22 l3 8 8 3 -8 3 -3 8 -3 -8 -8 -3 8 -3z" style="transform-origin:108px 33px"/>
+ <path class="sp" d="M180 40 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" style="transform-origin:180px 47px"/>
+ <path class="sp" d="M18 30 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" style="transform-origin:18px 37px"/>
+</g>`;
+document.getElementById('wm').innerHTML=WM;
+document.getElementById('heroArt').innerHTML=`<svg viewBox="0 0 200 170" style="width:100%;max-width:340px;display:block;margin:auto">${WM}</svg>`;
+
+/* ---------- storage helpers ---------- */
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const CREWS=[["family","Family & Friends","The home crew. Grandparents to the newest baby."],["camp","Camp Friends","Summer bunks, lake days, color war."],["middle","Middle School","Lockers, clubs and first big wins."],["high","High School","Teams, band, prom and finals."],["college","College","Dorm floors, quads and road trips."],["wolfeboro","Wolfeboro Academy","Special program crew."],["special","Special Programs","Any program, club or team."]];
+const crewSel=document.getElementById('crewSel'), nameIn=document.getElementById('nameIn');
+CREWS.forEach(([id,n])=>crewSel.add(new Option(n,id)));
+crewSel.value=store.get('poy_crew','family'); nameIn.value=store.get('poy_name','');
+crewSel.onchange=()=>{store.set('poy_crew',crewSel.value);renderLog()};
+nameIn.oninput=()=>store.set('poy_name',nameIn.value);
+const crewName=id=>(CREWS.find(c=>c[0]===id)||[0,'Crew'])[1];
+function record(game,score,higherBetter=true){
+  const log=store.get('poy_log',[]);
+  log.push({game,score,name:nameIn.value.trim()||'Deckhand',crew:crewSel.value,hb:higherBetter,t:Date.now()});
+  store.set('poy_log',log.slice(-200)); renderCabs(); renderLog();
+}
+function best(game){const l=store.get('poy_log',[]).filter(x=>x.game===game);if(!l.length)return null;return l.reduce((a,b)=>(b.hb?b.score>a.score:b.score<a.score)?b:a)}
+
+/* ---------- routing ---------- */
+const views=['arcade','movie','crew','crews'];
+function show(){const h=location.hash.slice(1);const v=views.includes(h)?h:'arcade';
+  views.forEach(x=>document.getElementById('v-'+x).hidden=x!==v);
+  document.querySelectorAll('.tab').forEach(t=>t.setAttribute('aria-current',t.dataset.go===v?'page':'false'));
+  if(v!=='movie')stopMovie();}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{location.hash=t.dataset.go;show()});
+window.addEventListener('hashchange',show);
+
+/* ---------- arcade cabinets ---------- */
+const GAMES=[
+ {id:'trivia',name:'Ybor Pirate Trivia',tag:'Brains',desc:'Ten questions on Tampa, Ybor City, Gasparilla and pirate lore.',fmt:s=>s+' / 10'},
+ {id:'treasure',name:"Gaspar's Treasure Hunt",tag:'Luck + logic',desc:'Dig the map. Hot and cold clues point to the chest. Eight digs.',fmt:s=>s+' digs left',},
+ {id:'chess',name:"Henry's Pirate Chess",tag:'Strategy',desc:'Full chess against the ship\'s AI. Dedicated to baby Henry, future grandmaster.',fmt:s=>s?'Won':'—'},
+ {id:'golf',name:'Andy Seavy Golf Club',tag:'Skill',desc:'Three pirate holes with sand, water and a pin. Drag back, let fly.',fmt:s=>s+' strokes',low:true},
+ {id:'duel',name:"Shere's Revenge",tag:'Reflex',desc:'Sword duel. Read the strike, parry high or low, then lunge.',fmt:s=>s+' HP left'}
+];
+function renderCabs(){document.getElementById('cabs').innerHTML=GAMES.map(g=>{const b=best(g.id);
+ return `<article class="cab"><span class="tag">${g.tag}</span><h3>${g.name}</h3><p>${g.desc}</p><span class="best">${b?'Best: '+g.fmt(b.score)+' · '+esc(b.name):'No score yet'}</span><button class="btn" data-play="${g.id}">Play</button></article>`}).join('');
+ document.querySelectorAll('[data-play]').forEach(b=>b.onclick=()=>play(b.dataset.play));}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let cleanup=null;
+function play(id){if(cleanup){cleanup();cleanup=null}
+ const g=GAMES.find(x=>x.id===id);const st=document.getElementById('stage');
+ st.innerHTML=`<div class="stage"><div class="stagehead"><h2>${g.name}</h2><span class="score" id="sc"></span><button class="btn ghost" id="restart">Restart</button><button class="btn ghost" id="close">Close</button></div><div id="game"></div></div>`;
+ document.getElementById('close').onclick=()=>{if(cleanup){cleanup();cleanup=null}st.innerHTML=''};
+ document.getElementById('restart').onclick=()=>play(id);
+ ({trivia,treasure,chess,golf,duel})[id](document.getElementById('game'),document.getElementById('sc'));
+ st.scrollIntoView({behavior:'smooth',block:'start'});}
+
+/* ---------- Trivia ---------- */
+const QS=[
+ ["The Gasparilla Pirate Festival in Tampa first sailed in which year?",["1904","1948","1886","1976"],0],
+ ["Who founded Ybor City in 1886?",["Vicente Martinez-Ybor","Henry Plant","José Gaspar","Juan Ponce de León"],0],
+ ["Ybor City built its fame making what?",["Cigars","Ships","Oranges","Rum"],0],
+ ["What animals famously roam Ybor City's streets?",["Wild chickens","Peacocks","Goats","Parrots"],0],
+ ["Which group organizes the Gasparilla invasion?",["Ye Mystic Krewe of Gasparilla","The Buccaneer Brigade","Tampa Pirate Guild","Krewe of Rex"],0],
+ ["Blackbeard's real name was?",["Edward Teach","William Kidd","Henry Morgan","Jack Rackham"],0],
+ ["The classic skull-and-crossbones flag is called the?",["Jolly Roger","Black Spot","Red Ensign","Davy Jones"],0],
+ ["A Tampa-style Cuban sandwich adds which meat?",["Genoa salami","Turkey","Chorizo","Bacon"],0],
+ ["Ybor City's main nightlife strip is which avenue?",["7th Avenue","Bayshore Boulevard","Dale Mabry","Kennedy Boulevard"],0],
+ ["\"Pieces of eight\" were what kind of coin?",["Spanish silver dollars","English gold guineas","Dutch copper pennies","French francs"],0],
+ ["Florida became a U.S. state in which year?",["1845","1821","1861","1776"],0],
+ ["The Gasparilla invasion ship is named?",["José Gasparilla","Queen Anne's Revenge","Black Pearl","Santa María"],0]
+];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+function trivia(el,sc){const qs=shuffle(QS).slice(0,10);let i=0,score=0;
+ function q(){if(i>=qs.length){el.innerHTML=`<p class="status">Final haul: ${score} of 10. ${score>=8?'Captain material.':score>=5?'Solid deckhand.':'Back to the galley.'}</p>`;record('trivia',score);return}
+  const [t,o,a]=qs[i];const order=shuffle(o.map((x,k)=>k));sc.textContent=`Q${i+1}/10 · ${score} pts`;
+  el.innerHTML=`<h3>${esc(t)}</h3><div class="opts">${order.map(k=>`<button class="opt" data-k="${k}">${esc(o[k])}</button>`).join('')}</div><p class="status" id="ts"></p>`;
+  el.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{el.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(+x.dataset.k===a)x.classList.add('right')});
+   if(+b.dataset.k===a){score++;document.getElementById('ts').textContent='Aye, correct!'}else{b.classList.add('wrong');document.getElementById('ts').textContent='Arr, not quite.'}
+   setTimeout(()=>{i++;q()},1100)});}
+ q();}
+
+/* ---------- Treasure ---------- */
+function treasure(el,sc){const N=6;const tr=[Math.random()*N|0,Math.random()*N|0];let digs=8,done=false;
+ el.innerHTML=`<p class="status" id="ms">X marks nothing yet. Tap a square to dig.</p><div class="map" id="map"></div>`;
+ const map=el.querySelector('#map');
+ for(let r=0;r<N;r++)for(let c=0;c<N;c++){const b=document.createElement('button');b.className='cell';b.setAttribute('aria-label',`Dig row ${r+1} column ${c+1}`);
+  b.onclick=()=>{if(done||b.disabled)return;b.disabled=true;digs--;const d=Math.abs(r-tr[0])+Math.abs(c-tr[1]);const ms=el.querySelector('#ms');
+   if(d===0){b.classList.add('win');b.textContent='💰';done=true;ms.textContent=`Treasure! Found with ${digs} digs to spare.`;record('treasure',digs)}
+   else{const k=d<=1?'hot':d<=3?'warm':'cold';b.classList.add(k);b.textContent=d;ms.textContent=k==='hot'?'Scorching! It\'s right next door.':k==='warm'?'Warm. Getting closer.':'Cold sea breeze. Try elsewhere.';
+    if(digs<=0){done=true;ms.textContent='Out of digs. The chest stays buried.';const t=map.children[tr[0]*N+tr[1]];t.textContent='💰';}}
+   sc.textContent=digs+' digs left'};
+  map.appendChild(b)}
+ sc.textContent=digs+' digs left';}
+
+/* ---------- Chess ---------- */
+function chess(el,sc){
+ const G={wK:'♔',wQ:'♕',wR:'♖',wB:'♗',wN:'♘',wP:'♙',bK:'♚',bQ:'♛',bR:'♜',bB:'♝',bN:'♞',bP:'♟'};
+ const V={P:1,N:3,B:3,R:5,Q:9,K:0};
+ let b=[ 'RNBQKBNR','PPPPPPPP','........','........','........','........','PPPPPPPP','RNBQKBNR'].map((row,r)=>row.split('').map(ch=>ch==='.'?null:(r<2?'b':'w')+ch));
+ let turn='w',sel=null,last=null,over=false,thinking=false;
+ const inB=(r,c)=>r>=0&&r<8&&c>=0&&c<8;
+ function pseudo(bd,color){const out=[];
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=bd[r][c];if(!p||p[0]!==color)continue;const t=p[1];
+   const add=(r2,c2)=>{if(!inB(r2,c2))return false;const q=bd[r2][c2];if(q&&q[0]===color)return false;out.push([r,c,r2,c2]);return !q};
+   if(t==='P'){const d=color==='w'?-1:1,s=color==='w'?6:1;
+    if(inB(r+d,c)&&!bd[r+d][c]){out.push([r,c,r+d,c]);if(r===s&&!bd[r+2*d][c])out.push([r,c,r+2*d,c])}
+    for(const dc of[-1,1]){const r2=r+d,c2=c+dc;if(inB(r2,c2)&&bd[r2][c2]&&bd[r2][c2][0]!==color)out.push([r,c,r2,c2])}}
+   else if(t==='N'){[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]].forEach(([a,e])=>add(r+a,c+e))}
+   else if(t==='K'){for(let a=-1;a<=1;a++)for(let e=-1;e<=1;e++)if(a||e)add(r+a,c+e)}
+   else{const dirs=t==='R'?[[1,0],[-1,0],[0,1],[0,-1]]:t==='B'?[[1,1],[1,-1],[-1,1],[-1,-1]]:[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+    dirs.forEach(([a,e])=>{let r2=r+a,c2=c+e;while(add(r2,c2)){r2+=a;c2+=e}})}}
+  return out}
+ const apply=(bd,m)=>{const n=bd.map(x=>x.slice());const p=n[m[0]][m[1]];n[m[2]][m[3]]=(p[1]==='P'&&(m[2]===0||m[2]===7))?p[0]+'Q':p;n[m[0]][m[1]]=null;return n};
+ function inCheck(bd,color){let kr,kc;for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(bd[r][c]===color+'K'){kr=r;kc=c}
+  return pseudo(bd,color==='w'?'b':'w').some(m=>m[2]===kr&&m[3]===kc)}
+ const legal=(bd,color)=>pseudo(bd,color).filter(m=>!inCheck(apply(bd,m),color));
+ el.innerHTML=`<div class="chesswrap"><div class="board" id="bd"></div><div><p class="status" id="cs"></p><p class="note">You play white. Pawns reaching the far rank become queens.</p><p class="dedic">For Henry, the new future and a grandmaster in the making.</p></div></div>`;
+ const bdEl=el.querySelector('#bd'),cs=el.querySelector('#cs');
+ function draw(){const hints=sel?legal(b,'w').filter(m=>m[0]===sel[0]&&m[1]===sel[1]):[];
+  bdEl.innerHTML='';for(let r=0;r<8;r++)for(let c=0;c<8;c++){const s=document.createElement('button');const p=b[r][c];
+   s.className='sq '+((r+c)%2?'d':'l');if(sel&&sel[0]===r&&sel[1]===c)s.classList.add('sel');
+   if(hints.some(m=>m[2]===r&&m[3]===c))s.classList.add('hint');if(last&&((last[0]===r&&last[1]===c)||(last[2]===r&&last[3]===c)))s.classList.add('last');
+   if(p){s.innerHTML=`<span class="${p[0]==='w'?'pw':'pb'}">${G[p]}</span>`}
+   s.setAttribute('aria-label',(p?p:'empty')+' '+'abcdefgh'[c]+(8-r));s.onclick=()=>click(r,c);bdEl.appendChild(s)}}
+ function status(){const moves=legal(b,turn);const chk=inCheck(b,turn);
+  if(!moves.length){over=true;if(chk){cs.textContent=turn==='w'?'Checkmate. The ship\'s AI takes this one.':'Checkmate! Victory is yours, Captain.';if(turn==='b')record('chess',1)}else cs.textContent='Stalemate. A draw on the high seas.';sc.textContent='Game over';return}
+  cs.textContent=(turn==='w'?'Your move':'AI is thinking…')+(chk?' · Check!':'');sc.textContent=turn==='w'?'White to move':'Black to move'}
+ function click(r,c){if(over||turn!=='w'||thinking)return;const p=b[r][c];
+  if(sel){const m=legal(b,'w').find(m=>m[0]===sel[0]&&m[1]===sel[1]&&m[2]===r&&m[3]===c);
+   if(m){b=apply(b,m);last=m;sel=null;turn='b';draw();status();if(!over){thinking=true;setTimeout(ai,450)}return}}
+  sel=p&&p[0]==='w'?[r,c]:null;draw()}
+ function ai(){thinking=false;const moves=legal(b,'b');if(!moves.length){status();return}
+  let bestM=null,bs=-1e9;
+  for(const m of moves){const cap=b[m[2]][m[3]];let s=cap?V[cap[1]]*10:0;const nb=apply(b,m);
+   if(b[m[0]][m[1]][1]==='P'&&(m[2]===7))s+=80;
+   const rep=pseudo(nb,'w');let worst=0;for(const x of rep){const t=nb[x[2]][x[3]];if(t&&t[0]==='b')worst=Math.max(worst,V[t[1]]*10)}
+   s-=worst*0.9;if(inCheck(nb,'w'))s+=3;if(!legal(nb,'w').length&&inCheck(nb,'w'))s+=1000;
+   s+=Math.random()*2+(3.5-Math.abs(3.5-m[3]))*0.3;if(s>bs){bs=s;bestM=m}}
+  b=apply(b,bestM);last=bestM;turn='w';draw();status()}
+ draw();status();}
+
+/* ---------- Golf ---------- */
+function golf(el,sc){
+ el.innerHTML=`<canvas id="gc" width="360" height="520" style="max-width:420px;margin:auto" aria-label="Golf course. Drag back from the ball and release to shoot."></canvas><p class="status" id="gs" style="text-align:center;margin-top:8px"></p>`;
+ const cv=el.querySelector('#gc'),cx=cv.getContext('2d'),gs=el.querySelector('#gs');
+ const HOLES=[
+  {par:2,tee:[180,460],cup:[180,90],water:[[60,250,240,50]],sand:[[230,140,80,50]],name:'Hole 1 · Plank Walk'},
+  {par:3,tee:[70,470],cup:[290,80],water:[[0,280,230,60]],sand:[[240,180,90,70],[40,110,90,50]],name:"Hole 2 · Davy Jones' Locker"},
+  {par:3,tee:[300,470],cup:[70,100],water:[[130,320,230,40],[0,200,200,36]],sand:[[150,90,70,60]],name:"Hole 3 · Gaspar's Grotto"}];
+ let h=0,strokes=0,total=0,ball,vel=[0,0],drag=null,safe,moving=false,raf,doneAll=false;
+ function load(){const H=HOLES[h];ball=[...H.tee];safe=[...ball];vel=[0,0];strokes=0;moving=false;gs.textContent=H.name+' · Par '+H.par;upd()}
+ const upd=()=>sc.textContent=`Hole ${h+1}/3 · ${strokes} strokes · Total ${total+strokes}`;
+ const inR=(p,R)=>p[0]>R[0]&&p[0]<R[0]+R[2]&&p[1]>R[1]&&p[1]<R[1]+R[3];
+ function pos(e){const r=cv.getBoundingClientRect();return[(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]}
+ cv.onpointerdown=e=>{if(moving||doneAll)return;const p=pos(e);if(Math.hypot(p[0]-ball[0],p[1]-ball[1])<60){drag=p;cv.setPointerCapture(e.pointerId)}};
+ cv.onpointermove=e=>{if(drag)drag=pos(e)};
+ cv.onpointerup=e=>{if(!drag)return;const dx=ball[0]-drag[0],dy=ball[1]-drag[1];const L=Math.min(Math.hypot(dx,dy),140);
+  if(L>6){const a=Math.atan2(dy,dx);vel=[Math.cos(a)*L*0.11,Math.sin(a)*L*0.11];strokes++;safe=[...ball];moving=true;upd()}drag=null};
+ function step(){const H=HOLES[h];
+  if(moving){ball[0]+=vel[0];ball[1]+=vel[1];
+   if(ball[0]<8||ball[0]>352){vel[0]*=-0.7;ball[0]=Math.max(8,Math.min(352,ball[0]))}
+   if(ball[1]<8||ball[1]>512){vel[1]*=-0.7;ball[1]=Math.max(8,Math.min(512,ball[1]))}
+   const f=H.sand.some(R=>inR(ball,R))?0.93:0.985;vel[0]*=f;vel[1]*=f;const sp=Math.hypot(vel[0],vel[1]);
+   if(H.water.some(R=>inR(ball,R))){strokes++;ball=[...safe];vel=[0,0];moving=false;gs.textContent='Splash! +1 stroke. Back to dry land.';upd()}
+   const dc=Math.hypot(ball[0]-H.cup[0],ball[1]-H.cup[1]);
+   if(dc<10&&sp<7){moving=false;total+=strokes;const diff=strokes-H.par;const word=strokes===1?'Hole in one!':diff<=-2?'Eagle!':diff===-1?'Birdie!':diff===0?'Par.':diff===1?'Bogey.':'Double bogey or worse.';
+    gs.textContent=word+' '+strokes+' strokes.';if(h<2){h++;setTimeout(load,1300)}else{doneAll=true;sc.textContent='Final: '+total+' strokes (par 8)';gs.textContent+=' Round over: '+total+' total. Par is 8.';record('golf',total,false)}}
+   else if(sp<0.08){moving=false;vel=[0,0]}}
+  drawG();raf=requestAnimationFrame(step)}
+ function drawG(){const H=HOLES[h];cx.fillStyle='#2f7a3e';cx.fillRect(0,0,360,520);
+  for(let y=0;y<520;y+=40){cx.fillStyle=y/40%2?'#2c7339':'#33823f';cx.fillRect(0,y,360,40)}
+  cx.fillStyle='#3d9b4c';cx.beginPath();cx.arc(H.cup[0],H.cup[1],50,0,7);cx.fill();
+  H.sand.forEach(R=>{cx.fillStyle='#e3cf95';cx.beginPath();cx.roundRect(R[0],R[1],R[2],R[3],18);cx.fill()});
+  H.water.forEach(R=>{cx.fillStyle='#2a6fa3';cx.beginPath();cx.roundRect(R[0],R[1],R[2],R[3],14);cx.fill();cx.strokeStyle='rgba(255,255,255,.25)';cx.beginPath();cx.moveTo(R[0]+12,R[1]+R[3]/2);cx.lineTo(R[0]+R[2]-12,R[1]+R[3]/2);cx.stroke()});
+  cx.fillStyle='#111';cx.beginPath();cx.arc(H.cup[0],H.cup[1],8,0,7);cx.fill();
+  cx.strokeStyle='#ddd';cx.lineWidth=2;cx.beginPath();cx.moveTo(H.cup[0],H.cup[1]);cx.lineTo(H.cup[0],H.cup[1]-46);cx.stroke();
+  cx.fillStyle='#111';cx.beginPath();cx.moveTo(H.cup[0],H.cup[1]-46);cx.lineTo(H.cup[0]+24,H.cup[1]-38);cx.lineTo(H.cup[0],H.cup[1]-30);cx.fill();
+  cx.fillStyle='#fff';cx.font='10px sans-serif';cx.fillText('☠',H.cup[0]+6,H.cup[1]-34);
+  if(drag){const dx=ball[0]-drag[0],dy=ball[1]-drag[1];const L=Math.min(Math.hypot(dx,dy),140),a=Math.atan2(dy,dx);
+   cx.strokeStyle=`hsl(${120-L*0.85},90%,60%)`;cx.lineWidth=4;cx.setLineDash([6,6]);cx.beginPath();cx.moveTo(ball[0],ball[1]);cx.lineTo(ball[0]+Math.cos(a)*L*1.2,ball[1]+Math.sin(a)*L*1.2);cx.stroke();cx.setLineDash([])}
+  cx.fillStyle='rgba(0,0,0,.3)';cx.beginPath();cx.arc(ball[0]+2,ball[1]+3,7,0,7);cx.fill();
+  cx.fillStyle='#fff';cx.beginPath();cx.arc(ball[0],ball[1],7,0,7);cx.fill();
+  if(!moving&&!drag&&!doneAll){cx.fillStyle='rgba(255,255,255,.8)';cx.font='13px sans-serif';cx.textAlign='center';cx.fillText('Drag back from the ball, release to shoot',180,508);cx.textAlign='left'}}
+ load();step();cleanup=()=>cancelAnimationFrame(raf);}
+
+/* ---------- Duel ---------- */
+function duel(el,sc){
+ el.innerHTML=`<div class="arena"><div class="fighter"><div class="face" id="you">🏴‍☠️</div><b>You</b><div class="bar"><i id="yh" style="width:100%"></i></div></div>
+  <div class="cue" id="cue">Ready</div>
+  <div class="fighter"><div class="face" id="foe">🦜</div><b>Captain Barnacle</b><div class="bar"><i id="fh" style="width:100%"></i></div></div></div>
+  <p class="status" id="ds" style="text-align:center;margin-top:10px">When he winds up HIGH or LOW, parry to match. When he's OPEN, lunge.</p>
+  <div class="row" style="justify-content:center"><button class="btn ghost" id="ph">Parry high (↑)</button><button class="btn" id="lg">Lunge (Space)</button><button class="btn ghost" id="pl">Parry low (↓)</button></div>`;
+ let you=100,foe=100,state='idle',dir=null,timer=null,over=false;const $=id=>el.querySelector('#'+id);
+ const upd=()=>{$('yh').style.width=you+'%';$('fh').style.width=foe+'%';sc.textContent=`You ${you} · Foe ${foe}`};
+ const flash=(id)=>{$(id).classList.add('shake');setTimeout(()=>$(id).classList.remove('shake'),150)};
+ function sched(fn,ms){clearTimeout(timer);timer=setTimeout(fn,ms)}
+ function idle(){if(over)return;state='idle';$('cue').textContent='…';sched(tele,700+Math.random()*900)}
+ function tele(){state='tele';dir=Math.random()<.5?'high':'low';$('cue').textContent=dir==='high'?'HIGH ↑':'LOW ↓';sched(strike,Math.max(380,650-(100-foe)*2.5))}
+ function strike(){you=Math.max(0,you-15);flash('you');$('ds').textContent='Ouch! He landed a '+dir+' strike.';upd();end()||idle()}
+ function open(){state='open';$('cue').textContent='OPEN!';sched(idle,900)}
+ function act(a){if(over)return;
+  if(a==='lunge'){if(state==='open'){foe=Math.max(0,foe-20);flash('foe');$('ds').textContent='Clean hit! Twenty damage.';upd();end()||idle()}
+   else if(state==='idle'){if(Math.random()<.5){foe=Math.max(0,foe-6);flash('foe');$('ds').textContent='Glancing blow.'}else{$('ds').textContent='Blocked. Wait for an opening.'}upd();end()}
+   else{you=Math.max(0,you-10);flash('you');$('ds').textContent='You lunged into his swing!';upd();end()||idle()}}
+  else{if(state==='tele'){if(a===dir){$('ds').textContent='Parried! He\'s open.';open()}else{you=Math.max(0,you-15);flash('you');$('ds').textContent='Wrong guard!';upd();end()||idle()}}}}
+ function end(){if(you<=0||foe<=0){over=true;clearTimeout(timer);$('cue').textContent=you>0?'Victory':'Defeat';$('ds').textContent=you>0?'Shere has her revenge. The captain walks the plank.':'You walk the plank this time. Restart for a rematch.';if(you>0)record('duel',you);return true}return false}
+ $('ph').onclick=()=>act('high');$('pl').onclick=()=>act('low');$('lg').onclick=()=>act('lunge');
+ const key=e=>{if(e.key==='ArrowUp'){e.preventDefault();act('high')}else if(e.key==='ArrowDown'){e.preventDefault();act('low')}else if(e.key===' '){e.preventDefault();act('lunge')}};
+ document.addEventListener('keydown',key);upd();sched(idle,900);
+ cleanup=()=>{clearTimeout(timer);document.removeEventListener('keydown',key)};}
+
+/* ---------- Crew ---------- */
+const CREW=[
+ ["Pippy","First Mate. Pirate chihuahua, official seal of every page."],["Pops","The world-famous bar cat, in the paw-prints of Tanker Ray."],
+ ["Adam Kornreich","Captain and creator. R.A. Consulting."],["Adam's Dad","Admiral of the home fleet."],["Adam's Sister","Navigator and keeper of the crown."],
+ ["Atara","Crowned niece. 👑"],["Captain Eric Schiller","Captain of the Schiller crew."],["Elise Schiller","Co-captain."],
+ ["Evan Schiller","Proud dad of the newest crew member."],["Baby Henry","The new future. Grandmaster of chess in training."],
+ ["Landon","Deck boss and contest champion."],["Victor","Quartermaster."],["Mark Brenner","Trusted friend of the ship."],
+ ["Ed Lafferty","Narrowpoint."],["Saturn Partners","Partners of the voyage."]];
+document.getElementById('crewList').innerHTML=CREW.map(([n,r])=>`<div class="mate"><b>${esc(n)}</b><span>${esc(r)}</span></div>`).join('');
+document.getElementById('crewCards').innerHTML=CREWS.map(([id,n,d])=>`<article class="cab"><span class="tag">Crew</span><h3>${esc(n)}</h3><p>${esc(d)}</p><button class="btn ghost" data-crew="${id}">Sail with ${esc(n)}</button></article>`).join('');
+document.querySelectorAll('[data-crew]').forEach(b=>b.onclick=()=>{crewSel.value=b.dataset.crew;store.set('poy_crew',crewSel.value);b.textContent='Aboard ✓';renderLog()});
+function renderLog(){const log=store.get('poy_log',[]);const rows=GAMES.map(g=>{const l=log.filter(x=>x.game===g.id).sort((a,b)=>g.low?a.score-b.score:b.score-a.score).slice(0,3);
+  return l.map(x=>`<tr><td>${g.name}</td><td>${esc(x.name)}</td><td>${esc(crewName(x.crew))}</td><td class="score">${g.fmt(x.score)}</td></tr>`).join('')}).join('');
+ document.getElementById('logBody').innerHTML=rows||'<tr><td colspan="4" style="color:var(--muted)">No scores yet. Play a game in the Arcade to start the log.</td></tr>'}
+
+/* ---------- Movie Machine ---------- */
+const castNames=CREW.map(c=>c[0]);let cast=new Set(['Pippy','Pops','Baby Henry']);
+const chipsEl=document.getElementById('castChips');
+function renderChips(){chipsEl.innerHTML=castNames.map(n=>`<button class="chip" aria-pressed="${cast.has(n)}" data-n="${esc(n)}">${esc(n)}</button>`).join('');
+ chipsEl.querySelectorAll('.chip').forEach(c=>c.onclick=()=>{const n=c.dataset.n;if(cast.has(n))cast.delete(n);else if(cast.size<5)cast.add(n);renderChips()})}
+renderChips();
+const SETS={ybor:["Ybor City, 7th Avenue at night",["#1a0f1c","#5a2430"],"brick"],grotto:["Gaspar's Grotto",["#0f1a1f","#3b2a1a"],"lanterns"],ship:["A pirate ship off Tampa Bay",["#0a1630","#1f4f70"],"waves"],camp:["Lakeside summer camp",["#0d1f1a","#2f5d3a"],"stars"],campus:["College quad at homecoming",["#121428","#3b3060"],"lights"],wolfe:["Wolfeboro Academy, lakeshore",["#0e1a26","#35556b"],"stars"]};
+const GENRES={adventure:"Adventure",comedy:"Comedy",heist:"Treasure Heist",sports:"Big Game",mystery:"Mystery"};
+const BEATS={west:["West Coast bounce",92],east:["East Coast boom-bap",90],rock:["Arena rock anthem",120],dub:["Dubstep wobble",140]};
+const fill=(sel,obj,f)=>Object.entries(obj).forEach(([k,v])=>sel.add(new Option(f(v),k)));
+fill(document.getElementById('setSel'),SETS,v=>v[0]);fill(document.getElementById('genSel'),GENRES,v=>v);fill(document.getElementById('beatSel'),BEATS,v=>v[0]);
+function writeScript(){const c=[...cast];if(!c.length)c.push('Pippy');const pick=()=>c[Math.random()*c.length|0];
+ const set=SETS[document.getElementById('setSel').value][0],g=document.getElementById('genSel').value;
+ const lines={adventure:[`${c[0]} unrolls an old map: "The X is closer than we think."`,`${pick()} spots a storm on the horizon. "Hold on to your hats!"`,`The crew races across ${set}.`,`${pick()} swings on a rope and lands on deck, sort of.`,`Under the last plank: a chest full of gold doubloons.`,`${c[0]}: "Best voyage ever. Same time next year?"`],
+  comedy:[`${c[0]} insists the treasure map is upside down. It is not.`,`${pick()} tries to order a parrot and gets a rooster from 7th Avenue.`,`Pops knocks the captain's hat off the bar. Again.`,`${pick()}: "Who put Pippy in charge of snacks?"`,`A dance-off breaks out across ${set}.`,`Everyone agrees: the rooster stays.`],
+  heist:[`${c[0]} lays out the plan: "In at midnight, out by one."`,`${pick()} cracks the code on the old cigar box.`,`Lasers! ${pick()} limbos under them like a pro.`,`The vault opens. Inside: Henry's golden chess set.`,`Sirens? No, just the Gasparilla parade starting early.`,`${c[0]}: "We were never here."`],
+  sports:[`Down by two, final round at ${set}.`,`${c[0]} gives the speech: "We play for the crew."`,`${pick()} sinks the long putt. The crowd goes wild.`,`${pick()} checkmates in four. Henry approves.`,`Last second. ${pick()} lands the winning shot.`,`Trophy up. Pippy gets the first lap.`],
+  mystery:[`The captain's hat has vanished from ${set}.`,`${c[0]} finds paw prints leading to the cellar.`,`${pick()} interviews the suspects. Pops looks innocent.`,`A clue in a bottle: "Check under the cigar box."`,`${pick()} gasps. It was the rooster all along.`,`Case closed. Pops was framed, as usual.`]}[g];
+ return {title:`${GENRES[g]}: ${c[0]} and the Crew`,lines,set:document.getElementById('setSel').value,cast:c}}
+const scr=document.getElementById('screen'),sx=scr.getContext('2d');let movie=null,mraf=0;
+function wrapText(t,x,y,w,lh){const ws=t.split(' ');let line='';for(const wd of ws){const test=line+wd+' ';if(sx.measureText(test).width>w&&line){sx.fillText(line,x,y);line=wd+' ';y+=lh}else line=test}sx.fillText(line,x,y)}
+function drawFrame(t){const W=640,H=360;const S=movie?SETS[movie.set]:SETS.ship;const gr=sx.createLinearGradient(0,0,0,H);gr.addColorStop(0,S[1][0]);gr.addColorStop(1,S[1][1]);sx.fillStyle=gr;sx.fillRect(0,0,W,H);
+ const k=S[2];
+ if(k==='waves'){sx.fillStyle='rgba(255,255,255,.08)';for(let i=0;i<4;i++){sx.beginPath();for(let x=0;x<=W;x+=10)sx.lineTo(x,250+i*22+Math.sin(x/40+t/600+i)*6);sx.lineTo(W,H);sx.lineTo(0,H);sx.fill()}
+  sx.fillStyle='#2a1a10';sx.beginPath();sx.moveTo(200,235+Math.sin(t/700)*4);sx.lineTo(440,235+Math.sin(t/700)*4);sx.lineTo(410,265);sx.lineTo(230,265);sx.fill();sx.fillRect(316,120,6,118);sx.fillStyle='#ece6d6';sx.beginPath();sx.moveTo(322,126);sx.lineTo(392,170);sx.lineTo(322,214);sx.fill();sx.fillStyle='#111';sx.fillRect(322,112,26,16);}
+ else if(k==='brick'){for(let y=0;y<H;y+=18)for(let x=(y/18%2)*20;x<W;x+=40){sx.fillStyle='rgba(154,63,47,'+(0.25+((x*7+y*3)%5)/30)+')';sx.fillRect(x,y,38,16)}
+  for(let i=0;i<5;i++){const lx=60+i*130;sx.fillStyle='#e2b04a';sx.beginPath();sx.arc(lx,70,6+Math.sin(t/300+i)*1.5,0,7);sx.fill();sx.fillStyle='rgba(226,176,74,.12)';sx.beginPath();sx.arc(lx,70,40,0,7);sx.fill()}}
+ else if(k==='lanterns'){for(let i=0;i<7;i++){const lx=40+i*95,ly=60+Math.sin(t/800+i)*8;sx.fillStyle='rgba(226,176,74,.18)';sx.beginPath();sx.arc(lx,ly,34,0,7);sx.fill();sx.fillStyle='#e9a23b';sx.fillRect(lx-7,ly-10,14,20)}
+  sx.fillStyle='#3b2a1a';sx.fillRect(0,260,W,100);sx.fillStyle='#5a3a1e';for(let x=0;x<W;x+=80)sx.fillRect(x,260,76,6)}
+ else{for(let i=0;i<60;i++){const x=(i*97)%W,y=(i*53)%200;sx.fillStyle=`rgba(255,255,240,${0.3+0.5*Math.abs(Math.sin(t/900+i))})`;sx.fillRect(x,y,2,2)}
+  sx.fillStyle='rgba(0,0,0,.35)';sx.beginPath();sx.moveTo(0,280);for(let x=0;x<=W;x+=40)sx.lineTo(x,260-Math.abs(Math.sin(x/90))*40);sx.lineTo(W,H);sx.lineTo(0,H);sx.fill();
+  if(k==='lights'){for(let i=0;i<10;i++){sx.fillStyle=`hsla(${i*36+t/20},80%,60%,.5)`;sx.beginPath();sx.arc(30+i*64,40,5,0,7);sx.fill()}}}
+ // watermark corner
+ sx.globalAlpha=.85;sx.fillStyle='#e2b04a';sx.font='12px "IBM Plex Mono",monospace';sx.fillText('© 2026 Adam Kornreich / R.A. Consulting ❤ Pops & Pippy',12,H-10);sx.globalAlpha=1;
+ if(!movie){sx.fillStyle='#e2b04a';sx.font='42px "Pirata One",Georgia,serif';sx.textAlign='center';sx.fillText('Movie Machine',W/2,150);sx.fillStyle='#ece6d6';sx.font='18px "Barlow Semi Condensed",sans-serif';sx.fillText('Pick a cast and roll camera',W/2,185);sx.textAlign='left';return}
+ const el=t-movie.start,per=3600,idx=Math.floor(el/per)-1;sx.textAlign='center';
+ if(idx<0){sx.fillStyle='rgba(0,0,0,.45)';sx.fillRect(0,0,W,H);sx.fillStyle='#e2b04a';sx.font='40px "Pirata One",Georgia,serif';wrapText(movie.title,W/2,150,560,44);sx.fillStyle='#ece6d6';sx.font='16px "Barlow Semi Condensed",sans-serif';sx.fillText('A Pirates of Ybor Playhouse picture · '+BEATS[movie.beat][0],W/2,230)}
+ else if(idx<movie.lines.length){sx.fillStyle='rgba(0,0,0,.6)';sx.fillRect(0,H-108,W,78);sx.fillStyle='#fff';sx.font='20px "Barlow Semi Condensed",sans-serif';wrapText(movie.lines[idx],W/2,H-78,580,24);
+  sx.fillStyle='#e2b04a';sx.font='13px "IBM Plex Mono",monospace';sx.fillText(`SCENE ${idx+1}`,W/2,28)}
+ else{sx.fillStyle='rgba(0,0,0,.7)';sx.fillRect(0,0,W,H);sx.fillStyle='#e2b04a';sx.font='34px "Pirata One",Georgia,serif';sx.fillText('Starring',W/2,90);sx.fillStyle='#ece6d6';sx.font='20px "Barlow Semi Condensed",sans-serif';movie.cast.forEach((n,i)=>sx.fillText(n,W/2,130+i*28));
+  if(el>per*(movie.lines.length+3)){stopMovie(true)}}
+ sx.textAlign='left'}
+function loop(t){drawFrame(t);if(movie)mraf=requestAnimationFrame(loop)}
+/* beat engine */
+let ac=null,beatTimer=null;
+function startBeat(kind){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume()}catch(e){return}
+ const bpm=BEATS[kind][1],six=60/bpm/4;let step=0,next=ac.currentTime+.1;const master=ac.createGain();master.gain.value=.5;master.connect(ac.destination);
+ const P={west:{k:[0,7,10],s:[4,12],h:[0,2,4,6,8,10,12,14],bass:[0,0,0,0,0,0,0,0,7,7,5,5,3,3,3,3]},east:{k:[0,3,8,10],s:[4,12],h:[0,2,4,6,8,10,12,14,15],bass:[0,0,0,0,3,3,3,3,5,5,5,5,3,3,0,0]},rock:{k:[0,8,10],s:[4,12],h:[0,2,4,6,8,10,12,14],bass:[0,0,0,0,0,0,0,0,5,5,5,5,7,7,7,7]},dub:{k:[0,10],s:[8],h:[0,2,4,6,8,10,12,14],bass:[0,0,0,0,0,0,0,0,3,3,3,3,-2,-2,-2,-2]}}[kind];
+ const kick=t=>{const o=ac.createOscillator(),g=ac.createGain();o.frequency.setValueAtTime(140,t);o.frequency.exponentialRampToValueAtTime(40,t+.15);g.gain.setValueAtTime(1,t);g.gain.exponentialRampToValueAtTime(.001,t+.25);o.connect(g).connect(master);o.start(t);o.stop(t+.3)};
+ const noise=(t,dur,hp,vol)=>{const b=ac.createBuffer(1,ac.sampleRate*dur,ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;const s=ac.createBufferSource();s.buffer=b;const f=ac.createBiquadFilter();f.type='highpass';f.frequency.value=hp;const g=ac.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(f).connect(g).connect(master);s.start(t)};
+ const root=kind==='rock'?82.4:kind==='dub'?43.65:55;
+ const bass=(t,semi,len)=>{const o=ac.createOscillator(),g=ac.createGain(),f=ac.createBiquadFilter();o.type=kind==='rock'?'sawtooth':kind==='dub'?'sawtooth':'triangle';o.frequency.value=root*Math.pow(2,semi/12);f.type='lowpass';f.frequency.value=kind==='rock'?1200:400;
+  if(kind==='dub'){const l=ac.createOscillator(),lg=ac.createGain();l.frequency.value=bpm/60*2;lg.gain.value=600;l.connect(lg).connect(f.frequency);f.frequency.value=700;l.start(t);l.stop(t+len)}
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(kind==='dub'?.5:.35,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+len);o.connect(f).connect(g).connect(master);o.start(t);o.stop(t+len+.05)};
+ const lead=(t)=>{if(kind!=='west')return;const o=ac.createOscillator(),g=ac.createGain();o.type='sine';o.frequency.setValueAtTime(880,t);o.frequency.linearRampToValueAtTime(990,t+six*6);g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(.06,t+.05);g.gain.linearRampToValueAtTime(.0001,t+six*7);o.connect(g).connect(master);o.start(t);o.stop(t+six*8)};
+ beatTimer=setInterval(()=>{while(next<ac.currentTime+.15){const s=step%16,swing=kind==='east'&&s%2?six*.18:0,t=next+swing;
+   if(P.k.includes(s))kick(t);if(P.s.includes(s))noise(t,.18,1500,.5);if(P.h.includes(s))noise(t,.04,7000,.18);
+   if(s%2===0&&(kind!=='dub'||s%8===0))bass(t,P.bass[s],kind==='dub'?six*8:six*2);if(s===0&&step%32===0)lead(t);
+   next+=six;step++}},40);}
+function stopBeat(){clearInterval(beatTimer);beatTimer=null;if(ac){try{ac.suspend()}catch(e){}}}
+function stopMovie(keepLast){stopBeat();if(movie){movie=null;cancelAnimationFrame(mraf)}drawFrame(performance.now())}
+let lastScript='';
+document.getElementById('roll').onclick=()=>{stopMovie();const s=writeScript();movie={...s,beat:document.getElementById('beatSel').value,start:performance.now()};
+ lastScript=`${s.title}\nSet: ${SETS[s.set][0]}\nSoundtrack: ${BEATS[movie.beat][0]}\nCast: ${s.cast.join(', ')}\n\n`+s.lines.map((l,i)=>`SCENE ${i+1}\n${l}`).join('\n\n')+`\n\n© 2026 Adam Kornreich / R.A. Consulting ❤ Pops & Pippy`;
+ document.getElementById('script').textContent=lastScript;startBeat(movie.beat);mraf=requestAnimationFrame(loop)};
+document.getElementById('cut').onclick=()=>stopMovie();
+document.getElementById('copyScript').onclick=()=>{const m=document.getElementById('copyMsg');if(!lastScript){m.textContent='Roll camera first.';return}
+ navigator.clipboard.writeText(lastScript).then(()=>m.textContent='Copied.',()=>{const r=document.createRange();r.selectNodeContents(document.getElementById('script'));const s=getSelection();s.removeAllRanges();s.addRange(r);m.textContent='Selected. Copy with your device.'})};
+drawFrame(0);
+
+renderCabs();renderLog();show();
+})();
+</script>
+
+
+<script src="../assets/ship.js" data-root="../" data-mode="game" defer></script>
+</body></html>

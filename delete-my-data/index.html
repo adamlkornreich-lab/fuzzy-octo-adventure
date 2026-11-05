@@ -1,0 +1,23 @@
+<!DOCTYPE html><html lang="en"><head><script src="../assets/poy-config.js"></script><script src="../assets/poy.js"></script><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Delete My Data · Pirates of Ybor</title><link rel="icon" href="../assets/watermark.png">
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Alegreya:wght@400;700&display=swap" rel="stylesheet">
+<style>:root{--bg:#0b1a26;--ink:#f3ead7;--mute:#a9bcc0;--brass:#e0b056;--line:#28495b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 Alegreya,Georgia,serif}
+main{max-width:720px;margin:0 auto;padding:28px 16px calc(120px + env(safe-area-inset-bottom,0px))}
+h1{font:400 clamp(2.2rem,8vw,3.2rem)/1.05 "Pirata One",Georgia,serif;color:var(--brass);margin:0 0 6px}
+h2{font:400 1.6rem/1.1 "Pirata One",Georgia,serif;color:var(--brass);margin:26px 0 6px}
+p,li{color:#e6dcc6}.mute{color:var(--mute)}a{color:var(--brass)}
+footer{border-top:1px solid var(--line);margin-top:30px;padding-top:14px;color:var(--mute);font-size:.9rem}</style></head><body><main>
+<h1>Delete My Data</h1><p class="mute">Last updated October 31, 2026</p>
+<h2>Delete your account</h2>
+<p>Signed in? Open Account in the app and tap <b>Delete my account</b>, then type DELETE to confirm. This permanently removes your profile, your scores, your purchase records and your sign-in from our servers, right away. It works the same in the app and on the website.</p>
+<p>A Crew Pass subscription is billed by Apple, Google or Amazon, so cancel it in your store's subscription settings as well. Deleting your account does not refund past purchases; ask your store about refunds.</p>
+<h2>Erase what's saved on this device</h2>
+<p>Scores and settings saved on this device (signed in or not) can be erased with the button below, or by clearing site data for thepiratesofybor.com in your browser, or by deleting the app.</p>
+<p><button id="wipe" style="font:inherit;font-weight:700;min-height:46px;padding:0 20px;border-radius:12px;border:0;background:#c4572b;color:#fff;cursor:pointer">Erase my saved game data on this device</button></p>
+<p id="msg" class="mute" aria-live="polite"></p>
+<h2>Can't sign in any more?</h2>
+<p>Email <a href="mailto:adamlkornreich@gmail.com?subject=Delete%20my%20data">adamlkornreich@gmail.com</a> with the subject "Delete my data" from the email address on your account. We will delete everything and confirm within 30 days.</p>
+<script>document.getElementById("wipe").onclick=function(){var n=0;try{n=localStorage.length;localStorage.clear()}catch(e){}try{sessionStorage.clear()}catch(e){}document.getElementById("msg").textContent=n?"Done. Saved game data on this device has been erased. If you were signed in, you are now signed out on this device; your account still exists until you delete it above.":"Nothing was saved on this device, so there is nothing to erase."};</script>
+<footer>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.<br>Contact: <a href="mailto:adamlkornreich@gmail.com">adamlkornreich@gmail.com</a><br><a href="../support/index.html">Support</a> · <a href="../delete-my-data/index.html">Delete My Data</a> · <a href="../no-endorsement/index.html">No Endorsement</a></footer>
+</main><script src="../assets/ship.js" data-root="../" defer></script></body></html>
