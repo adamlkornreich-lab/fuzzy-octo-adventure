@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pirates of Ybor</title>
+  <meta name="description" content="Pirates of Ybor — a pirate krewe sailing out of Ybor City, Tampa.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./"><img src="assets/favicon.svg" alt="" width="32" height="32"> Pirates of Ybor</a>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#events">Events</a>
+      <a href="#join">Join</a>
+      <a href="members.html" data-auth="in" hidden>Members</a>
+      <a href="login.html" class="btn btn-small" data-auth="out">Sign in</a>
+      <button class="btn btn-small" data-auth="in" data-signout hidden>Sign out</button>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <p class="eyebrow">Ybor City · Tampa Bay</p>
+      <h1>Pirates of Ybor</h1>
+      <p class="lede">A krewe of friends, rogues and good neighbors keeping the pirate spirit alive in Ybor City.</p>
+      <div class="actions">
+        <a class="btn" href="#join">Join the crew</a>
+        <a class="btn btn-ghost" href="#events">See events</a>
+      </div>
+    </section>
+
+    <section id="about" class="panel">
+      <h2>About the krewe</h2>
+      <p>Pirates of Ybor is a social krewe. We gather for parades, festivals and community events
+        across Tampa Bay, and for plenty of good times in between.</p>
+      <div class="cards">
+        <div class="card"><h3>Sail together</h3><p>Parades, invasions and street festivals, in full pirate garb.</p></div>
+        <div class="card"><h3>Give back</h3><p>We put our plunder to work for local causes in and around Ybor.</p></div>
+        <div class="card"><h3>Make friends</h3><p>Socials, meetups and a crew that shows up for each other.</p></div>
+      </div>
+    </section>
+
+    <section id="events" class="panel">
+      <h2>Upcoming events</h2>
+      <ul class="events" id="event-list"></ul>
+    </section>
+
+    <section id="join" class="panel">
+      <h2>Join the crew</h2>
+      <p>Create a member account to get crew news, event details and the members-only page.</p>
+      <div class="actions">
+        <a class="btn" href="login.html#signup">Create an account</a>
+        <a class="btn btn-ghost" id="contact-link" hidden>Email the krewe</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="year"></span> Pirates of Ybor</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="assets/site.js"></script>
+  <script>
+    (function () {
+      var cfg = window.SITE_CONFIG || {};
+      var list = document.getElementById("event-list");
+      var today = new Date().toISOString().slice(0, 10);
+      var upcoming = (cfg.EVENTS || []).filter(function (e) { return e.date >= today; })
+        .sort(function (a, b) { return a.date.localeCompare(b.date); });
+      if (!upcoming.length) {
+        list.innerHTML = '<li class="empty">Next voyage announced soon. Members hear first.</li>';
+      }
+      upcoming.forEach(function (e) {
+        var d = new Date(e.date + "T12:00:00");
+        var li = document.createElement("li");
+        li.innerHTML = '<time></time><div><strong></strong><span class="muted"></span><p></p></div>';
+        li.querySelector("time").textContent = d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+        li.querySelector("strong").textContent = e.title || "";
+        li.querySelector(".muted").textContent = e.place ? " · " + e.place : "";
+        li.querySelector("p").textContent = e.note || "";
+        list.appendChild(li);
+      });
+      if (cfg.CONTACT_EMAIL) {
+        var a = document.getElementById("contact-link");
+        a.href = "mailto:" + cfg.CONTACT_EMAIL;
+        a.hidden = false;
+      }
+      document.getElementById("year").textContent = new Date().getFullYear();
+    })();
+  </script>
+</body>
+</html>

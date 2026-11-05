@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · Pirates of Ybor</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./"><img src="assets/favicon.svg" alt="" width="32" height="32"> Pirates of Ybor</a>
+    <nav><a href="./">Home</a></nav>
+  </header>
+
+  <main class="auth-wrap">
+    <div class="panel auth-card">
+      <div class="tabs" role="tablist">
+        <button role="tab" data-tab="signin" aria-selected="true">Sign in</button>
+        <button role="tab" data-tab="signup" aria-selected="false">Create account</button>
+      </div>
+
+      <p class="notice" id="not-configured" hidden>
+        Sign-in isn't switched on yet. The site owner needs to add the Supabase settings to <code>config.js</code>.
+      </p>
+
+      <form id="auth-form" novalidate>
+        <label>Email <input type="email" name="email" autocomplete="email" required></label>
+        <label>Password <input type="password" name="password" minlength="8" autocomplete="current-password" required></label>
+        <button class="btn" type="submit" id="submit">Sign in</button>
+        <button class="link" type="button" id="forgot">Forgot password?</button>
+      </form>
+
+      <p class="msg" id="msg" role="status" aria-live="polite"></p>
+    </div>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+  <script src="assets/site.js"></script>
+  <script src="assets/login.js"></script>
+</body>
+</html>
