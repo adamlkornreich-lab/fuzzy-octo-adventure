@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Schiller Ledger</title><link rel="stylesheet" href="assets/site.css">
+<style>
+.lhead{padding:18px 0 8px}.lhead h1{margin:0;color:var(--gold2);font-size:clamp(1.7rem,6vw,2.6rem);text-wrap:balance}.lhead p{margin:4px 0 0;color:var(--mute);max-width:65ch}
+.ch{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;width:100%;text-align:left;padding:12px;margin-bottom:8px;border-radius:10px;border:1px solid rgba(232,184,74,.28);background:var(--panel);color:var(--fog);font:inherit;cursor:pointer}
+.ch:disabled{opacity:.5;cursor:not-allowed}.ch b{display:block;color:var(--gold2);font-size:1.05rem}.ch small{color:var(--mute)}.ch .n{font-size:1.5rem;text-align:center}
+.ch:focus-visible,.choice:focus-visible,.btn:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+.page{background:#f3e6c8;color:#2b2013;border-radius:6px;padding:18px;background-image:repeating-linear-gradient(transparent 0 27px,rgba(60,90,120,.18) 27px 28px)}
+.page h2{color:#6e2d14}.page p,.page li{line-height:28px;margin:0}.page ul{margin:0;padding-left:20px}
+.formula{font:bold 1.15rem Georgia,serif;color:#6e2d14}
+.q{font-size:1.15rem;margin:0 0 6px}
+pre.t{font:1rem ui-monospace,Menlo,monospace;background:var(--panel2);padding:10px;border-radius:8px;overflow-x:auto;margin:8px 0;color:var(--fog)}
+#why{padding:10px 12px;background:var(--panel2);border-radius:8px;margin:8px 0}
+.ded{color:var(--mute);font-size:.9rem;max-width:65ch}
+</style></head>
+<body>
+<main class="wrap">
+  <div class="lhead"><h1>The Schiller Ledger</h1><p>Learn real accounting by keeping the books for a pirate tavern. Pass each chapter to climb from Deckhand to Master of the Ledger.</p></div>
+  <section id="map" style="padding-top:8px">
+    <p class="stat" id="rank" style="display:inline-block"></p>
+    <div id="list" style="margin-top:12px"></div>
+    <p class="ded">Dedicated to Evan Schiller and the Schiller family. This game teaches the basics. It isn't professional training or tax, legal or financial advice.</p>
+  </section>
+  <section id="lesson" hidden style="padding-top:8px">
+    <div class="page"><h2 id="lT"></h2><div id="lB"></div></div>
+    <p class="row" style="margin-top:14px"><button class="btn" id="lGo">Start the 5 questions</button><button class="btn ghost" id="lBack">Back to chapters</button></p>
+  </section>
+  <section id="quiz" class="panel" hidden>
+    <div class="hud" style="justify-content:flex-start"><span class="stat" id="qN"></span><span class="stat" id="qS"></span></div>
+    <div id="qQ"></div><div class="choices" id="qC"></div><div id="why" hidden aria-live="polite"></div>
+    <button class="btn" id="qNext" hidden>Next</button>
+  </section>
+  <section id="done" class="panel" hidden><h2 id="dT"></h2><p id="dB"></p><p class="row"><button class="btn" id="dNext"></button><button class="btn ghost" id="dMap">Chapters</button></p></section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+const $=i=>document.getElementById(i),R=(a,b)=>a+Math.floor(Math.random()*(b-a+1)),pick=a=>a[R(0,a.length-1)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=R(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;};
+const $$=n=>"$"+n.toLocaleString("en-US");
+const nearby=(v,step)=>{const o=new Set();for(const d of shuffle([step,-step,2*step,-2*step,3*step]))if(v+d>=0&&o.size<3)o.add(v+d);return[...o].map($$);};
+const fixed=rows=>()=>{const r=pick(rows);return{q:r[0],ok:r[1],no:r[2],why:r[3]};};
+const TYPES=["Asset","Liability","Equity","Revenue","Expense"];
+const ACCTS=[["Cash","Asset","Cash is something the business owns."],["Kegs and bar stock (inventory)","Asset","Stock on hand will be sold, so it's an asset."],["The tavern's ice machine","Asset","Equipment is owned and used for years."],["Money guests owe on their tabs (accounts receivable)","Asset","Money owed to you is an asset."],["A bank loan","Liability","You owe it to the bank."],["Bills owed to the liquor vendor (accounts payable)","Liability","You owe it to a vendor."],["Gift cards sold but not yet used (unearned revenue)","Liability","You still owe the guest the drinks."],["The owner's investment (owner's capital)","Equity","It's the owner's claim on the business."],["Retained earnings","Equity","Past profits kept in the business belong to the owners."],["Drink sales","Revenue","Earned from selling to guests."],["Plank Bar booking fees earned","Revenue","Earned from serving customers."],["Crew wages","Expense","A cost of running the business."],["Monthly rent","Expense","A cost of using the space."],["Electric bill","Expense","A cost of running the business."]];
+const JE=[["The tavern sells $500 of drinks for cash.","Dr Cash, Cr Sales Revenue",["Dr Sales Revenue, Cr Cash","Dr Cash, Cr Accounts Payable","Dr Inventory, Cr Cash"],"Cash (asset) goes up, so debit it. Revenue goes up, so credit it."],
+["The owner puts $10,000 of her own money into the business.","Dr Cash, Cr Owner's Capital",["Dr Owner's Capital, Cr Cash","Dr Cash, Cr Sales Revenue","Dr Cash, Cr Loan Payable"],"Cash goes up (debit). The owner's equity goes up (credit). It isn't revenue because nothing was sold."],
+["The tavern pays $2,000 rent for this month.","Dr Rent Expense, Cr Cash",["Dr Cash, Cr Rent Expense","Dr Rent Expense, Cr Accounts Payable","Dr Equipment, Cr Cash"],"Expenses go up with a debit. Cash goes down with a credit."],
+["The tavern buys $800 of rum on credit from a vendor.","Dr Inventory, Cr Accounts Payable",["Dr Inventory, Cr Cash","Dr Accounts Payable, Cr Inventory","Dr Cash, Cr Accounts Payable"],"Inventory goes up (debit). You now owe the vendor, so the liability goes up (credit)."],
+["The tavern pays that $800 vendor bill.","Dr Accounts Payable, Cr Cash",["Dr Inventory, Cr Cash","Dr Cash, Cr Accounts Payable","Dr Rent Expense, Cr Cash"],"The liability goes down (debit). Cash goes down (credit). The inventory was already recorded."],
+["The bank lends the tavern $25,000.","Dr Cash, Cr Loan Payable",["Dr Loan Payable, Cr Cash","Dr Cash, Cr Sales Revenue","Dr Cash, Cr Owner's Capital"],"Cash goes up (debit). You owe the bank, so the liability goes up (credit)."],
+["A guest buys a $100 gift card.","Dr Cash, Cr Unearned Revenue",["Dr Cash, Cr Sales Revenue","Dr Unearned Revenue, Cr Cash","Dr Accounts Receivable, Cr Sales Revenue"],"You got cash but still owe the drinks. That's a liability until the card is used."],
+["A company runs up a $600 tab and will pay next month.","Dr Accounts Receivable, Cr Sales Revenue",["Dr Cash, Cr Sales Revenue","Dr Sales Revenue, Cr Accounts Receivable","Dr Accounts Receivable, Cr Unearned Revenue"],"Revenue is earned now. No cash arrived, so record the money owed as a receivable."],
+["The tavern buys a $6,000 ice machine with cash.","Dr Equipment, Cr Cash",["Dr Repairs Expense, Cr Cash","Dr Cash, Cr Equipment","Dr Equipment, Cr Accounts Payable"],"One asset goes up and another goes down. Its cost becomes expense over time through depreciation."]];
+const CH=[
+ {t:"The Accounting Equation",n:"⚖",l:`<p class="formula">Assets = Liabilities + Equity</p><ul><li><b>Assets</b>: what the business owns.</li><li><b>Liabilities</b>: what it owes others.</li><li><b>Equity</b>: what's left for the owners.</li></ul><p>A tavern with $50,000 in assets and a $20,000 loan has $30,000 in equity. The two sides always balance.</p>`,
+  gen:[()=>{const l=R(2,40)*500,e=R(2,40)*500,a=l+e;return pick([{q:`Assets are ${$$(a)} and liabilities are ${$$(l)}. What is equity?`,ok:$$(e),no:nearby(e,500),why:`Equity = ${$$(a)} − ${$$(l)} = ${$$(e)}.`},{q:`Liabilities are ${$$(l)} and equity is ${$$(e)}. What are assets?`,ok:$$(a),no:nearby(a,500),why:`Assets = ${$$(l)} + ${$$(e)} = ${$$(a)}.`},{q:`Assets are ${$$(a)} and equity is ${$$(e)}. What are liabilities?`,ok:$$(l),no:nearby(l,500),why:`Liabilities = ${$$(a)} − ${$$(e)} = ${$$(l)}.`}]);},
+  fixed([["The tavern borrows money from a bank. What happens to the equation?","Assets and liabilities both go up",["Assets go up and equity goes down","Only liabilities go up","Nothing changes"],"Cash rises and so does the loan, so both sides stay equal."],["The tavern pays off part of a loan with cash. What happens?","Assets and liabilities both go down",["Assets go down and equity goes up","Only assets go down","Liabilities go up"],"Cash falls and the debt falls by the same amount."]])]},
+ {t:"Know Your Accounts",n:"📒",l:`<p>Every account fits one of five types.</p><ul><li><b>Asset</b>: cash, stock, equipment.</li><li><b>Liability</b>: loans, unpaid bills.</li><li><b>Equity</b>: the owners' stake.</li><li><b>Revenue</b>: money earned from sales.</li><li><b>Expense</b>: costs of running the business.</li></ul>`,
+  gen:[()=>{const a=pick(ACCTS);return{q:`What type of account is this? <b>${a[0]}</b>`,ok:a[1],no:TYPES.filter(t=>t!==a[1]).slice(0,4),why:a[2]};}]},
+ {t:"Debits and Credits",n:"✍",l:`<p>Debit means left side. Credit means right side. Neither one means good or bad.</p><ul><li><b>Debit increases</b>: assets and expenses.</li><li><b>Credit increases</b>: liabilities, equity and revenue.</li></ul><p>The opposite side decreases the account. Every entry has equal debits and credits.</p>`,
+  gen:[()=>{const a=pick(ACCTS),up=Math.random()<.5,dr=(a[1]==="Asset"||a[1]==="Expense")===up;return{q:`To <b>${up?"increase":"decrease"}</b> this account, do you debit or credit it? <b>${a[0]}</b>`,ok:dr?"Debit":"Credit",no:[dr?"Credit":"Debit"],why:`${a[1]} accounts increase with a ${a[1]==="Asset"||a[1]==="Expense"?"debit":"credit"}, so a ${up?"increase":"decrease"} is a ${dr?"debit":"credit"}.`};}]},
+ {t:"Journal Entries",n:"🖋",l:`<p>A journal entry records one transaction. Ask three questions:</p><ul><li>Which accounts changed?</li><li>Did each go up or down?</li><li>Which side records that change?</li></ul><p>Debits are usually written first, as in "Dr Cash, Cr Sales Revenue."</p>`,gen:[fixed(JE.map(j=>[j[0]+" Which entry records it?",j[1],j[2],j[3]]))]},
+ {t:"The Income Statement",n:"📈",l:`<p>This report shows profit for a period of time.</p><p class="formula">Sales − Cost of goods sold = Gross profit</p><p class="formula">Gross profit − Operating expenses = Net income</p><p>Cost of goods sold is what the drinks and food you sold cost you.</p>`,
+  gen:[()=>{const s=R(40,90)*1000,c=R(10,25)*1000,w=R(5,10)*1000,r=R(2,4)*1000,g=s-c,n=g-w-r;const t=`<pre class="t">Sales          ${$$(s)}\nCost of goods  ${$$(c)}\nWages          ${$$(w)}\nRent           ${$$(r)}</pre>`;return pick([{q:"What is gross profit?"+t,ok:$$(g),no:[$$(n),$$(s),$$(s+c)],why:`Gross profit = ${$$(s)} − ${$$(c)} = ${$$(g)}. Wages and rent come out later.`},{q:"What is net income?"+t,ok:$$(n),no:[$$(g),$$(n+r),$$(n-1000)],why:`${$$(s)} − ${$$(c)} − ${$$(w)} − ${$$(r)} = ${$$(n)}.`}]);},
+  fixed([["Which of these belongs on the income statement?","Wages expense",["Cash","Bank loan","Owner's capital"],"Revenue and expenses go on the income statement. The others go on the balance sheet."]])]},
+ {t:"The Balance Sheet",n:"🏛",l:`<p>This report is a snapshot of one day: assets, liabilities and equity.</p><ul><li><b>Current</b> items are expected to turn into cash or come due within a year.</li><li><b>Long-term</b> items last longer.</li></ul><p>Net income increases retained earnings. Dividends paid to owners reduce it.</p><p class="formula">Ending RE = Beginning RE + Net income − Dividends</p>`,
+  gen:[()=>{const c=R(5,30)*1000,i=R(2,9)*1000,e=R(10,40)*1000,tot=c+i+e;return{q:`Cash is ${$$(c)}, inventory is ${$$(i)} and equipment is ${$$(e)}. What are total assets?`,ok:$$(tot),no:nearby(tot,1000),why:`${$$(c)} + ${$$(i)} + ${$$(e)} = ${$$(tot)}.`};},
+  ()=>{const b=R(10,50)*1000,n=R(5,20)*1000,d=R(1,4)*1000,v=b+n-d;return{q:`Beginning retained earnings are ${$$(b)}, net income is ${$$(n)} and dividends are ${$$(d)}. What are ending retained earnings?`,ok:$$(v),no:[$$(b+n),$$(b-n+d>=0?b-n+d:b+d),$$(b+n+d)],why:`${$$(b)} + ${$$(n)} − ${$$(d)} = ${$$(v)}.`};},
+  fixed([["Which is a current liability?","Vendor bills due next month",["A 10-year building loan's later payments","Equipment","Retained earnings"],"It comes due within a year."],["Which is a long-term asset?","The tavern's building",["Cash","Accounts receivable","Bar stock"],"It'll be used for many years."]])]},
+ {t:"Accruals and Depreciation",n:"⏳",l:`<p>Accrual accounting records revenue when it's <b>earned</b> and expenses when they're <b>incurred</b>, whenever the cash moves.</p><p class="formula">Straight-line depreciation = (Cost − Salvage) ÷ Useful life</p><p>Depreciation spreads the cost of equipment over the years you use it.</p>`,
+  gen:[()=>{const y=pick([4,5,8,10]),an=R(1,9)*500,sv=R(0,4)*500,c=an*y+sv;return{q:`Equipment cost ${$$(c)}, has a salvage value of ${$$(sv)} and lasts ${y} years. What's the yearly straight-line depreciation?`,ok:$$(an),no:nearby(an,500),why:`(${$$(c)} − ${$$(sv)}) ÷ ${y} = ${$$(an)}.`};},
+  ()=>{const m=pick([3,6,12]),p=R(1,6)*100,tot=m*p,u=R(1,m-1),left=tot-u*p;return{q:`You prepay ${$$(tot)} for ${m} months of insurance. After ${u} month${u>1?"s":""}, how much is still a prepaid asset?`,ok:$$(left),no:nearby(left,p),why:`Each month uses ${$$(p)}. ${$$(tot)} − ${u} × ${$$(p)} = ${$$(left)}.`};},
+  fixed([["Crew worked the last week of December but get paid in January. When does the wage expense belong?","December",["January","Split it evenly","When the tax return is filed"],"Under accrual accounting, the expense belongs in the month the work happened."],["A guest pays in March for a party held in May. When is the revenue recognized?","May",["March","April","At year-end"],"It's earned when the party happens. Until then, it's unearned revenue."]])]},
+ {t:"Bank Reconciliation",n:"🏦",l:`<p>Your books and the bank's statement rarely match on the same day. A reconciliation explains why.</p><p class="formula">Bank balance + Deposits in transit − Outstanding checks = Adjusted bank</p><p class="formula">Book balance + Interest − Fees = Adjusted book</p><p>The two adjusted figures must match. If they don't, keep looking.</p>`,
+  gen:[()=>{const b=R(30,90)*100,d=R(2,12)*100,o=R(1,9)*100,v=b+d-o;return{q:`Bank balance is ${$$(b)}, deposits in transit are ${$$(d)} and outstanding checks are ${$$(o)}. What's the adjusted bank balance?`,ok:$$(v),no:[$$(b+d),$$(b-d+o>=0?b-d+o:b+o),$$(b+d+o)],why:`${$$(b)} + ${$$(d)} − ${$$(o)} = ${$$(v)}.`};},
+  ()=>{const b=R(30,90)*100,i=R(1,9)*5,f=R(2,9)*5,v=b+i-f;return{q:`Book balance is ${$$(b)}, the bank paid ${$$(i)} interest and charged a ${$$(f)} fee. What's the adjusted book balance?`,ok:$$(v),no:[$$(b+i+f),$$(b-i-f),$$(b)].filter(x=>x!==$$(v)),why:`${$$(b)} + ${$$(i)} − ${$$(f)} = ${$$(v)}.`};},
+  fixed([["A check you wrote hasn't cleared. Where do you adjust for it?","Subtract it from the bank balance",["Subtract it from the book balance","Add it to the bank balance","Ignore it"],"Your books already show it. The bank hasn't caught up."],["The statement shows a service fee you never recorded. Where do you adjust?","Subtract it from the book balance",["Subtract it from the bank balance","Add it to the book balance","Ignore it"],"The bank already took it. Your books need to catch up."]])]},
+ {t:"Year-End Close",n:"👑",l:`<p>The final test mixes every chapter. At year-end, revenue and expense accounts close to retained earnings, so the new year starts at zero.</p><p>Assets, liabilities and equity carry forward.</p>`,gen:[]}
+];
+CH[8].gen=[...CH.slice(0,8).flatMap(c=>c.gen),fixed([["Which accounts are closed to zero at year-end?","Revenue and expense",["Assets and liabilities","Cash and loans","All accounts"],"They measure one year's profit, so they restart each year."]])];
+const RANKS=["Deckhand","Ledger Apprentice","Bookkeeper","Junior Accountant","Staff Accountant","Senior Accountant","Controller","Chief Purser","Master of the Ledger","Master of the Ledger"];
+let P=0;try{P=+localStorage.getItem("py_ledger")||0;}catch(e){}
+const save=()=>{try{localStorage.setItem("py_ledger",P);}catch(e){}};
+let cur=0,qs=[],qi=0,right=0;
+const show=id=>["map","lesson","quiz","done"].forEach(s=>$(s).hidden=s!==id);
+function drawMap(){show("map");$("rank").textContent="Rank: "+RANKS[P];$("list").innerHTML=CH.map((c,i)=>`<button class="ch" data-i="${i}" ${i>P?"disabled":""}><span class="n">${i>P?"🔒":c.n}</span><span><b>${i+1}. ${c.t}</b><small>${i<P?"Passed":i===P?"Up next":"Locked"}</small></span><span>${i<P?"✓":""}</span></button>`).join("");}
+function makeQ(i){const q=CH[i].gen[R(0,CH[i].gen.length-1)]();q.no=[...new Set(q.no)].filter(x=>x!==q.ok);return q;}
+function openCh(i){cur=i;show("lesson");$("lT").textContent=CH[i].t;$("lB").innerHTML=CH[i].l;scrollTo(0,0);}
+function startQuiz(){qs=[];let g=0;while(qs.length<5&&g++<80){const q=makeQ(cur);if(!qs.some(x=>x.q===q.q))qs.push(q);}qi=0;right=0;show("quiz");drawQ();}
+function drawQ(){const q=qs[qi];$("qN").textContent=`Question ${qi+1} of ${qs.length}`;$("qS").textContent=right+" right";$("qQ").innerHTML=`<div class="q">${q.q}</div>`;$("why").hidden=true;$("qNext").hidden=true;
+ $("qC").innerHTML=shuffle([q.ok,...q.no]).map(o=>`<button class="choice" data-v="${o}">${o}</button>`).join("");}
+$("qC").onclick=e=>{const b=e.target.closest(".choice");if(!b||!$("qNext").hidden)return;const q=qs[qi],ok=b.dataset.v===q.ok;if(ok)right++;
+ document.querySelectorAll("#qC .choice").forEach(x=>{x.disabled=true;if(x.dataset.v===q.ok)x.classList.add("right");});if(!ok)b.classList.add("wrong");
+ $("why").textContent=(ok?"Correct. ":"Not quite. ")+q.why;$("why").hidden=false;$("qS").textContent=right+" right";$("qNext").hidden=false;$("qNext").textContent=qi===qs.length-1?"See results":"Next";};
+$("qNext").onclick=()=>{qi++;if(qi<qs.length)return drawQ();const pass=right>=4;if(pass)PY.celebrate();if(pass&&cur===P&&P<9){P=cur+1;save();}show("done");
+ const last=cur===8;$("dT").textContent=pass?(last?"You closed the year. Master of the Ledger!":`Chapter passed: ${right} of ${qs.length}`):`${right} of ${qs.length}. You need 4 to pass.`;
+ $("dB").textContent=pass?"Rank: "+RANKS[P]+".":"Read the lesson again and try a new set of questions.";
+ $("dNext").textContent=pass?(last?"Replay the final":"Next chapter"):"Try again";$("dNext").onclick=()=>openCh(pass&&!last?cur+1:cur);};
+$("list").onclick=e=>{const b=e.target.closest(".ch");if(b&&!b.disabled)openCh(+b.dataset.i);};
+$("lGo").onclick=startQuiz;$("lBack").onclick=drawMap;$("dMap").onclick=drawMap;drawMap();
+</script>
+</body></html>

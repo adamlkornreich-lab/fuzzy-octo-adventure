@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cup Pong — The Pirates of Ybor</title><link rel="stylesheet" href="assets/site.css"></head>
+<body>
+<main class="wrap">
+  <section class="hero"><h1>🥤 Cup Pong</h1><p class="lead">Sink all six cups before the clock runs out. Click or tap to throw — the ball lands where you aim, with a bit of ship sway. Vs AI or pass-and-play.</p></section>
+  <section class="panel">
+    <div class="hud"><select id="mode" style="width:auto"><option value="ai">Vs Ship AI</option><option value="2p">Two players</option></select><span class="stat" id="who">Player 1</span><span class="stat" id="time">60s</span><span class="stat" id="score">P1 0 · P2 0</span><button class="btn" id="start">Start</button></div>
+    <canvas class="game" id="c" width="900" height="500"></canvas>
+    <p id="log" style="text-align:center;color:var(--mute)">Hit Start, then tap a cup to throw.</p>
+  </section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+const c=document.getElementById("c"),x=c.getContext("2d");const log=m=>document.getElementById("log").textContent=m;
+let cups=[],ball=null,turn=0,sunk=[0,0],t=60,timer=null,running=false,sway=0,aiT=null;
+function layout(){cups=[];[[450,120],[420,170],[480,170],[390,220],[450,220],[510,220]].forEach(p=>cups.push({x:p[0],y:p[1],up:true}));}
+function hud(){document.getElementById("who").textContent=document.getElementById("mode").value==="ai"&&turn===1?"Ship AI":"Player "+(turn+1);document.getElementById("time").textContent=t+"s";document.getElementById("score").textContent=`P1 ${sunk[0]} · P2 ${sunk[1]}`;}
+function start(){clearTimeout(aiT);ball=null;layout();sunk=[0,0];turn=0;t=60;running=true;hud();clearInterval(timer);timer=setInterval(()=>{t--;hud();if(t<=0)finish();},1000);log("Tap a cup to throw!");}
+function finish(){if(sunk[0]>sunk[1]||(sunk[0]!==sunk[1]&&document.getElementById("mode").value==="2p"))PY.celebrate();clearInterval(timer);clearTimeout(aiT);ball=null;running=false;log(sunk[0]===sunk[1]?"Tie!":`${sunk[0]>sunk[1]?"Player 1":(document.getElementById("mode").value==="ai"?"Ship AI":"Player 2")} wins ${Math.max(...sunk)}–${Math.min(...sunk)}!`);PY.best("cuppong",sunk[0]);}
+function throwAt(tx,ty,who){if(ball)return;const err=who==="ai"?28:16;tx+=(Math.random()-.5)*err*2+Math.sin(sway)*8;ty+=(Math.random()-.5)*err*2;ball={x:450,y:470,tx,ty,p:0,who};}
+c.addEventListener("pointerdown",e=>{if(!running||ball)return;if(document.getElementById("mode").value==="ai"&&turn===1)return;const r=c.getBoundingClientRect();throwAt((e.clientX-r.left)*900/r.width,(e.clientY-r.top)*500/r.height,"p");});
+function aiTurn(){if(!running)return;const up=cups.filter(k=>k.up);if(!up.length)return;const k=up[Math.floor(Math.random()*up.length)];aiT=setTimeout(()=>throwAt(k.x,k.y,"ai"),700);}
+function endThrow(){const ai=document.getElementById("mode").value==="ai";if(cups.every(k=>!k.up)){layout();}turn=1-turn;hud();if(ai&&turn===1)aiTurn();}
+function step(){sway+=.03;if(ball){ball.p+=.04;const p=ball.p;ball.x=450+(ball.tx-450)*p;ball.y=470+(ball.ty-470)*p-Math.sin(p*Math.PI)*160;
+  if(p>=1){const hit=cups.find(k=>k.up&&Math.hypot(k.x-ball.tx,k.y-ball.ty)<22);if(hit){hit.up=false;sunk[turn]++;log("Splash! Cup sunk.");}else log("Miss…");ball=null;endThrow();}}
+  render();requestAnimationFrame(step);}
+function render(){x.fillStyle="#3b2414";x.fillRect(0,0,900,500);x.fillStyle="#5a3a1a";x.fillRect(300,60,300,400);
+  cups.forEach(k=>{x.fillStyle=k.up?"#b5532a":"#2a1a0e";x.beginPath();x.arc(k.x,k.y,22,0,7);x.fill();x.strokeStyle="#e8b84a";x.lineWidth=2;x.stroke();});
+  if(ball){x.fillStyle="#fff";x.beginPath();x.arc(ball.x,ball.y,8,0,7);x.fill();}
+  x.fillStyle="#f6d67a";x.font="16px Georgia";x.fillText("Aim and tap a cup",380,490);}
+document.getElementById("start").onclick=start;document.getElementById("mode").onchange=()=>{clearInterval(timer);clearTimeout(aiT);ball=null;running=false;layout();sunk=[0,0];turn=0;t=60;hud();log("Hit Start, then tap a cup to throw.");};layout();hud();step();
+</script>
+</body></html>

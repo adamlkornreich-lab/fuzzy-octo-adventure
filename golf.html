@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Andy Golf Club — The Pirates of Ybor</title><link rel="stylesheet" href="assets/site.css"></head>
+<body>
+<main class="wrap">
+  <section class="hero"><h1>⛳ Andy Golf Club</h1><p class="lead">Nine pirate holes. Drag back from the ball to aim and set power, release to swing. Sand slows you, water costs a stroke, wind pushes every shot.</p></section>
+  <section class="panel">
+    <div class="hud"><span class="stat" id="hole">Hole 1 · Par 3</span><span class="stat" id="strokes">Strokes 0</span><span class="stat" id="total">Total 0</span><span class="stat" id="wind">Wind →</span></div>
+    <canvas class="game" id="c" width="900" height="520"></canvas>
+    <p style="text-align:center;margin-top:12px"><button class="btn" id="restart">Restart Round</button></p>
+  </section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+const c=document.getElementById("c"),x=c.getContext("2d");
+const HOLES=[
+ {par:3,tee:[120,260],cup:[760,260],sand:[],water:[]},
+ {par:3,tee:[120,420],cup:[760,120],sand:[[400,250,90]],water:[]},
+ {par:4,tee:[100,100],cup:[800,420],sand:[],water:[[380,180,160,160]]},
+ {par:3,tee:[120,260],cup:[760,260],sand:[[450,260,80]],water:[[250,80,100,120]]},
+ {par:4,tee:[100,440],cup:[780,80],sand:[[300,300,70],[600,200,70]],water:[]},
+ {par:4,tee:[450,470],cup:[450,70],sand:[],water:[[300,220,300,90]]},
+ {par:3,tee:[80,260],cup:[820,260],sand:[[500,160,70],[500,360,70]],water:[[300,200,80,120]]},
+ {par:5,tee:[80,440],cup:[820,100],sand:[[250,200,80]],water:[[450,300,120,140],[600,80,120,120]]},
+ {par:4,tee:[450,450],cup:[450,100],sand:[[300,260,60],[600,260,60]],water:[[420,220,60,80]]},
+];
+let h=0,ball,v,strokes,total=0,wind,drag=null,moving=false,done=false,holing=null;
+function saveBest(n){try{const b=+localStorage.getItem("py_golf_best");if(!b||n<b)localStorage.setItem("py_golf_best",n);return Math.min(n,b||n);}catch(e){return n;}}
+function setup(){const H=HOLES[h];ball=[...H.tee];v=[0,0];strokes=0;wind=[(Math.random()-.5)*0.08,(Math.random()-.5)*0.08];moving=false;hud();}
+function hud(){document.getElementById("hole").textContent=`Hole ${h+1} · Par ${HOLES[h].par}`;document.getElementById("strokes").textContent="Strokes "+strokes;document.getElementById("total").textContent="Total "+total;
+  const a=Math.atan2(wind[1],wind[0]),arrows="→↘↓↙←↖↑↗";document.getElementById("wind").textContent="Wind "+arrows[Math.round(((a+Math.PI*2)%(Math.PI*2))/(Math.PI/4))%8]+" "+Math.round(Math.hypot(...wind)*200);}
+function inSand(){return HOLES[h].sand.some(s=>Math.hypot(ball[0]-s[0],ball[1]-s[1])<s[2]);}
+function inWater(){return HOLES[h].water.some(w=>ball[0]>w[0]&&ball[0]<w[0]+w[2]&&ball[1]>w[1]&&ball[1]<w[1]+w[3]);}
+function pos(e){const r=c.getBoundingClientRect(),p=e.touches?e.touches[0]:e;return [(p.clientX-r.left)*c.width/r.width,(p.clientY-r.top)*c.height/r.height];}
+function down(e){if(moving||done||holing)return;const p=pos(e);if(Math.hypot(p[0]-ball[0],p[1]-ball[1])<40){drag=p;e.preventDefault();}}
+function move(e){if(drag){drag=pos(e);e.preventDefault();}}
+function up(){if(!drag)return;let dx=ball[0]-drag[0],dy=ball[1]-drag[1];const d=Math.min(Math.hypot(dx,dy),220);if(d<5){drag=null;return;}
+  const a=Math.atan2(dy,dx),pw=d/220*18*(inSand()?.55:1);v=[Math.cos(a)*pw,Math.sin(a)*pw];strokes++;moving=true;drag=null;last=[...ball];hud();}
+let last;
+c.addEventListener("mousedown",down);c.addEventListener("mousemove",move);window.addEventListener("mouseup",up);
+c.addEventListener("touchstart",down,{passive:false});c.addEventListener("touchmove",move,{passive:false});window.addEventListener("touchend",up);
+function step(){if(moving){ball[0]+=v[0];ball[1]+=v[1];const pull=Math.min(1,Math.hypot(...v)/4);v[0]+=wind[0]*pull;v[1]+=wind[1]*pull;const f=inSand()?.9:.975;v[0]*=f;v[1]*=f;
+  if(ball[0]<10||ball[0]>890){v[0]*=-.6;ball[0]=Math.max(10,Math.min(890,ball[0]));}if(ball[1]<10||ball[1]>510){v[1]*=-.6;ball[1]=Math.max(10,Math.min(510,ball[1]));}
+  const cup=HOLES[h].cup;if(Math.hypot(ball[0]-cup[0],ball[1]-cup[1])<12&&Math.hypot(...v)<6){moving=false;total+=strokes;hud();holing=setTimeout(()=>{holing=null;h++;if(h>=HOLES.length){done=true;saveBest(total);PY.celebrate();}else setup();},900);}
+  else if(inWater()){moving=false;strokes++;ball=[...last];hud();}
+  else if(Math.hypot(...v)<.15)moving=false;}
+  render();requestAnimationFrame(step);}
+function render(){const H=HOLES[h];x.fillStyle="#2f7d3a";x.fillRect(0,0,900,520);x.strokeStyle="rgba(0,0,0,.08)";for(let i=0;i<900;i+=40){x.beginPath();x.moveTo(i,0);x.lineTo(i,520);x.stroke();}
+  H.water.forEach(w=>{x.fillStyle="#2a6fa8";x.fillRect(...w);});H.sand.forEach(s=>{x.fillStyle="#e3cf8a";x.beginPath();x.arc(s[0],s[1],s[2],0,7);x.fill();});
+  x.fillStyle="#111";x.beginPath();x.arc(H.cup[0],H.cup[1],11,0,7);x.fill();x.fillStyle="#e8b84a";x.fillRect(H.cup[0]-1,H.cup[1]-40,2,40);x.fillStyle="#b5532a";x.beginPath();x.moveTo(H.cup[0],H.cup[1]-40);x.lineTo(H.cup[0]+22,H.cup[1]-32);x.lineTo(H.cup[0],H.cup[1]-24);x.fill();
+  if(drag){x.strokeStyle="#fff";x.lineWidth=3;x.beginPath();x.moveTo(...ball);x.lineTo(ball[0]*2-drag[0],ball[1]*2-drag[1]);x.stroke();}
+  x.fillStyle="#fff";x.beginPath();x.arc(ball[0],ball[1],7,0,7);x.fill();
+  if(done){x.fillStyle="rgba(0,0,0,.65)";x.fillRect(0,0,900,520);x.fillStyle="#f6d67a";x.font="bold 44px Georgia";x.textAlign="center";x.fillText("Round complete!",450,230);x.font="28px Georgia";const par=HOLES.reduce((a,b)=>a+b.par,0);x.fillText(`${total} strokes · ${total-par>=0?"+":""}${total-par} vs par ${par}`,450,290);}}
+document.getElementById("restart").onclick=()=>{clearTimeout(holing);holing=null;h=0;total=0;done=false;setup();};
+setup();step();
+</script>
+</body></html>

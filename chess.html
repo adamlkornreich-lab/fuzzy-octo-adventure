@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pirate Chess — The Pirates of Ybor</title><link rel="stylesheet" href="assets/site.css"></head>
+<body>
+<main class="wrap">
+  <section class="hero"><h1>♞ Pirate Chess</h1><p class="lead">Dedicated to the next chess master. Play the ship's AI or a mate beside you — full legal moves, check, castling, en passant and promotion to a queen.</p></section>
+  <section class="panel">
+    <div class="hud">
+      <select id="mode" style="width:auto"><option value="ai">You (white) vs Ship AI</option><option value="2p">Two players</option></select>
+      <select id="depth" style="width:auto"><option value="1">Deckhand AI</option><option value="2" selected>First Mate AI</option><option value="3">Captain AI (slower)</option></select>
+      <button class="btn" id="new">New Game</button>
+      <span class="stat" id="status">White to move</span>
+    </div>
+    <div class="board" id="board"></div>
+  </section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+const U={K:"♔",Q:"♕",R:"♖",B:"♗",N:"♘",P:"♙",k:"♚",q:"♛",r:"♜",b:"♝",n:"♞",p:"♟"};
+const VAL={p:100,n:320,b:330,r:500,q:900,k:20000};
+let B,turn,sel,castle,over,aiT=null;
+function init(){clearTimeout(aiT);B=[..."rnbqkbnrpppppppp................................PPPPPPPPRNBQKBNR"];turn="w";sel=null;castle={K:true,Q:true,k:true,q:true};over=false;draw();status();}
+const isW=p=>p!==p.toLowerCase()&&p!==".";
+const own=(p,c)=>p!=="."&&(c==="w"?isW(p):!isW(p));
+function pseudo(b,c,cs){const mv=[];for(let i=0;i<64;i++){const p=b[i];if(!own(p,c))continue;const x=i%8,y=(i/8)|0,t=p.toLowerCase();
+  const add=(nx,ny,capOnly,noCap)=>{if(nx<0||nx>7||ny<0||ny>7)return false;const j=ny*8+nx,q=b[j];if(q==="."){if(!capOnly)mv.push([i,j]);return true;}if(!own(q,c)&&!noCap)mv.push([i,j]);return false;};
+  if(t==="p"){const d=c==="w"?-1:1,sr=c==="w"?6:1;if(b[(y+d)*8+x]==="."){add(x,y+d,false,true);if(y===sr&&b[(y+2*d)*8+x]===".")add(x,y+2*d,false,true);}add(x-1,y+d,true);add(x+1,y+d,true);if(cs&&cs.ep!=null){for(const dx of [-1,1]){const nx=x+dx,ny=y+d;if(nx>=0&&nx<8&&ny*8+nx===cs.ep)mv.push([i,cs.ep,"e"]);}}}
+  else if(t==="n"){[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]].forEach(([dx,dy])=>add(x+dx,y+dy));}
+  else if(t==="k"){for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)if(dx||dy)add(x+dx,y+dy);
+    if(cs){const r=c==="w"?7:0;if(y===r&&x===4){if(cs[c==="w"?"K":"k"]&&b[r*8+5]==="."&&b[r*8+6]==="."&&b[r*8+7].toLowerCase()==="r")mv.push([i,r*8+6,"c"]);if(cs[c==="w"?"Q":"q"]&&b[r*8+3]==="."&&b[r*8+2]==="."&&b[r*8+1]==="."&&b[r*8].toLowerCase()==="r")mv.push([i,r*8+2,"c"]);}}}
+  else{const dirs=t==="r"?[[1,0],[-1,0],[0,1],[0,-1]]:t==="b"?[[1,1],[1,-1],[-1,1],[-1,-1]]:[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+    dirs.forEach(([dx,dy])=>{let nx=x+dx,ny=y+dy;while(add(nx,ny)){nx+=dx;ny+=dy;}});}}
+  return mv;}
+function apply(b,m,cs){const nb=b.slice(),p=nb[m[0]];nb[m[1]]=p;nb[m[0]]=".";const y=(m[1]/8)|0;
+  if(p==="P"&&y===0)nb[m[1]]="Q";if(p==="p"&&y===7)nb[m[1]]="q";
+  if(m[2]==="e")nb[m[1]+(p==="P"?8:-8)]=".";
+  if(m[2]==="c"){const r=y*8;if(m[1]%8===6){nb[r+5]=nb[r+7];nb[r+7]=".";}else{nb[r+3]=nb[r];nb[r]=".";}}
+  const ncs=Object.assign({},cs);ncs.ep=null;if((p==="P"||p==="p")&&Math.abs(m[1]-m[0])===16)ncs.ep=(m[0]+m[1])/2;if(p==="K"){ncs.K=ncs.Q=false;}if(p==="k"){ncs.k=ncs.q=false;}
+  if(m[0]===63||m[1]===63)ncs.K=false;if(m[0]===56||m[1]===56)ncs.Q=false;if(m[0]===7||m[1]===7)ncs.k=false;if(m[0]===0||m[1]===0)ncs.q=false;
+  return [nb,ncs];}
+function attacked(b,sq,by){const x=sq%8,y=(sq/8)|0,py=y+(by==="w"?1:-1),pawn=by==="w"?"P":"p";if(py>=0&&py<8)for(const dx of [-1,1]){const px=x+dx;if(px>=0&&px<8&&b[py*8+px]===pawn)return true;}return pseudo(b,by,null).some(m=>m[1]===sq&&b[m[0]].toLowerCase()!=="p");}
+function inCheck(b,c){const k=b.indexOf(c==="w"?"K":"k");return k>=0&&attacked(b,k,c==="w"?"b":"w");}
+function legal(b,c,cs){return pseudo(b,c,cs).filter(m=>{if(m[2]==="c"){const o=c==="w"?"b":"w",r=(m[0]/8|0)*8;const path=m[1]%8===6?[r+4,r+5,r+6]:[r+4,r+3,r+2];if(path.some(s=>attacked(b,s,o)))return false;}
+  const [nb]=apply(b,m,cs);return !inCheck(nb,c);});}
+function evalB(b){let s=0;for(let i=0;i<64;i++){const p=b[i];if(p===".")continue;const v=VAL[p.toLowerCase()];const x=i%8,y=(i/8)|0;const cen=(3.5-Math.abs(3.5-x))+(3.5-Math.abs(3.5-y));s+=(isW(p)?1:-1)*(v+cen*4);}return s;}
+function search(b,c,cs,d,a,be){const ms=legal(b,c,cs);if(!ms.length)return inCheck(b,c)?(c==="w"?-99999:99999):0;if(d===0)return evalB(b);
+  if(c==="w"){let best=-Infinity;for(const m of ms){const [nb,ncs]=apply(b,m,cs);best=Math.max(best,search(nb,"b",ncs,d-1,a,be));a=Math.max(a,best);if(be<=a)break;}return best;}
+  let best=Infinity;for(const m of ms){const [nb,ncs]=apply(b,m,cs);best=Math.min(best,search(nb,"w",ncs,d-1,a,be));be=Math.min(be,best);if(be<=a)break;}return best;}
+function aiMove(){if(over||turn!=="b")return;const d=+document.getElementById("depth").value;const ms=legal(B,"b",castle);if(!ms.length)return;
+  ms.sort(()=>Math.random()-.5);let best=null,bs=Infinity;
+  for(const m of ms){const [nb,ncs]=apply(B,m,castle);const s=search(nb,"w",ncs,d-1,-Infinity,Infinity)+(B[m[1]]!=="."?-1:0);if(s<bs){bs=s;best=m;}}
+  make(best);}
+function make(m){[B,castle]=apply(B,m,castle);turn=turn==="w"?"b":"w";sel=null;draw();status();}
+function status(){const ms=legal(B,turn,castle),chk=inCheck(B,turn);let s;
+  if(!ms.length){over=true;if(chk&&(turn==="b"||document.getElementById("mode").value==="2p"))PY.celebrate();s=chk?`Checkmate — ${turn==="w"?"Black":"White"} wins! ☠`:"Stalemate — a draw.";}
+  else if(B.every(p=>p==="."||p==="K"||p==="k")){over=true;s="Only kings left — a draw.";}
+  else s=(turn==="w"?"White":"Black")+" to move"+(chk?" — CHECK!":"");
+  document.getElementById("status").textContent=s;
+  if(!over&&turn==="b"&&document.getElementById("mode").value==="ai")aiT=setTimeout(aiMove,250);}
+function draw(){const bd=document.getElementById("board");bd.innerHTML="";const hints=sel!==null?legal(B,turn,castle).filter(m=>m[0]===sel).map(m=>m[1]):[];
+  for(let i=0;i<64;i++){const d=document.createElement("div");d.className="sq "+(((i%8)+((i/8)|0))%2?"dark":"light")+(i===sel?" sel":"")+(hints.includes(i)?" hint":"");d.textContent=U[B[i]]||"";d.onclick=()=>click(i);bd.appendChild(d);}}
+function click(i){if(over)return;if(document.getElementById("mode").value==="ai"&&turn==="b")return;
+  if(sel!==null){const m=legal(B,turn,castle).find(m=>m[0]===sel&&m[1]===i);if(m){make(m);return;}}
+  sel=own(B[i],turn)?i:null;draw();}
+document.getElementById("new").onclick=init;document.getElementById("mode").onchange=init;init();
+</script>
+</body></html>

@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Laura &amp; Dom's Crossword</title><link rel="stylesheet" href="assets/site.css">
+<style>
+.cw-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:14px 0}
+.cw-top h1{margin:0;color:var(--gold2);font-size:clamp(1.5rem,5vw,2.3rem);line-height:1.1;text-wrap:balance}
+.coins{font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:4px;overflow-x:auto;margin-bottom:12px}
+.tabs button{flex:1 0 auto;padding:10px 12px;border:1px solid rgba(232,184,74,.3);background:var(--panel);color:var(--fog);border-radius:10px;font:inherit;font-size:.9rem;cursor:pointer}
+.tabs button.on{background:var(--gold);color:#2a1d05;font-weight:bold}
+button:focus-visible,a:focus-visible,.cell:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+.actions{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px}
+.big{display:block;text-align:left;width:100%;padding:18px;border-radius:var(--radius);border:1px solid var(--gold);background:linear-gradient(180deg,var(--panel2),var(--deep));color:var(--fog);font:inherit;cursor:pointer}
+.big b{display:block;font-size:1.25rem;color:var(--gold2)}
+.big.main{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a1d05}.big.main b{color:#2a1d05}
+.packs{display:flex;flex-wrap:wrap;gap:8px}
+.packs button{padding:8px 12px;border-radius:999px;border:1px solid rgba(232,184,74,.35);background:transparent;color:var(--gold2);font:inherit;font-size:.92rem;cursor:pointer}
+.album h3{color:var(--gold2);margin:16px 0 8px}
+.stamps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stamp{aspect-ratio:3/4;min-width:0;background:#f3e6c8;color:#3b2414;padding:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:.72rem;line-height:1.15;border:4px dotted var(--ink);outline:2px solid #f3e6c8;outline-offset:-1px}
+.stamp i{font-style:normal;font-size:clamp(1.5rem,7vw,2.6rem);line-height:1.2}
+.stamp.locked{background:#2b3244;color:#aab4c8;outline-color:#2b3244}.stamp.locked i{filter:grayscale(1) brightness(.55)}
+.seasons{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.season{border-radius:12px;padding:14px;text-align:center;color:#20150a;min-width:0}
+.season i{display:block;font-style:normal;font-size:2.4rem}.season.off i{filter:grayscale(1);opacity:.55}
+.Fall{background:#e39a4a}.Winter{background:#7fb2e6}.Spring{background:#eda6c4}.Summer{background:#a9d66b}
+.meter{height:10px;background:var(--panel2);border-radius:99px;overflow:hidden;margin:6px 0 12px}.meter span{display:block;height:100%;background:var(--gold)}
+.avatars{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px}
+.avatars button{padding:10px 4px;background:var(--panel);border:1px solid rgba(232,184,74,.25);border-radius:12px;color:var(--fog);font:inherit;font-size:.8rem;cursor:pointer}
+.avatars button.on{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}.avatars i{display:block;font-style:normal;font-size:2rem}
+.saying{background:#e8c98a;color:#3b2414;padding:16px;margin:10px 0;border-radius:4px;transform:rotate(-.6deg)}.saying:nth-child(even){transform:rotate(.6deg)}.saying small{display:block;margin-top:6px;opacity:.75}
+.me{font-size:2.2rem;width:64px;height:64px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--panel2)}
+.ring-Fall{box-shadow:0 0 0 4px #e39a4a}.ring-Winter{box-shadow:0 0 0 4px #7fb2e6}.ring-Spring{box-shadow:0 0 0 4px #eda6c4}.ring-Summer{box-shadow:0 0 0 4px #a9d66b}
+#playView{max-width:640px;margin:0 auto}
+.gridwrap{overflow:auto;display:flex;justify-content:center;padding:4px 0}
+#grid{display:grid;gap:2px;width:100%;max-width:min(100%,62vh)}
+.cell{position:relative;aspect-ratio:1;background:#f3e6c8;color:#20150a;border:0;padding:0;border-radius:3px;font:bold clamp(.8rem,3.6vw,1.35rem) Georgia,serif;cursor:pointer;display:flex;align-items:center;justify-content:center;text-transform:uppercase}
+.cell.void{background:transparent;cursor:default;pointer-events:none}
+.cell.word{background:#f6d67a}.cell.cur{background:var(--sea);color:#fff}.cell.bad{background:#e39a8a}.cell.given{color:#1f5a3a}
+.cell sup{position:absolute;left:2px;top:0;font:normal clamp(.42rem,1.6vw,.62rem) Georgia,serif;line-height:1.3;color:#3b2414}
+.cluebar{display:flex;align-items:center;gap:8px;background:var(--panel2);border-radius:10px;padding:8px;margin:10px 0;min-height:64px}
+.cluebar p{flex:1;margin:0;min-width:0;text-align:center;font-size:1.02rem}
+.cluebar button{background:transparent;border:1px solid rgba(232,184,74,.4);color:var(--gold2);border-radius:8px;width:40px;height:40px;font-size:1.1rem;cursor:pointer;flex:none}
+.tools{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.tools button{padding:8px 10px;font-size:.88rem}
+.kb{display:grid;gap:5px;margin-bottom:10px}.kb div{display:flex;gap:4px;justify-content:center}
+.kb button{flex:1 1 0;min-width:0;max-width:52px;height:44px;border:0;border-radius:6px;background:var(--panel2);color:var(--fog);font:bold 1rem Georgia,serif;cursor:pointer;padding:0}
+.kb button.wide{flex:1.6 1 0;max-width:80px}
+#clueList{columns:2 220px;font-size:.92rem;color:var(--fog)}#clueList h4{margin:0 0 6px;color:var(--gold2)}#clueList div{break-inside:avoid;padding:3px 0;cursor:pointer}#clueList div.done{color:var(--mute);text-decoration:line-through}
+body.playing .pp-watermark{top:70px;bottom:auto;width:72px;opacity:.45}
+body.playing footer.site{margin-top:10px}
+@media (max-width:640px){body.playing .cw-top{display:none}body.playing header.top{display:none}.cw-top{padding:10px 0}}
+@media (prefers-reduced-motion:reduce){.pp-watermark .sparkle{animation:none}}
+</style></head>
+<body>
+<main class="wrap" id="app">
+  <div class="cw-top"><div class="row"><div class="me" id="me"></div><h1 id="title">Laura &amp; Dom's Crossword</h1></div><span class="stat coins" id="coins"></span></div>
+
+  <section id="homeView" style="padding-top:0">
+    <div class="actions">
+      <button class="big main" id="goNext"></button>
+      <button class="big" id="goDaily"></button>
+    </div>
+    <div class="panel">
+      <h2>Theme voyages</h2>
+      <p style="margin-top:0;color:var(--mute)">Extra crosswords on one subject. They earn doubloons but don't move your level.</p>
+      <div class="packs" id="packs"></div>
+    </div>
+    <h2 style="margin-top:24px">My Collection</h2>
+    <div class="tabs" id="tabs" role="tablist"></div>
+    <div id="tabBody"></div>
+    <p class="row" style="margin-top:18px"><a class="btn ghost" href="arcade.html">⚔ Back to the Arcade</a><a class="btn ghost" href="world.html#cabin">🗺 Back to the Open World</a></p>
+  </section>
+
+  <section id="playView" hidden style="padding-top:0">
+    <div class="hud" style="margin-top:0"><button class="btn ghost" id="quit" style="padding:6px 12px">← Leave</button><span class="stat" id="label"></span></div>
+    <div class="gridwrap"><div id="grid" role="grid" aria-label="Crossword grid"></div></div>
+    <div class="cluebar"><button id="prev" aria-label="Previous clue">‹</button><p id="clue" aria-live="polite"></p><button id="nxt" aria-label="Next clue">›</button></div>
+    <div class="tools">
+      <button class="btn ghost" id="hLetter">Reveal letter · 25</button>
+      <button class="btn ghost" id="hWord">Reveal word · 80</button>
+      <button class="btn ghost" id="hCheck">Check grid · free</button>
+      <button class="btn ghost" id="hList">All clues</button>
+    </div>
+    <div class="kb" id="kb"></div>
+    <p class="notice" id="note" hidden></p>
+    <div class="panel" id="clueList" hidden></div>
+  </section>
+</main>
+
+<div class="modal" id="win"><div class="box" style="text-align:center"><h3 id="winT"></h3><p id="winB"></p><p class="row" style="justify-content:center"><button class="btn" id="winNext"></button><button class="btn ghost" id="winHome">My Collection</button></p></div></div>
+
+<script src="assets/site.js"></script>
+<script>
+/* ---------- Word bank: [answer, clue, theme] ---------- */
+const BANK=`GASPAR|Tampa's legendary pirate, José ___|pirates
+TREASURE|What X marks on the map|pirates
+PLANK|Board a captive is made to walk|pirates
+CUTLASS|Short curved pirate sword|pirates
+PARROT|Talking bird on a pirate's shoulder|pirates
+ANCHOR|Heavy iron weight that holds a ship in place|pirates
+GALLEON|Large Spanish treasure ship|pirates
+BOOTY|Stolen loot|pirates
+DOUBLOON|Spanish gold coin|pirates
+BLACKBEARD|Nickname of Edward Teach|pirates
+KRAKEN|Giant sea monster of legend|pirates
+RUM|Caribbean spirit made from sugarcane|pirates
+JOLLYROGER|Skull-and-crossbones flag (2 words)|pirates
+CAPTAIN|Commander of a ship|pirates
+FIRSTMATE|Second in command on a ship (2 words)|pirates
+CREW|Everyone working aboard a ship|pirates
+MUTINY|Sailors' revolt against the captain|pirates
+SCURVY|Sailor's disease caused by lack of vitamin C|pirates
+AVAST|"Stop!" in pirate talk|pirates
+AHOY|Sailor's greeting|pirates
+BUCCANEER|Caribbean pirate of the 1600s|pirates
+PLUNDER|Steal by force|pirates
+CANNON|Big gun on a ship's deck|pirates
+COMPASS|Instrument that points north|pirates
+SPYGLASS|Handheld telescope|pirates
+TRICORN|Three-cornered hat|pirates
+EYEPATCH|Pirate's cover for one eye|pirates
+BOSUN|Ship's officer in charge of deck crew|pirates
+BRIG|Ship's jail|pirates
+HELM|Wheel that steers a ship|pirates
+MAST|Tall pole that holds up the sails|pirates
+STARBOARD|Right side of a ship|pirates
+BOW|Front of a ship|pirates
+STERN|Back of a ship|pirates
+DECK|Ship's floor|pirates
+SAIL|Canvas that catches the wind|pirates
+KEEL|Ship's backbone along the bottom|pirates
+HULL|Main body of a ship|pirates
+GALLEY|Ship's kitchen|pirates
+CROWSNEST|Lookout post atop the mast|pirates
+LOOT|Stolen goods|pirates
+CHEST|Box for buried gold|pirates
+SWORD|Duelist's blade|pirates
+BARNACLE|Crustacean that clings to a hull|pirates
+DAVYJONES|His locker is the bottom of the sea (2 words)|pirates
+BONNY|Anne ___, famous female pirate|pirates
+KIDD|Captain William ___, hanged for piracy in 1701|pirates
+TORTUGA|Caribbean island that was a pirate haven|pirates
+YBOR|Tampa's historic cigar district|tampa
+CIGAR|Hand-rolled product that made Tampa's district famous|tampa
+ROOSTER|Crowing bird that roams 7th Avenue|tampa
+STREETCAR|Rail ride linking downtown Tampa to its historic district|tampa
+CUBAN|Pressed Tampa sandwich with salami|tampa
+GASPARILLA|Tampa's yearly pirate festival|tampa
+TAMPA|City on the bay with a pirate festival|tampa
+BUCS|Tampa's NFL team, for short|tampa
+LIGHTNING|Tampa Bay's NHL team|tampa
+SEPTIMA|La ___, nickname of Ybor's 7th Avenue|tampa
+BAYSHORE|Tampa boulevard with a long waterfront sidewalk|tampa
+CHANNELSIDE|Tampa waterfront district near the port|tampa
+SALAMI|Italian meat in Tampa's signature sandwich|tampa
+TECO|___ Line Streetcar|tampa
+RIVERWALK|Tampa's downtown waterfront path|tampa
+GROTTO|Gaspar's ___, home port on 7th Avenue|tampa
+PIPPY|Pirate chihuahua of this ship|tampa
+POPS|Bar cat of this ship|tampa
+GATOR|Florida's toothy state reptile, for short|florida
+MANATEE|Gentle "sea cow" of Florida waters|florida
+EVERGLADES|South Florida's river of grass|florida
+KEYWEST|Southern end of the Overseas Highway (2 words)|florida
+ORLANDO|Central Florida theme park capital|florida
+MIAMI|Biscayne Bay's big city|florida
+SUNSHINE|Florida's nickname: the ___ State|florida
+ORANGE|Florida's famous citrus crop|florida
+PELICAN|Big-billed coastal bird|florida
+STAUGUSTINE|Spanish-founded city from 1565 (2 words)|florida
+PANHANDLE|Florida's northwest strip|florida
+TALLAHASSEE|Florida's capital|florida
+CANAVERAL|Cape where NASA rockets launch|florida
+HURRICANE|Atlantic storm with a June-to-November season|florida
+SEMINOLE|Native American nation of Florida|florida
+PALMETTO|Low Florida palm|florida
+FLAMINGO|Pink wading bird|florida
+OSPREY|Fish-hunting hawk|florida
+MANGROVE|Salt-tolerant coastal tree|florida
+SPONGE|Sea harvest of Tarpon Springs|florida
+CLEARWATER|Gulf beach city near Tampa|florida
+GULF|Body of water west of Florida|florida
+LIBERTY|Lady holding a torch in New York Harbor|usa
+EAGLE|Bald national bird|usa
+WASHINGTON|First U.S. president|usa
+LINCOLN|President who gave the Gettysburg Address|usa
+ALASKA|Largest U.S. state by area|usa
+TEXAS|The Lone Star State|usa
+CONGRESS|House and Senate together|usa
+FLAG|It has 50 stars and 13 stripes|usa
+SENATE|Chamber with 100 members|usa
+HAWAII|50th U.S. state|usa
+MISSOURI|Longest river in the U.S.|usa
+GRANDCANYON|Arizona's giant gorge (2 words)|usa
+BOSTON|City of a famous 1773 Tea Party|usa
+RUSHMORE|South Dakota mountain with four presidents|usa
+ANTHEM|"The Star-Spangled Banner," for one|usa
+JEFFERSON|Main author of the Declaration of Independence|usa
+GOONIES|1985 film about One-Eyed Willy's treasure|movies
+JAWS|1975 shark thriller|movies
+HOOK|1991 film with Dustin Hoffman as the captain|movies
+TITANIC|1997 film about a doomed ocean liner|movies
+SPARROW|Captain Jack of the movies|movies
+BLACKPEARL|Captain Jack's ship (2 words)|movies
+WESTLEY|Farm boy hero of "The Princess Bride"|movies
+WATERWORLD|1995 Kevin Costner film set on a flooded Earth|movies
+MOANA|2016 Disney film about a Polynesian voyager|movies
+SPIELBERG|Director of "E.T." and "Hook"|movies
+DEPP|Johnny who played Captain Jack|movies
+ROCKY|1976 boxing film set in Philadelphia|movies
+CASABLANCA|1942 Bogart classic|movies
+OSCAR|Hollywood's golden statuette|movies
+STARWARS|1977 space saga (2 words)|movies
+GREASE|1978 musical with Danny and Sandy|movies
+POPCORN|Classic theater snack|movies
+SEQUEL|Follow-up film|movies
+DIRECTOR|Person who calls "Action!"|movies
+OCEAN|The Atlantic or the Pacific|sea
+TIDE|Sea's rise and fall|sea
+CORAL|Reef builder|sea
+DOLPHIN|Smart, playful marine mammal|sea
+SHARK|Fish with a famous dorsal fin|sea
+WHALE|Largest animal on Earth, in its blue form|sea
+STARFISH|Five-armed sea creature|sea
+SEAGULL|Beach snack thief|sea
+WAVE|Surfer's ride|sea
+REEF|Ridge of rock or coral near the surface|sea
+LIGHTHOUSE|Coastal tower that warns ships|sea
+SEASHELL|Beachcomber's find|sea
+OYSTER|Mollusk that can hold a gem|sea
+PEARL|Gem from a mollusk|sea
+TURTLE|Shelled reptile that nests on beaches|sea
+JELLYFISH|Stinging, drifting sea creature|sea
+LOBSTER|Clawed crustacean|sea
+SQUID|Ten-armed swimmer that squirts ink|sea
+ISLAND|Land surrounded by water|sea
+HARBOR|Sheltered place for ships|sea
+DARTS|Pub game with a bullseye|tavern
+BINGO|Game called with numbers and a dauber|tavern
+CHESS|Game of kings and pawns|tavern
+TAVERN|Old-time pub|tavern
+BILLIARDS|Cue-and-ball game|tavern
+CHECKMATE|End of a game of kings|tavern
+ROOK|Castle-shaped chess piece|tavern
+BISHOP|Chess piece that moves diagonally|tavern
+KNIGHT|Chess piece that moves in an L|tavern
+PAWN|Smallest chess piece|tavern
+GROG|Sailor's watered-down rum|tavern
+MUG|Handled drinking vessel|tavern
+TOAST|Raised glasses and a few words|tavern
+SHUFFLEBOARD|Puck-sliding deck game|tavern`.split("\n").map(l=>{const[a,c,t]=l.split("|");return{a,c,t}}).filter(w=>w.a.length<=11);
+const PACKS=[["pirates","🏴‍☠️ Pirate Lore"],["tampa","🐓 Tampa & Ybor"],["florida","🐊 Florida"],["usa","🦅 The USA"],["movies","🎬 Movies"],["sea","🐙 The Sea"],["tavern","🍺 Tavern"]];
+const ALBUMS=[["Ybor City",[["🐓","Ybor Chickens"],["🚋","Streetcar"],["🥪","Cuban Sandwich"],["☕","Café con Leche"]]],["Florida Coast",[["🐊","Everglades"],["🚀","Space Coast"],["🍊","Citrus Groves"],["🌴","Gulf Beaches"]]],["The Caribbean",[["🏝","Tortuga"],["🦜","Parrot Cay"],["🐢","Turtle Bay"],["🥥","Coconut Isle"]]],["The Seven Seas",[["🐙","Kraken Deep"],["🧭","True North"],["⚓","Safe Harbor"],["💰","Gaspar's Gold"]]]];
+const AVATARS=[["🏴‍☠️","Deckhand",0],["🐱","Pops",100],["🐶","Pippy",100],["🦜","Parrot",150],["💀","Skully",200],["🦈","Shark",250],["🐙","Kraken",300],["👑","Atara's Crown",500]];
+const SEASONS=["Winter","Spring","Summer","Fall"];
+const CROWNS={Fall:["🍂","Harvest Crown"],Winter:["❄","Frost Crown"],Spring:["🌺","Bloom Crown"],Summer:["☀","Sun Crown"]};
+const SAYINGS=["A calm sea never made a sharp crossword solver.","Fill in what you know. The rest of the map follows.","Every chest starts with one shovel of sand.","Pops says: nap first, then solve.","Pippy says: small dog, big plans.","Read the wind before you raise the sail.","A wrong letter is only a detour.","The best crew shares the last doubloon.","Ink dries. Courage stays.","When stuck, walk the deck and come back.","Short words open long doors.","Good mates fill in each other's blanks.","There's no treasure in a puzzle you never start.","Steer by the stars you can see.","Bad weather makes good stories.","A captain asks for hints and keeps the ship.","Today's riddle is tomorrow's bragging right.","Keep your compass close and your pencil closer.","Even the kraken started small.","Slow tide, steady ship.","Laugh loud. The sea can take it.","Every port has a clue if you look.","Share the rum and the answers.","The horizon is only the next word across.","Gold shines. Friends last.","Solve it together and it counts double.","Measure twice, fire the cannon once.","No ship ever found gold tied to the dock.","Treat the cat well and the ship runs fine.","Fair winds to whoever finishes the corner.","One more clue, then bed."];
+
+/* ---------- Saved progress: this device only ---------- */
+const KEY="py_crossword_v1";
+const fresh=()=>({level:1,coins:100,stamps:0,avatar:"🏴‍☠️",owned:["🏴‍☠️"],frameOn:null,season:{},frames:[],crowns:[],sayings:[],daily:null});
+let S=fresh();try{S=Object.assign(fresh(),JSON.parse(localStorage.getItem(KEY)||"{}"));}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}};
+const $=id=>document.getElementById(id);
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+const seasonNow=()=>SEASONS[Math.floor((new Date().getMonth()+1)%12/3)];
+const seasonKey=()=>seasonNow()+new Date().getFullYear();
+
+/* ---------- Puzzle generator ---------- */
+function rng(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;};}
+const hash=s=>{let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;};
+function shuffled(a,r){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function build(seedStr,target,theme){
+  const r=rng(hash(seedStr));
+  let pool=theme?BANK.filter(w=>w.t===theme):BANK;
+  let best=null;
+  for(let attempt=0;attempt<12;attempt++){
+    const list=shuffled(pool,r);const size=21,mid=10;const g=new Map();const placed=[];
+    const get=(x,y)=>g.get(x+","+y);
+    const first=list.find(w=>w.a.length>=6&&w.a.length<=9)||list[0];
+    const can=(w,x,y,dx,dy)=>{const n=w.length;if(x<0||y<0||x+dx*(n-1)>=size||y+dy*(n-1)>=size)return-1;if(get(x-dx,y-dy)||get(x+dx*n,y+dy*n))return-1;let cross=0;
+      for(let i=0;i<n;i++){const cx=x+dx*i,cy=y+dy*i,c=get(cx,cy);if(c){if(c.ch!==w[i]||c.dir===(dx?"a":"d")||c.dir==="b")return-1;cross++;}else if(get(cx+dy,cy+dx)||get(cx-dy,cy-dx))return-1;}return cross;};
+    const put=(w,x,y,dx,dy)=>{for(let i=0;i<w.a.length;i++){const k=(x+dx*i)+","+(y+dy*i),c=g.get(k);g.set(k,{ch:w.a[i],dir:c?"b":(dx?"a":"d")});}placed.push({w,x,y,dx,dy});};
+    put(first,mid-(first.a.length>>1),mid,1,0);
+    for(const w of list){if(placed.length>=target)break;if(placed.some(p=>p.w.a===w.a))continue;
+      let top=null;for(const p of placed){const dx=p.dx?0:1,dy=p.dx?1:0;for(let i=0;i<p.w.a.length;i++)for(let j=0;j<w.a.length;j++){if(p.w.a[i]!==w.a[j])continue;const x=p.x+p.dx*i-dx*j,y=p.y+p.dy*i-dy*j,cr=can(w.a,x,y,dx,dy);if(cr<1)continue;
+        const xs=[...g.keys()].map(k=>+k.split(",")[0]).concat(x,x+dx*(w.a.length-1)),ys=[...g.keys()].map(k=>+k.split(",")[1]).concat(y,y+dy*(w.a.length-1));
+        const span=Math.max(Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys))+1;if(span>15)continue;const sc=cr*6-span+r();if(!top||sc>top.sc)top={sc,x,y,dx,dy};}}
+      if(top)put(w,top.x,top.y,top.dx,top.dy);}
+    if(!best||placed.length>best.placed.length)best={placed};
+    if(placed.length>=target)break;
+  }
+  const P=best.placed,xs=P.flatMap(p=>[p.x,p.x+p.dx*(p.w.a.length-1)]),ys=P.flatMap(p=>[p.y,p.y+p.dy*(p.w.a.length-1)]);
+  const x0=Math.min(...xs),y0=Math.min(...ys),W=Math.max(...xs)-x0+1,H=Math.max(...ys)-y0+1;
+  const sol=Array.from({length:H},()=>Array(W).fill(null));
+  const entries=P.map(p=>{const e={a:p.w.a,c:p.w.c,x:p.x-x0,y:p.y-y0,dx:p.dx,dy:p.dy};for(let i=0;i<e.a.length;i++)sol[e.y+e.dy*i][e.x+e.dx*i]=e.a[i];return e;});
+  let num=0;const numAt={};for(let y=0;y<H;y++)for(let x=0;x<W;x++){const st=entries.filter(e=>e.x===x&&e.y===y);if(st.length){num++;numAt[x+","+y]=num;st.forEach(e=>e.n=num);}}
+  entries.sort((a,b)=>(a.dx?0:1)-(b.dx?0:1)||a.n-b.n);
+  return{W,H,sol,entries,numAt};
+}
+const sizeFor=l=>Math.min(16,6+Math.floor((l-1)/4));
+
+/* ---------- Play ---------- */
+let G=null,fill=[],cx=0,cy=0,dirA=true,mode=null,hints=0;
+function begin(m,pack){mode={m,pack};
+  if(m==="level")G=build("level"+S.level,sizeFor(S.level));
+  if(m==="daily")G=build("daily"+today(),14);
+  if(m==="pack"){G=build("pack"+pack+Date.now(),10,pack);}
+  fill=G.sol.map(r=>r.map(c=>c?"":null));hints=0;const e=G.entries[0];cx=e.x;cy=e.y;dirA=!!e.dx;
+  $("label").textContent=m==="level"?"Level "+S.level:m==="daily"?"Daily Challenge":PACKS.find(p=>p[0]===pack)[1];
+  $("homeView").hidden=true;$("playView").hidden=false;$("clueList").hidden=true;$("note").hidden=true;document.body.classList.add("playing");drawGrid();scrollTo(0,0);}
+function cur(){const on=e=>{const dx=cx-e.x,dy=cy-e.y;return e.dx?dy===0&&dx>=0&&dx<e.a.length:dx===0&&dy>=0&&dy<e.a.length;};return G.entries.find(e=>on(e)&&!!e.dx===dirA)||G.entries.find(on);}
+function drawGrid(){const g=$("grid");g.style.gridTemplateColumns=`repeat(${G.W},1fr)`;const e=cur();dirA=!!e.dx;
+  const inW=(x,y)=>e.dx?y===e.y&&x>=e.x&&x<e.x+e.a.length:x===e.x&&y>=e.y&&y<e.y+e.a.length;
+  let h="";for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++){if(G.sol[y][x]===null){h+='<div class="cell void"></div>';continue;}
+    const n=G.numAt[x+","+y];h+=`<button class="cell${x===cx&&y===cy?" cur":inW(x,y)?" word":""}" data-x="${x}" data-y="${y}" aria-label="Row ${y+1} column ${x+1}">${n?`<sup>${n}</sup>`:""}${fill[y][x]||""}</button>`;}
+  g.innerHTML=h;$("clue").innerHTML=`<b>${e.n} ${e.dx?"Across":"Down"}</b> · ${e.c}`;$("coins").textContent="💰 "+S.coins;
+  if(!$("clueList").hidden)drawList();}
+function drawList(){const row=(e)=>{const done=[...e.a].every((_,i)=>fill[e.y+e.dy*i][e.x+e.dx*i]);return `<div class="${done?"done":""}" data-i="${G.entries.indexOf(e)}">${e.n}. ${e.c}</div>`;};
+  $("clueList").innerHTML="<h4>Across</h4>"+G.entries.filter(e=>e.dx).map(row).join("")+"<h4 style='margin-top:10px'>Down</h4>"+G.entries.filter(e=>!e.dx).map(row).join("");}
+const isCell=(x,y)=>G.sol[y]&&G.sol[y][x]!=null&&G.sol[y][x]!==undefined;
+function advance(step){const e=cur(),i=(e.dx?cx-e.x:cy-e.y)+step;if(i>=0&&i<e.a.length){cx=e.x+e.dx*i;cy=e.y+e.dy*i;}}
+function typeL(l){fill[cy][cx]=l;advance(1);drawGrid();checkDone();}
+function back(){if(!fill[cy][cx])advance(-1);fill[cy][cx]="";drawGrid();}
+function jump(d){const i=G.entries.indexOf(cur()),e=G.entries[(i+d+G.entries.length)%G.entries.length];cx=e.x;cy=e.y;dirA=!!e.dx;
+  for(let k=0;k<e.a.length;k++){if(!fill[e.y+e.dy*k][e.x+e.dx*k]){cx=e.x+e.dx*k;cy=e.y+e.dy*k;break;}}drawGrid();}
+function note(m){$("note").textContent=m;$("note").hidden=!m;}
+function checkDone(){for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++)if(G.sol[y][x]&&!fill[y][x])return;
+  let wrong=false;for(let y=0;y<G.H;y++)for(let x=0;x<G.W;x++)if(G.sol[y][x]&&fill[y][x]!==G.sol[y][x])wrong=true;
+  if(wrong)note("The grid is full, but something is off. Tap Check grid to see which letters are wrong.");else win();}
+function win(){note("");PY.celebrate();const base=mode.m==="daily"?60:mode.m==="pack"?15:15+G.entries.length;const bonus=hints?0:10;const gain=base+bonus;S.coins+=gain;
+  const k=seasonKey();let pts=mode.m==="daily"?3:1;S.season[k]=(S.season[k]||0)+pts;const sn=seasonNow();let msg=[`+${gain} doubloons${bonus?" (no-hint bonus included)":""}.`];
+  if(S.season[k]>=10&&!S.frames.includes(k)){S.frames.push(k);msg.push(`New ${sn} frame!`);}
+  if(S.season[k]>=25&&!S.crowns.includes(k)){S.crowns.push(k);msg.push(`You earned the ${CROWNS[sn][1]}!`);}
+  if(mode.m==="level"){if(S.level%5===0&&S.stamps<16){const fl=ALBUMS.flatMap(a=>a[1]);msg.push(`New stamp: ${fl[S.stamps][1]} ${fl[S.stamps][0]}`);S.stamps++;}S.level++;}
+  if(mode.m==="daily"&&S.daily!==today()){S.daily=today();const q=SAYINGS[hash(today())%SAYINGS.length];if(!S.sayings.some(x=>x.q===q))S.sayings.unshift({q,d:today()});msg.push("New saying added to your collection.");}
+  save();$("winT").textContent="☠ Solved!";$("winB").textContent=msg.join(" ");
+  $("winNext").textContent=mode.m==="level"?"Level "+S.level:mode.m==="pack"?"Another voyage":"Next level";$("win").classList.add("open");}
+function home(){G=null;document.body.classList.remove("playing");$("win").classList.remove("open");$("playView").hidden=true;$("homeView").hidden=false;drawHome();}
+
+/* ---------- Home and collection ---------- */
+let tab="Stamps";
+function drawHome(){$("coins").textContent="💰 "+S.coins;const me=$("me");me.textContent=S.avatar;me.className="me"+(S.frameOn?" ring-"+S.frameOn:"");
+  const toStamp=5-((S.level-1)%5);
+  $("goNext").innerHTML=`<b>Play Level ${S.level}</b>${S.stamps<16?`${toStamp} more level${toStamp>1?"s":""} to a new stamp`:"Every stamp collected"}`;
+  const done=S.daily===today();$("goDaily").innerHTML=done?`<b>Daily solved ✓</b>New puzzle in <span id="cd"></span>`:`<b>Daily Challenge</b>Solve it to collect a saying. Ends in <span id="cd"></span>`;tickCd();
+  $("tabs").innerHTML=["Stamps","Avatars","Crowns","Frames","Sayings"].map(t=>`<button role="tab" aria-selected="${t===tab}" class="${t===tab?"on":""}" data-t="${t}">${t}</button>`).join("");
+  const b=$("tabBody"),k=seasonKey(),sn=seasonNow(),pts=S.season[k]||0;
+  if(tab==="Stamps"){let n=0;b.innerHTML=`<p style="color:var(--mute);margin:0">Collect a stamp every 5 levels. ${S.stamps} of 16 collected.</p><div class="album">`+ALBUMS.map(a=>`<h3>${a[0]}</h3><div class="stamps">`+a[1].map(s=>{const on=n++<S.stamps;return `<div class="stamp${on?"":" locked"}"><i>${s[0]}</i>${s[1]}</div>`;}).join("")+"</div>").join("")+"</div>";}
+  if(tab==="Avatars")b.innerHTML=`<p style="color:var(--mute);margin:0 0 10px">Tap to wear one, or buy it with doubloons.</p><div class="avatars">`+AVATARS.map(a=>{const own=S.owned.includes(a[0]);return `<button data-av="${a[0]}" data-cost="${a[2]}" class="${S.avatar===a[0]?"on":""}"><i>${a[0]}</i>${a[1]}<br>${own?(S.avatar===a[0]?"Wearing":"Owned"):"💰 "+a[2]}</button>`;}).join("")+"</div>";
+  const seas=(have,goal,label,icon)=>`<p style="margin:0;color:var(--mute)">${sn} season: ${pts} of ${goal} points. A puzzle is 1 point and the Daily is 3.</p><div class="meter"><span style="width:${Math.min(100,pts/goal*100)}%"></span></div><div class="seasons">`+["Fall","Winter","Spring","Summer"].map(s=>{const on=have.some(x=>x.startsWith(s));return `<div class="season ${s} ${on?"":"off"}" ${label==="Frames"&&on?`data-frame="${s}" style="cursor:pointer"`:""}><b>${s}</b><i>${on?icon(s):"🔒"}</i>${label==="Crowns"?CROWNS[s][1]:S.frameOn===s?"Wearing":s+" frame"}</div>`;}).join("")+"</div>";
+  if(tab==="Crowns")b.innerHTML=seas(S.crowns,25,"Crowns",s=>CROWNS[s][0]);
+  if(tab==="Frames")b.innerHTML=seas(S.frames,10,"Frames",()=>"⭕");
+  if(tab==="Sayings")b.innerHTML=`<p style="color:var(--mute);margin:0">Pops and Pippy hand out one saying for each Daily Challenge you solve.</p>`+(S.sayings.length?S.sayings.map(s=>`<div class="saying">"${s.q}"<small>Collected ${s.d}</small></div>`).join(""):`<div class="saying">Your first saying is waiting in today's Daily Challenge.</div>`);
+}
+function tickCd(){const c=$("cd");if(!c)return;const n=new Date(),m=new Date(n);m.setHours(24,0,0,0);const s=Math.floor((m-n)/1000);c.textContent=String(Math.floor(s/3600)).padStart(2,"0")+":"+String(Math.floor(s/60)%60).padStart(2,"0")+":"+String(s%60).padStart(2,"0");}
+setInterval(tickCd,1000);
+
+/* ---------- Events ---------- */
+$("goNext").onclick=()=>begin("level");$("goDaily").onclick=()=>begin("daily");$("quit").onclick=home;$("winHome").onclick=home;
+$("winNext").onclick=()=>{$("win").classList.remove("open");if(mode.m==="pack")begin("pack",mode.pack);else begin("level");};
+$("packs").innerHTML=PACKS.map(p=>`<button data-p="${p[0]}">${p[1]}</button>`).join("");
+$("packs").onclick=e=>{const p=e.target.dataset.p;if(p)begin("pack",p);};
+$("tabs").onclick=e=>{const t=e.target.dataset.t;if(t){tab=t;drawHome();}};
+$("tabBody").onclick=e=>{const f=e.target.closest("[data-frame]");if(f){S.frameOn=S.frameOn===f.dataset.frame?null:f.dataset.frame;save();drawHome();return;}
+  const a=e.target.closest("[data-av]");if(!a)return;const v=a.dataset.av,c=+a.dataset.cost;if(!S.owned.includes(v)){if(S.coins<c)return;S.coins-=c;S.owned.push(v);}S.avatar=v;save();drawHome();};
+$("grid").onclick=e=>{const b=e.target.closest("[data-x]");if(!b)return;const x=+b.dataset.x,y=+b.dataset.y;if(x===cx&&y===cy)dirA=!dirA;cx=x;cy=y;drawGrid();};
+$("prev").onclick=()=>jump(-1);$("nxt").onclick=()=>jump(1);
+$("kb").innerHTML=["QWERTYUIOP","ASDFGHJKL","ZXCVBNM⌫"].map(r=>"<div>"+[...r].map(k=>`<button data-k="${k}" class="${k==="⌫"?"wide":""}" aria-label="${k==="⌫"?"Delete":k}">${k}</button>`).join("")+"</div>").join("");
+$("kb").onclick=e=>{const k=e.target.dataset.k;if(!k||!G)return;k==="⌫"?back():typeL(k);};
+addEventListener("keydown",e=>{if(!G||$("win").classList.contains("open"))return;if(/^[a-zA-Z]$/.test(e.key)&&!e.metaKey&&!e.ctrlKey){typeL(e.key.toUpperCase());e.preventDefault();}
+  else if(e.key==="Backspace"){back();e.preventDefault();}else if(e.key==="Tab"){jump(e.shiftKey?-1:1);e.preventDefault();}
+  else{const d={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];if(d){const nx=cx+d[0],ny=cy+d[1];if(isCell(nx,ny)){cx=nx;cy=ny;dirA=!!d[0];drawGrid();}e.preventDefault();}}});
+function pay(c){if(S.coins<c){note("You need "+c+" doubloons for that. Solve more puzzles to earn them.");return false;}S.coins-=c;hints++;save();return true;}
+$("hLetter").onclick=()=>{if(!pay(25))return;fill[cy][cx]=G.sol[cy][cx];note("");advance(1);drawGrid();checkDone();};
+$("hWord").onclick=()=>{if(!pay(80))return;const e=cur();for(let i=0;i<e.a.length;i++)fill[e.y+e.dy*i][e.x+e.dx*i]=e.a[i];note("");drawGrid();checkDone();};
+$("hCheck").onclick=()=>{let bad=0;document.querySelectorAll("#grid [data-x]").forEach(b=>{const x=+b.dataset.x,y=+b.dataset.y;if(fill[y][x]&&fill[y][x]!==G.sol[y][x]){b.classList.add("bad");bad++;}});note(bad?bad+" letter"+(bad>1?"s are":" is")+" wrong. They're marked in red.":"No wrong letters so far.");};
+$("hList").onclick=()=>{const l=$("clueList");l.hidden=!l.hidden;if(!l.hidden)drawList();};
+$("clueList").onclick=e=>{const d=e.target.closest("[data-i]");if(!d)return;const en=G.entries[+d.dataset.i];cx=en.x;cy=en.y;dirA=!!en.dx;drawGrid();scrollTo(0,0);};
+drawHome();
+</script>
+</body></html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shere's Revenge — The Pirates of Ybor</title><link rel="stylesheet" href="assets/site.css"></head>
+<body>
+<main class="wrap">
+  <section class="hero"><h1>⚔ Shere's Revenge</h1><p class="lead">A swashbuckling duel on the deck. When the enemy winds up, <strong>parry</strong>. When they're open, <strong>strike</strong>. First to empty the other's health wins.</p></section>
+  <section class="panel">
+    <div class="hud">
+      <select id="mode" style="width:auto"><option value="ai">Vs Ship AI</option><option value="2p">Two players, one screen</option></select>
+      <span class="stat" id="you">You ❤ 100</span><span class="stat" id="foe">Foe ❤ 100</span>
+    </div>
+    <canvas class="game" id="c" width="900" height="420"></canvas>
+    <div class="hud">
+      <button class="btn" id="strike">⚔ Strike (S)</button><button class="btn ghost" id="parry">🛡 Parry (D)</button>
+      <button class="btn" id="p2strike" hidden>⚔ P2 Strike (K)</button><button class="btn ghost" id="p2parry" hidden>🛡 P2 Parry (L)</button>
+      <button class="btn rum" id="start">Begin Duel</button>
+    </div>
+    <p id="log" style="text-align:center;color:var(--mute);min-height:1.5em">Press Begin Duel.</p>
+    <p style="color:var(--mute);text-align:center;font-size:.9rem">Keyboard: P1 = S strike, D parry. P2 = K strike, L parry.</p>
+  </section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+const c=document.getElementById("c"),x=c.getContext("2d");
+let hp=[100,100],state="idle",tel=0,telDur=0,open=0,round=1,running=false,aiTimer=null,anim={},gen=0,cool=[0,0];
+const ready=i=>{const n=performance.now();if(n<cool[i])return false;cool[i]=n+380;return true;};
+const log=m=>document.getElementById("log").textContent=m;
+function hud(){document.getElementById("you").textContent="P1 ❤ "+Math.max(0,hp[0]);document.getElementById("foe").textContent=(mode()==="ai"?"Foe":"P2")+" ❤ "+Math.max(0,hp[1]);}
+const mode=()=>document.getElementById("mode").value;
+function start(){gen++;state="idle";anim={};cool=[0,0];hp=[100,100];round=1;running=true;log("En garde!");hud();if(mode()==="ai")aiLoop();}
+function aiLoop(){clearTimeout(aiTimer);if(!running)return;const g=gen;aiTimer=setTimeout(()=>{if(!running||g!==gen)return;
+  if(Math.random()<.65){state="tel";telDur=700+Math.random()*500;tel=performance.now();anim.foe="wind";log("The foe winds up… PARRY!");
+    setTimeout(()=>{if(g!==gen||!running)return;if(state==="tel"){state="idle";anim.foe="slash";hit(0,18,"Slashed! You took 18.");}aiLoop();},telDur);}
+  else{state="open";anim.foe="open";log("The foe is OPEN — STRIKE!");setTimeout(()=>{if(g!==gen||!running)return;if(state==="open"){state="idle";anim.foe=null;}aiLoop();},650+Math.random()*300);}
+},600+Math.random()*900);}
+function hit(who,dmg,m){hp[who]-=dmg;log(m);hud();if(hp[who]<=0)end(who===0?1:0);}
+function end(w){if(w===0||mode()==="2p")PY.celebrate();running=false;clearTimeout(aiTimer);log((mode()==="ai"?(w===0?"🏴‍☠️ Victory! Shere is avenged.":"☠ You fall. Shere's revenge waits another day."):`🏴‍☠️ Player ${w+1} wins the duel!`));PY.best("duel_wins",w===0?(PY.best("duel_wins")+1):undefined);}
+function p1Strike(){if(!running||!ready(0))return;anim.you="slash";if(mode()==="ai"){if(state==="open"){state="idle";anim.foe="hurt";hit(1,22,"Clean strike! 22 damage.");}else if(state==="tel"){state="idle";anim.foe=null;hit(0,10,"You swung into the wind-up — clipped for 10.");}else hit(1,6,"Glancing blow. 6 damage.");}
+  else{if(p2.parry){hit(0,8,"P2 parried! P1 takes 8 recoil.");}else hit(1,15,"P1 strikes P2 for 15.");}}
+function p1Parry(){if(!running||!ready(0))return;anim.you="parry";if(mode()==="ai"){if(state==="tel"){state="idle";anim.foe="stagger";log("Parried! The foe staggers — strike now!");state="open";setTimeout(()=>{if(state==="open"){state="idle";anim.foe=null;}},700);}else log("Parry… nothing to block.");}
+  else{p1.parry=true;setTimeout(()=>p1.parry=false,400);}}
+const p1={parry:false},p2={parry:false};
+function p2Strike(){if(!running||mode()!=="2p"||!ready(1))return;anim.foe="slash";if(p1.parry)hit(1,8,"P1 parried! P2 takes 8 recoil.");else hit(0,15,"P2 strikes P1 for 15.");}
+function p2Parry(){if(!running||mode()!=="2p"||!ready(1))return;anim.foe="parry";p2.parry=true;setTimeout(()=>p2.parry=false,400);}
+document.getElementById("strike").onclick=p1Strike;document.getElementById("parry").onclick=p1Parry;document.getElementById("start").onclick=start;
+document.getElementById("p2strike").onclick=p2Strike;document.getElementById("p2parry").onclick=p2Parry;
+document.getElementById("mode").onchange=()=>{gen++;running=false;clearTimeout(aiTimer);state="idle";anim={};hp=[100,100];const two=mode()==="2p";document.getElementById("p2strike").hidden=!two;document.getElementById("p2parry").hidden=!two;log("Press Begin Duel.");hud();};
+window.addEventListener("keydown",e=>{if(e.repeat)return;const k=e.key.toLowerCase();if(k==="s")p1Strike();if(k==="d")p1Parry();if(k==="k")p2Strike();if(k==="l")p2Parry();});
+function pirate(px,flip,col,a){x.save();x.translate(px,300);if(flip)x.scale(-1,1);
+  x.fillStyle=col;x.fillRect(-25,-120,50,90);x.beginPath();x.arc(0,-145,24,0,7);x.fill();
+  x.fillStyle="#1b1f2a";x.beginPath();x.moveTo(-34,-160);x.lineTo(34,-160);x.lineTo(0,-185);x.fill();
+  x.fillStyle="#3a2a1a";x.fillRect(-25,-30,20,40);x.fillRect(5,-30,20,40);
+  x.strokeStyle="#ddd";x.lineWidth=6;x.beginPath();const ang=a==="slash"?-.2:a==="wind"?-1.6:a==="parry"?-1.1:-.8;x.moveTo(25,-80);x.lineTo(25+Math.cos(ang)*90,-80+Math.sin(ang)*90);x.stroke();
+  if(a==="hurt"||a==="stagger"){x.fillStyle="rgba(255,0,0,.3)";x.fillRect(-30,-190,60,200);}
+  if(a==="open"){x.fillStyle="#f6d67a";x.font="bold 30px Georgia";x.scale(flip?-1:1,1);x.fillText("OPEN!",-40,-200);}
+  x.restore();}
+function render(){x.fillStyle="#0d1320";x.fillRect(0,0,900,420);x.fillStyle="#5a3a1a";x.fillRect(0,300,900,120);x.strokeStyle="rgba(0,0,0,.3)";for(let i=0;i<900;i+=60){x.beginPath();x.moveTo(i,300);x.lineTo(i,420);x.stroke();}
+  x.fillStyle="#f6d67a";x.beginPath();x.arc(780,70,30,0,7);x.fill();
+  pirate(250,false,"#b5532a",anim.you);pirate(650,true,"#2aa3a8",anim.foe);
+  anim.you=anim.you==="slash"||anim.you==="parry"?null:anim.you;if(anim.foe==="slash"||anim.foe==="hurt"||anim.foe==="parry")setTimeout(()=>anim.foe=null,120);
+  requestAnimationFrame(()=>setTimeout(render,60));}
+hud();render();
+</script>
+</body></html>

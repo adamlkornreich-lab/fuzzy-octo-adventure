@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pirate Darts — The Pirates of Ybor</title><link rel="stylesheet" href="assets/site.css"></head>
+<body>
+<main class="wrap">
+  <section class="hero"><h1>🎯 Pirate Darts</h1><p class="lead">The ship sways, so the sight drifts. Tap when the crosshair is where you want it. Three darts a turn, highest total after three turns wins. Bullseye 50, inner ring 25.</p></section>
+  <section class="panel">
+    <div class="hud"><select id="mode" style="width:auto"><option value="ai">Vs Ship AI</option><option value="2p">Two players</option></select><span class="stat" id="who">Player 1</span><span class="stat" id="darts">Darts 3</span><span class="stat" id="score">P1 0 · P2 0</span><button class="btn" id="start">New Match</button></div>
+    <canvas class="game" id="c" width="600" height="600" style="max-width:520px"></canvas>
+    <p id="log" style="text-align:center;color:var(--mute)">Tap the board to throw.</p>
+  </section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+const c=document.getElementById("c"),x=c.getContext("2d");const log=m=>document.getElementById("log").textContent=m;
+let sc=[0,0],turn=0,darts=3,rounds=[0,0],hits=[],t=0,over=false,cross=[300,300],tm=[];
+const later=(f,ms)=>tm.push(setTimeout(f,ms));
+function hud(){document.getElementById("who").textContent=document.getElementById("mode").value==="ai"&&turn===1?"Ship AI":"Player "+(turn+1);document.getElementById("darts").textContent="Darts "+darts;document.getElementById("score").textContent=`P1 ${sc[0]} · P2 ${sc[1]}`;}
+function value(px,py){const d=Math.hypot(px-300,py-300);if(d<12)return 50;if(d<30)return 25;if(d>240)return 0;const seg=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];let a=Math.atan2(py-300,px-300)+Math.PI/2+Math.PI/20;if(a<0)a+=Math.PI*2;const s=seg[Math.floor(a/(Math.PI/10))%20];if(d>228)return s*2;if(d>140&&d<152)return s*3;return s;}
+function throwDart(px,py){if(over||darts===0)return;const v=value(px,py);hits.push([px,py,turn]);sc[turn]+=v;darts--;log(`${v===50?"BULLSEYE! ":""}${v} points`);hud();
+  if(darts===0)later(next,800);}
+function next(){rounds[turn]++;turn=1-turn;darts=3;hits=[];if(rounds[0]>=3&&rounds[1]>=3){over=true;if(sc[0]>sc[1]||(sc[0]!==sc[1]&&document.getElementById("mode").value==="2p"))PY.celebrate();log(sc[0]===sc[1]?"Tie!":`${sc[0]>sc[1]?"Player 1":(document.getElementById("mode").value==="ai"?"Ship AI":"Player 2")} wins ${Math.max(...sc)}–${Math.min(...sc)}!`);PY.best("darts",sc[0]);return;}
+  hud();if(document.getElementById("mode").value==="ai"&&turn===1)aiThrow();}
+function aiThrow(){if(darts===0||over)return;later(()=>{throwDart(300+(Math.random()-.5)*120,300+(Math.random()-.5)*120);if(darts>0)aiThrow();},700);}
+c.addEventListener("pointerdown",e=>{if(document.getElementById("mode").value==="ai"&&turn===1)return;throwDart(cross[0],cross[1]);});
+function step(){t+=.035;cross=[300+Math.sin(t*1.3)*45,300+Math.cos(t*.9)*45];render();requestAnimationFrame(step);}
+function render(){x.fillStyle="#0d1320";x.fillRect(0,0,600,600);
+  for(let i=0;i<20;i++){const a0=-Math.PI/2-Math.PI/20+i*Math.PI/10,a1=a0+Math.PI/10;x.fillStyle=i%2?"#f3e6c8":"#1b1f2a";x.beginPath();x.moveTo(300,300);x.arc(300,300,240,a0,a1);x.fill();
+    x.fillStyle=i%2?"#2a7d3a":"#b5532a";x.beginPath();x.arc(300,300,240,a0,a1);x.arc(300,300,228,a1,a0,true);x.fill();x.beginPath();x.arc(300,300,152,a0,a1);x.arc(300,300,140,a1,a0,true);x.fill();}
+  x.fillStyle="#2a7d3a";x.beginPath();x.arc(300,300,30,0,7);x.fill();x.fillStyle="#b5532a";x.beginPath();x.arc(300,300,12,0,7);x.fill();
+  const seg=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];x.fillStyle="#f6d67a";x.font="bold 20px Georgia";x.textAlign="center";seg.forEach((s,i)=>{const a=-Math.PI/2+i*Math.PI/10;x.fillText(s,300+Math.cos(a)*265,300+Math.sin(a)*265+7);});
+  hits.forEach(h=>{x.fillStyle=h[2]?"#2aa3a8":"#e8b84a";x.beginPath();x.arc(h[0],h[1],6,0,7);x.fill();});
+  if(!over){x.strokeStyle="#fff";x.lineWidth=2;x.beginPath();x.arc(cross[0],cross[1],14,0,7);x.moveTo(cross[0]-22,cross[1]);x.lineTo(cross[0]+22,cross[1]);x.moveTo(cross[0],cross[1]-22);x.lineTo(cross[0],cross[1]+22);x.stroke();}}
+const newMatch=()=>{tm.forEach(clearTimeout);tm=[];sc=[0,0];turn=0;darts=3;rounds=[0,0];hits=[];over=false;hud();log("Tap the board to throw.");};
+document.getElementById("start").onclick=newMatch;document.getElementById("mode").onchange=newMatch;
+hud();step();
+</script>
+</body></html>

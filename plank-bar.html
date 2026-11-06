@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Book the Plank Bar — The Pirates of Ybor</title><link rel="stylesheet" href="assets/site.css"></head>
+<body>
+<main class="wrap">
+  <section class="hero"><h1>🍹 Book the Plank Bar</h1><p class="lead">A separate VIP experience at Gaspar's Grotto, modern pirate style. Private space, entertainment, and your crew.</p></section>
+  <section class="grid" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+    <div class="panel">
+      <h2>The Plank Bar — VIP</h2>
+      <p><strong>$4,000 non-refundable down payment</strong> secures the space booking and entertainment. Drinks are paid by the guest, or by whoever wants to pick up the tab.</p>
+      <ul style="color:var(--mute)"><li>Private Plank Bar space</li><li>Live entertainment</li><li>Pirate host crew</li><li>Pops &amp; Pippy appearance (schedule permitting)</li></ul>
+      <a class="btn rum" href="mailto:adamlkornreich@gmail.com?subject=Plank%20Bar%20booking%20request">Request a date</a>
+    </div>
+    <div class="panel">
+      <h2>Make Your Own Event</h2>
+      <p><strong>$100,000</strong> — a fully produced event with famous artists and DJs, built around you. Tell us the vibe, the date and the headcount.</p>
+      <ul style="color:var(--mute)"><li>Headline artists and DJs</li><li>Full production and staging</li><li>Custom pirate theming</li><li>Dedicated event crew</li></ul>
+      <a class="btn" href="mailto:adamlkornreich@gmail.com?subject=Make%20My%20Own%20Event">Start planning</a>
+    </div>
+  </section>
+  <section class="panel">
+    <h2>Booking request</h2>
+    <form onsubmit="send(event)">
+      <label>Your name</label><input id="n" required>
+      <label>Email</label><input id="e" type="email" required>
+      <label>Experience</label><select id="x"><option>Plank Bar VIP ($4,000 deposit)</option><option>Make Your Own Event ($100,000)</option></select>
+      <label>Preferred date &amp; details</label><input id="d" placeholder="Date, headcount, vibe">
+      <p style="margin-top:16px"><button class="btn" type="submit">Send request</button></p>
+      <p class="notice">Requests open in your email app. If nothing opens, write to adamlkornreich@gmail.com. Online payment arrives with crew accounts; deposits are handled directly.</p>
+    </form>
+  </section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+function send(ev){ev.preventDefault();const g=id=>document.getElementById(id).value;location.href=`mailto:adamlkornreich@gmail.com?subject=${encodeURIComponent("Booking: "+g("x"))}&body=${encodeURIComponent(`Name: ${g("n")}\nEmail: ${g("e")}\nDetails: ${g("d")}`)}`;}
+</script>
+</body></html>

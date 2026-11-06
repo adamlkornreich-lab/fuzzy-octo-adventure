@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jen Runs the Ship</title><link rel="stylesheet" href="assets/site.css">
+<style>
+.j-head{display:flex;gap:14px;align-items:center;padding:16px 0 8px}
+.j-head img{width:76px;height:76px;border-radius:50%;object-fit:cover;border:3px solid var(--gold);flex:none}
+.j-head h1{margin:0;color:var(--gold2);font-size:clamp(1.5rem,5vw,2.3rem);line-height:1.1;text-wrap:balance}
+.j-head p{margin:2px 0 0;color:var(--mute)}
+.meters{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px 14px;margin:10px 0}
+.m label{margin:0;display:flex;justify-content:space-between;color:var(--fog);font-variant-numeric:tabular-nums}
+.bar{height:10px;background:var(--panel2);border-radius:99px;overflow:hidden}.bar span{display:block;height:100%;background:var(--sea);transition:width .2s}.bar span.low{background:var(--rum)}
+#jobs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;align-items:start;min-height:210px}
+.job{background:linear-gradient(180deg,var(--panel),var(--deep));border:1px solid rgba(232,184,74,.3);border-radius:12px;padding:12px;min-width:0}
+.job h3{margin:0 0 4px;color:var(--gold2);font-size:1.05rem}.job p{margin:0 0 8px}
+.job .tm{height:6px;background:var(--panel2);border-radius:9px;overflow:hidden;margin-bottom:8px}.job .tm span{display:block;height:100%;background:var(--gold)}
+.job .tm span.hot{background:var(--rum)}
+.job .opts{display:grid;gap:6px}
+.opt{text-align:left;padding:10px 12px;border-radius:8px;border:1px solid rgba(232,184,74,.3);background:var(--panel2);color:var(--fog);font:inherit;font-size:.95rem;cursor:pointer}
+.opt:hover{border-color:var(--gold)}.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+#log{min-height:1.5em;text-align:center;color:var(--gold2);margin:8px 0}
+.empty{color:var(--mute);padding:20px;text-align:center;grid-column:1/-1}
+.report li{margin:4px 0}
+</style></head>
+<body>
+<main class="wrap">
+  <div class="j-head"><img src="assets/jen.jpg" alt="Jen"><div><h1>Jen Runs the Ship</h1><p>The owners are out of town. Five days. Every manager job is yours.</p></div></div>
+
+  <section class="panel" id="intro">
+    <h2>You're in charge, Jen</h2>
+    <p>Jobs land on your desk all shift: count the till, check deliveries, cover call-outs, card guests, reorder stock, calm complaints and answer the owners' texts. Pick the right call before each timer runs out.</p>
+    <p>Keep Guests, Crew, Books and Owners' Trust above zero until the owners come home. Each day gets busier.</p>
+    <button class="btn" id="begin">Start Monday's shift</button>
+  </section>
+
+  <section id="game" hidden style="padding-top:0">
+    <div class="hud"><span class="stat" id="day"></span><span class="stat" id="clock"></span><span class="stat" id="score"></span></div>
+    <div class="meters" id="meters"></div>
+    <p id="log" aria-live="polite"></p>
+    <div id="jobs"></div>
+  </section>
+
+  <section class="panel report" id="report" hidden>
+    <h2 id="rT"></h2><ul id="rL"></ul>
+    <p class="row"><button class="btn" id="rNext"></button><a class="btn ghost" href="arcade.html">⚔ Arcade</a><a class="btn ghost" href="world.html#jen">🏝 Back to Jen's Island</a></p>
+  </section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday"],M={guests:"Guests",crew:"Crew",books:"Books",trust:"Owners' Trust"};
+let DAY_MS=50000,day=0,mv,score=0,jobs=[],dayLeft=0,nextIn=0,tick=null,nid=0,stats,last=0,recent=[];
+const $=i=>document.getElementById(i),R=n=>Math.floor(Math.random()*n),pick=a=>a[R(a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=R(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;};
+const money=n=>"$"+n;
+/* Each job: icon + title, prompt, meter it affects, and options with one right call. */
+const SCENES=[
+ ["🍽","Upset guest","Table 6 waited 40 minutes for wings and wants the manager.","guests","Apologize, comp the wings, check back",["Tell them the kitchen is busy","Hide in the office"]],
+ ["🧊","Ice machine down","The ice machine quit an hour before happy hour.","guests","Call the repair tech and send someone for bagged ice",["Serve warm drinks tonight","Wait until the owners get back"]],
+ ["🎸","Band is late","The 9 p.m. band says they'll be 30 minutes late.","guests","Run the house playlist and announce a new start time",["Cancel and refund everyone","Say nothing"]],
+ ["🧯","Fryer warning","The fryer is smoking and smells wrong.","guests","Shut it off, pull fried items and call service",["Keep frying until close","Turn it up"]],
+ ["🧹","Spill on the floor","A full pitcher just hit the floor by the door.","guests","Put out a wet-floor sign and mop now",["Mop at closing","Cover it with napkins"]],
+ ["🤝","Crew conflict","Two bartenders are arguing behind the bar in front of guests.","crew","Pull them aside, split their wells, talk after shift",["Argue back","Send both home at peak"]],
+ ["🕒","Late again","A server clocked in 25 minutes late for the third time.","crew","Talk privately and write it up",["Yell across the floor","Ignore it again"]],
+ ["🥵","Long double","A bartender has worked 9 hours with no break.","crew","Jump on the bar and send them on break",["Tell them to tough it out","Promise a break next week"]],
+ ["💵","Tip-out","Friday's tip pool needs to go out before crew leaves.","books","Split it by the posted policy and have them sign",["Keep it for Monday","Guess by who worked hardest"]],
+ ["🧾","Vendor overcharge","The liquor invoice bills last month's higher price.","books","Dispute it with the rep and hold that line",["Pay it and move on","Throw out the invoice"]],
+ ["🏦","Night deposit","The safe has last night's cash and it hasn't gone to the bank.","books","Log it, seal it and make the deposit",["Leave it for the owners","Keep it in your car"]],
+ ["🍺","Over-served guest","A guest at the bar is clearly drunk and orders another round.","trust","Cut them off kindly, offer water and call a ride",["Serve one more","Let them drive"]],
+ ["📱","Owners text","\"How's everything going? Anything we need to know?\"","trust","Send a short, honest update with today's numbers",["Leave them on read","Say all good and hide the fryer problem"]],
+ ["📱","Owners text from the beach","\"Quick one: did the rep drop off the new menus?\"","trust","Check, then answer with a clear yes or no",["Guess yes","Tell them to stop texting"]],
+ ["🚨","Fire inspector","The inspector stopped by unannounced.","trust","Walk them through, fix notes, send the owners the report",["Say the owners aren't here, come back later","Hide the clipboard"]],
+ ["🐱","Pops on the POS","Pops the bar cat is asleep on the register and the line is growing.","guests","Lure him off with a treat and open the register",["Ring up around the cat","Wake him with a loud noise"]],
+ ["🐶","Pippy in the walk-in","Pippy followed a delivery into the walk-in cooler.","trust","Carry her out and shut the door",["Close up and hope she leaves","Ask her to leave nicely, again"]],
+];
+function genTill(){const c=[[R(5)+1,20],[R(6)+1,10],[R(8)+1,5],[R(15)+2,1]],t=c.reduce((s,x)=>s+x[0]*x[1],0);
+ return{i:"💰",t:"Count the till",p:c.map(x=>x[0]+" × "+money(x[1])).join(", ")+". What's the total?",m:"books",ok:money(t),no:[money(t+pick([5,10])),money(t-pick([1,5,20])>0?t-pick([1,5,20]):t+20)].filter((v,i,a)=>v!==money(t)&&a.indexOf(v)===i)};}
+function genDelivery(){const item=pick(["cases of lager","bottles of rum","kegs","boxes of limes","cases of cups"]),inv=R(8)+6,short=Math.random()<.6?R(3)+1:0,got=inv-short;
+ return{i:"🚚",t:"Delivery at the dock",p:`Invoice says ${inv} ${item}. You count ${got}.`,m:"books",ok:short?`Mark ${short} short, then sign`:"Sign the invoice",no:short?["Sign it as is","Refuse the whole truck"]:[`Mark 2 short, then sign`,"Refuse the whole truck"]};}
+function genCover(){const shift=pick(["Friday 8 p.m.","Saturday close","Thursday happy hour"]),who=shuffle(["Steph","Landon","Stephania","Ashlee Rae"]),free=who[0];
+ const list=[`${who[1]} is on vacation`,`${who[2]} already works a double`,`${who[3]} is out sick`,`${free} is free`];
+ return{i:"📅",t:"Call-out",p:`The ${shift} bartender called out. ${shuffle(list).join(", ")}.`,m:"crew",ok:`Ask ${free} to cover`,no:[`Ask ${who[pick([1,2,3])]} to cover`,"Leave the shift empty"]};}
+function genId(){const now=new Date(),under=Math.random()<.5,y=under?20:21+R(9),months=R(11)+1,b=new Date(now.getFullYear()-y,now.getMonth()-months,Math.min(now.getDate(),28));
+ return{i:"🪪",t:"Check the ID",p:`Today is ${now.toLocaleDateString("en-US")}. Guest's birthday: ${b.toLocaleDateString("en-US")}. They want a beer.`,m:"trust",fixed:true,opts:[{l:"Serve them",ok:!under},{l:"Decline, under 21",ok:under}]};}
+function genStock(){const it=shuffle([["rum",R(3)+1],["lager",R(4)+8],["limes",R(4)+6],["cups",R(4)+12]]),low=it.reduce((a,b)=>b[1]<a[1]?b:a);
+ return{i:"📦",t:"Weekly reorder",p:"Par is 12 of each. On hand: "+it.map(x=>`${x[0]} ${x[1]}`).join(", ")+". What's most urgent?",m:"guests",ok:"Reorder "+low[0],no:it.filter(x=>x!==low).slice(0,2).map(x=>"Reorder "+x[0])};}
+const GENS=[genTill,genDelivery,genCover,genId,genStock];
+function makeJob(){let j;
+ if(Math.random()<.55){let s,g=0;do{s=pick(SCENES);g++;}while(recent.includes(s[1])&&g<12);recent=[s[1],...recent].slice(0,6);j={i:s[0],t:s[1],p:s[2],m:s[3],ok:s[4],no:s[5]};}
+ else j=pick(GENS)();
+ j.opts=j.opts||shuffle([{l:j.ok,ok:true},...j.no.map(l=>({l,ok:false}))]);
+ j.id=++nid;j.total=j.left=Math.max(7000,14000-day*1400);return j;}
+function bump(m,d){mv[m]=Math.max(0,Math.min(100,mv[m]+d));}
+function drawMeters(){$("meters").innerHTML=Object.keys(M).map(k=>`<div class="m"><label>${M[k]}<span>${mv[k]}</span></label><div class="bar"><span class="${mv[k]<30?"low":""}" style="width:${mv[k]}%"></span></div></div>`).join("");$("score").textContent="Score "+score;}
+function drawJobs(){$("jobs").innerHTML=jobs.length?jobs.map(j=>`<article class="job" data-id="${j.id}"><h3>${j.i} ${j.t}</h3><div class="tm"><span style="width:${j.left/j.total*100}%"></span></div><p>${j.p}</p><div class="opts">${j.opts.map((o,n)=>`<button class="opt" data-n="${n}">${o.l}</button>`).join("")}</div></article>`).join(""):'<p class="empty">Desk is clear. The next job is on its way.</p>';}
+function failCheck(){if(Object.values(mv).some(v=>v<=0)){finish(false);return true;}return false;}
+function loop(){const now=performance.now(),dt=now-last;last=now;dayLeft-=dt;nextIn-=dt;
+ if(nextIn<=0&&dayLeft>0&&jobs.length<4){jobs.push(makeJob());nextIn=Math.max(2600,6000-day*700);drawJobs();}
+ let gone=false;jobs=jobs.filter(j=>{j.left-=dt;if(j.left<=0){bump(j.m,-12);stats.missed++;$("log").textContent=`Missed: ${j.t}. ${M[j.m]} −12.`;gone=true;return false;}return true;});
+ if(gone){drawJobs();drawMeters();if(failCheck())return;}
+ jobs.forEach(j=>{const e=document.querySelector(`[data-id="${j.id}"] .tm span`);if(e){e.style.width=j.left/j.total*100+"%";e.classList.toggle("hot",j.left<3000);}});
+ $("clock").textContent=Math.max(0,Math.ceil(dayLeft/1000))+"s left";
+ if(dayLeft<=0&&!jobs.length)endDay();
+}
+function startDay(){$("intro").hidden=true;$("report").hidden=true;$("game").hidden=false;jobs=[];stats={done:0,wrong:0,missed:0};dayLeft=DAY_MS;nextIn=300;last=performance.now();$("day").textContent=DAYS[day]+", day "+(day+1)+" of 5";$("log").textContent="";drawMeters();drawJobs();clearInterval(tick);tick=setInterval(loop,100);}
+function endDay(){clearInterval(tick);$("game").hidden=true;$("report").hidden=false;
+ if(day>=4)return finish(true);
+ $("rT").textContent=DAYS[day]+" is closed";$("rL").innerHTML=`<li>${stats.done} jobs done right</li><li>${stats.wrong} wrong calls</li><li>${stats.missed} jobs missed</li><li>Score: ${score}</li>`;
+ $("rNext").textContent="Start "+DAYS[day+1]+"'s shift";$("rNext").onclick=()=>{day++;startDay();};}
+function finish(won){if(won)PY.celebrate();clearInterval(tick);jobs=[];$("game").hidden=true;$("report").hidden=false;const avg=Math.round(Object.values(mv).reduce((a,b)=>a+b)/4);
+ const best=PY.best("jen",score);
+ $("rT").textContent=won?(avg>=70?"The owners came home to a better bar. Raise for Jen!":"The owners are home and the ship still floats."):"The owners are flying home early.";
+ $("rL").innerHTML=(won?"":`<li>${Object.keys(M).filter(k=>mv[k]<=0).map(k=>M[k]).join(", ")} hit zero on ${DAYS[day]}.</li>`)+Object.keys(M).map(k=>`<li>${M[k]}: ${mv[k]}</li>`).join("")+`<li>Score: ${score} · Your best: ${best}</li>`;
+ $("rNext").textContent="Play again";$("rNext").onclick=newGame;}
+function newGame(){day=0;score=0;mv={guests:70,crew:70,books:70,trust:70};startDay();}
+$("begin").onclick=newGame;
+$("jobs").onclick=e=>{const b=e.target.closest(".opt");if(!b)return;const id=+b.closest(".job").dataset.id,j=jobs.find(x=>x.id===id);if(!j)return;const o=j.opts[+b.dataset.n];jobs=jobs.filter(x=>x!==j);
+ if(o.ok){bump(j.m,6);score+=50+Math.round(j.left/j.total*50);stats.done++;$("log").textContent=`Handled: ${j.t}. ${M[j.m]} +6.`;}
+ else{bump(j.m,-10);stats.wrong++;$("log").textContent=`Bad call on ${j.t}. ${M[j.m]} −10.`;}
+ drawJobs();drawMeters();failCheck();};
+</script>
+</body></html>

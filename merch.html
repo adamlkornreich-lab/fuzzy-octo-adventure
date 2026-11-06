@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Merch Store — The Pirates of Ybor</title><link rel="stylesheet" href="assets/site.css"></head>
+<body>
+<main class="wrap">
+  <section class="hero"><h1>👕 Merch Store</h1><p class="lead">Gaspar's Grotto and Ybor City pirate gear. Checkout opens with the app-store release — tap any item to reserve by email, or write to adamlkornreich@gmail.com.</p></section>
+  <section>
+    <div class="grid" id="items"></div>
+  </section>
+  <section class="panel"><h2>VIP Gallery Package</h2><p>Signed and unsigned print downloads from Waldo Nahuel's collection, available to All Access members on the boat's gallery deck. Coming with crew accounts.</p></section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+const items=[["🧢","Gaspar's Grotto Tricorn Cap","$28"],["👕","Pirates of Ybor Crew Tee","$25"],["🍺","Gaspar's Branded Pint Glass","$14"],["🥃","Gaspar's Rocks Glass (set of 2)","$22"],["🧥","Ybor City Pirate Hoodie","$48"],["🏴‍☠️","Pops & Pippy Flag","$30"],["🎲","Pirate Chess Travel Set","$35"],["🔑","Doubloon Keychain","$9"]];
+document.getElementById("items").innerHTML=items.map(i=>`<a class="card" href="mailto:adamlkornreich@gmail.com?subject=Reserve: ${encodeURIComponent(i[1])}"><div class="icon">${i[0]}</div><h3>${i[1]}</h3><p>${i[2]} · Reserve by email</p></a>`).join("");
+</script>
+</body></html>

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rene's Guitar School</title><link rel="stylesheet" href="assets/site.css">
+<style>
+.gh{padding:18px 0 6px}.gh h1{margin:0;color:var(--gold2);font-size:clamp(1.8rem,6vw,2.7rem);text-wrap:balance}
+.trib{border-left:0;background:linear-gradient(120deg,#3b2414,#1a2234);border:1px solid var(--gold);border-radius:12px;padding:14px 16px;margin:10px 0 16px;max-width:70ch}
+.trib b{color:var(--gold2)}
+.tabsr{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tabsr button{padding:9px 12px;border-radius:9px;border:1px solid rgba(232,184,74,.35);background:var(--panel);color:var(--fog);font:inherit;cursor:pointer}.tabsr button.on{background:var(--gold);color:#2a1d05;font-weight:bold}
+.tabsr button:focus-visible,.f:focus-visible,.btn:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+.tip{background:var(--panel2);border-radius:10px;padding:12px;margin:0 0 12px}
+#neck{display:grid;grid-template-columns:44px repeat(4,1fr);gap:0;background:#3b2414;border-radius:10px;padding:8px 6px;touch-action:manipulation;max-width:640px;margin:0 auto}
+.lab{display:flex;align-items:center;justify-content:center;color:var(--gold2);font-weight:bold;font-size:.9rem;border:0;background:transparent;cursor:pointer;font-family:inherit}
+.f{height:44px;border:0;border-right:3px solid #c9a063;background:linear-gradient(transparent 46%,#d9d2c0 46%,#d9d2c0 54%,transparent 54%);position:relative;cursor:pointer;padding:0}
+.f.on::after{content:attr(data-d);position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:var(--sea);color:#fff;font:bold .9rem/30px Georgia,serif;box-shadow:0 0 8px rgba(0,0,0,.5)}
+.f.ghost::after{content:attr(data-d);position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:rgba(246,214,122,.35);color:#fff;font:bold .9rem/30px Georgia,serif;border:2px dashed var(--gold2);box-sizing:border-box}
+.frets{display:contents}.fn{color:var(--mute);text-align:center;font-size:.8rem}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+#say{text-align:center;color:var(--gold2);min-height:1.5em;margin:6px 0}
+.chords{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:10px}
+.chords button{min-width:52px;padding:8px;border-radius:8px;border:1px solid rgba(232,184,74,.35);background:var(--panel);color:var(--fog);font:bold 1rem Georgia,serif;cursor:pointer}.chords button.done{background:#1f5a3a}.chords button.on{outline:2px solid var(--gold2)}
+#beat{display:flex;gap:8px;justify-content:center;margin:12px 0}#beat span{width:60px;height:60px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:var(--panel2);font:bold 1.3rem Georgia,serif;color:var(--fog)}#beat span.now{background:var(--gold);color:#2a1d05}
+#pad{display:block;width:100%;max-width:420px;margin:0 auto;padding:26px;font-size:1.4rem}
+</style></head>
+<body>
+<main class="wrap">
+  <div class="gh"><h1>Rene's Guitar School</h1></div>
+  <div class="trib"><b>In tribute to Rene, my brother,</b> the person who always helps us in crisis. When things go wrong, Rene shows up. Now he's showing you how to play. <span style="color:var(--mute)">— Adam</span></div>
+  <div class="tabsr" id="tabs"></div>
+  <section class="panel" id="stage"></section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+const $=i=>document.getElementById(i),STR=["E","A","D","G","B","e"],MIDI=[40,45,50,55,59,64];
+/* shapes run low E to high e. -1 = don't play, 0 = open, n = fret */
+const CH={Em:[0,2,2,0,0,0],E:[0,2,2,1,0,0],Am:[-1,0,2,2,1,0],A:[-1,0,2,2,2,0],D:[-1,-1,0,2,3,2],G:[3,2,0,0,0,3],C:[-1,3,2,0,1,0]};
+const FING={Em:[0,2,3,0,0,0],E:[0,2,3,1,0,0],Am:[0,0,2,3,1,0],A:[0,0,1,2,3,0],D:[0,0,0,1,3,2],G:[2,1,0,0,0,3],C:[0,3,2,0,1,0]};
+const TIPS={Em:"The friendliest chord in the world. Two fingers, all six strings.",E:"Em plus one finger. Hear how it brightens from sad to happy.",Am:"Skip the low E string. Same shape as E, moved one string over.",A:"Three fingers lined up on fret 2. Skip the low E.",D:"Play only the four thin strings. A little triangle of fingers.",G:"Big and full. Stretch from the low E to the high e.",C:"Skip the low E. Fingers climb like stairs: 3, 2, 1."};
+const ORDER=Object.keys(CH);
+let done={};try{done=JSON.parse(localStorage.getItem("py_guitar")||"{}");}catch(e){}
+const save=()=>{try{localStorage.setItem("py_guitar",JSON.stringify(done));}catch(e){}};
+/* A plucked-string sound made in the browser (Karplus-Strong). */
+let ac=null;
+function pluck(m,when){try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const f=440*Math.pow(2,(m-69)/12),sr=ac.sampleRate,N=Math.round(sr/f),len=Math.floor(sr*1.6),b=ac.createBuffer(1,len,sr),d=b.getChannelData(0);for(let i=0;i<N;i++)d[i]=Math.random()*2-1;for(let i=N;i<len;i++)d[i]=.497*(d[i-N]+d[i-N+1||0]);const s=ac.createBufferSource(),g=ac.createGain();g.gain.value=.3;s.buffer=b;s.connect(g);g.connect(ac.destination);s.start(ac.currentTime+(when||0));}catch(e){}}
+function strum(sh){sh.forEach((fr,i)=>{if(fr>=0)pluck(MIDI[i]+fr,i*.035);});}
+/* Fretboard */
+let hand=[0,0,0,0,0,0],ghost=null;
+function neck(){let h='<div></div>'+[1,2,3,4].map(n=>`<div class="fn">Fret ${n}</div>`).join("");
+ for(let s=5;s>=0;s--){h+=`<button class="lab" data-open="${s}" aria-label="${STR[s]} string: ${hand[s]===0?"open":hand[s]<0?"muted":"fret "+hand[s]}. Tap to switch open or muted.">${STR[s]} ${hand[s]<0?"✕":hand[s]===0?"○":""}</button>`;
+  for(let f=1;f<=4;f++){const on=hand[s]===f,gh=ghost&&ghost.s[s]===f;h+=`<button class="f ${on?"on":gh?"ghost":""}" data-s="${s}" data-f="${f}" data-d="${gh?(ghost.d[s]||""):"●"}" aria-label="${STR[s]} string fret ${f}"></button>`;}}
+ $("neck").innerHTML=h;}
+function neckEvents(onChange){$("neck").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.open!==undefined){const s=+b.dataset.open;hand[s]=hand[s]===0?-1:0;}else{const s=+b.dataset.s,f=+b.dataset.f;hand[s]=hand[s]===f?0:f;pluck(MIDI[s]+f);}neck();onChange&&onChange();};}
+const same=(a,b)=>a.every((v,i)=>v===b[i]);
+/* Screens */
+let tab="Learn",cur="Em";
+const TABS=["Meet the Strings","Learn","Memory Test","Play Along"];
+function tabs(){$("tabs").innerHTML=TABS.map(t=>`<button data-t="${t}" class="${t===tab?"on":""}">${t}</button>`).join("");}
+$("tabs").onclick=e=>{const t=e.target.dataset.t;if(t){tab=t;stop();show();}};
+function show(){tabs();({"Meet the Strings":strings,"Learn":learn,"Memory Test":memory,"Play Along":along})[tab]();}
+let strTarget=0,strScore=0;
+function strings(){$("stage").innerHTML=`<div class="tip">Rene says: start here. From thickest to thinnest the strings are <b>E A D G B e</b>. Remember it as "Eddie Ate Dynamite, Good Bye Eddie." Your guitar's thickest string is closest to your chin.</div><p id="say"></p><div class="ctl" id="sb"></div>`;
+ $("sb").innerHTML=STR.map((s,i)=>`<button class="btn ghost" data-i="${i}">${i===0?"Low E":i===5?"High e":s}</button>`).join("");const nx=()=>{strTarget=Math.floor(Math.random()*6);pluck(MIDI[strTarget]);$("say").textContent=`Which string just played? Score ${strScore}. Sound must be on to hear it.`;};
+ $("sb").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(+b.dataset.i===strTarget){strScore++;}else{$("say").textContent="Not that one. Listen again.";pluck(MIDI[strTarget]);return;}nx();};
+ const st=document.createElement("button");st.className="btn";st.textContent="Play me a string";st.onclick=()=>{nx();st.remove();};$("stage").appendChild(st);}
+function learn(){const sh=CH[cur];ghost={s:sh,d:FING[cur]};hand=sh.map(v=>v<0?-1:0);
+ $("stage").innerHTML=`<div class="chords" id="cs"></div><div class="tip"><b>${cur}</b>: ${TIPS[cur]} Tap the gold spots. The number is which finger: 1 index, 2 middle, 3 ring. ✕ means don't play that string.</div><div id="neck"></div><div class="ctl"><button class="btn" id="st">🎸 Strum</button><button class="btn ghost" id="hear">Hear ${cur} played right</button></div><p id="say"></p>`;
+ $("cs").innerHTML=ORDER.map(c=>`<button data-c="${c}" class="${done[c]?"done":""} ${c===cur?"on":""}">${c}</button>`).join("");
+ $("cs").onclick=e=>{const c=e.target.dataset.c;if(c){cur=c;learn();}};neck();neckEvents();
+ $("hear").onclick=()=>strum(sh);$("st").onclick=()=>{strum(hand);if(same(hand,sh)){done[cur]=true;save();$("say").textContent=`That's ${cur}! `+(ORDER.every(c=>done[c])?"You've learned all seven. Try the Memory Test.":"Pick your next chord.");PY.celebrate();$("cs").querySelector(`[data-c="${cur}"]`).classList.add("done");}else $("say").textContent="Close. Match every gold spot, then strum again.";};}
+let memQ=null,memS=0,memN=0;
+function memory(){memQ=ORDER[Math.floor(Math.random()*ORDER.length)];ghost=null;hand=[0,0,0,0,0,0];
+ $("stage").innerHTML=`<div class="tip">No gold spots this time. Build <b style="font-size:1.3rem;color:var(--gold2)">${memQ}</b> from memory. Tap a string's name to switch it between open ○ and muted ✕.</div><div id="neck"></div><div class="ctl"><button class="btn" id="chk">Strum and check</button><button class="btn ghost" id="sh">Show me</button></div><p id="say">Score ${memS} of ${memN}</p>`;neck();neckEvents();
+ $("sh").onclick=()=>{ghost={s:CH[memQ],d:FING[memQ]};neck();};
+ $("chk").onclick=()=>{strum(hand);memN++;if(same(hand,CH[memQ])){memS++;if(!ghost){}$("say").textContent=`Right! Score ${memS} of ${memN}.`;setTimeout(()=>{if(tab==="Memory Test")memory();},900);}else $("say").textContent=`Not yet. Score ${memS} of ${memN}. Fix it or tap Show me.`;};}
+/* Play Along: strum on the beat through a real four-chord progression */
+const SONG=["G","D","Em","C"];let ti=null,beat=0,hits=0,total=0,hitThis=false;
+function stop(){clearInterval(ti);ti=null;}
+function along(){$("stage").innerHTML=`<div class="tip">G, D, Em, C: four chords behind a huge number of songs. Strum once each time a chord lights up. Four times through and you've played your first song.</div><div class="ctl"><label for="bpm" style="margin:0">Speed</label><select id="bpm" style="width:auto"><option value="2000">Slow</option><option value="1500" selected>Steady</option><option value="1000">Fast</option></select><button class="btn" id="go">Count me in</button></div><div id="beat">${SONG.map(c=>`<span>${c}</span>`).join("")}</div><button class="btn rum" id="pad">🎸 STRUM</button><p id="say"></p>`;
+ $("pad").onclick=()=>{if(!ti)return;if(hitThis)return;hitThis=true;hits++;strum(CH[SONG[beat%4]]);};
+ $("go").onclick=()=>{stop();beat=-1;hits=0;total=16;hitThis=true;$("say").textContent="";const adv=()=>{beat++;if(beat>=total){stop();document.querySelectorAll("#beat span").forEach(s=>s.classList.remove("now"));const pct=Math.round(hits/total*100);$("say").textContent=`You strummed ${hits} of ${total} chords (${pct}%). `+(pct>=75?"Rene would be proud!":"Try the slow speed and go again.");if(pct>=75)PY.celebrate();return;}hitThis=false;document.querySelectorAll("#beat span").forEach((s,i)=>s.classList.toggle("now",i===beat%4));};adv();ti=setInterval(adv,+$("bpm").value);};}
+show();
+</script>
+</body></html>

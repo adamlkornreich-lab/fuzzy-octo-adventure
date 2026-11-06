@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pirate Trivia — The Pirates of Ybor</title><link rel="stylesheet" href="assets/site.css"></head>
+<body>
+<main class="wrap">
+  <section class="hero"><h1>🧠 Pirate Trivia</h1><p class="lead">Up to ten questions a round. Pick a category, answer fast and beat your best score.</p></section>
+  <section class="panel" id="setup">
+    <label>Category</label>
+    <select id="cat"><option value="all">Everything</option><option value="ybor">Tampa &amp; Ybor City</option><option value="florida">Florida</option><option value="usa">The USA</option><option value="pirates">Pirate Lore</option><option value="movies">Movies</option><option value="grotto">Gaspar's Grotto</option></select>
+    <label>Players</label>
+    <select id="players"><option value="1">Solo</option><option value="2">Two players (pass the phone)</option></select>
+    <p style="margin-top:16px"><button class="btn" id="start">Set Sail</button></p>
+  </section>
+  <section class="panel" id="game" style="display:none">
+    <div class="hud"><span class="stat" id="turn">Player 1</span><span class="stat" id="qnum">Q 1/10</span><span class="stat" id="score">0 pts</span><span class="stat" id="timer">15s</span></div>
+    <h2 id="q"></h2>
+    <div class="choices" id="choices"></div>
+    <p id="fact" style="color:var(--mute);min-height:1.5em"></p>
+    <p><button class="btn" id="next" style="display:none">Next</button></p>
+  </section>
+  <section class="panel" id="done" style="display:none">
+    <h2>Round over</h2><p id="result"></p><p id="best"></p>
+    <p><button class="btn" onclick="location.reload()">Play again</button></p>
+  </section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+const Q=[
+ // ybor
+ ["ybor","What was Ybor City famous for producing in the early 1900s?",["Hand-rolled cigars","Oranges","Steel","Sponges"],0,"Ybor City was once called the Cigar Capital of the World."],
+ ["ybor","Who founded Ybor City in 1885?",["Vicente Martinez-Ybor","Henry Plant","Jose Gasparilla","Teddy Roosevelt"],0,"Ybor moved his cigar operation from Key West to Tampa."],
+ ["ybor","Ybor City's main street is which avenue?",["7th Avenue","Dale Mabry","Bayshore","Kennedy Blvd"],0,"La Séptima — 7th Avenue — is the heart of Ybor."],
+ ["ybor","Which bird roams Ybor City freely and is protected by ordinance?",["Chickens","Peacocks","Flamingos","Pelicans"],0,"Ybor's free-roaming chickens are local celebrities."],
+ ["ybor","What is a Cuban sandwich traditionally pressed with in Tampa?",["Genoa salami","Pineapple","Turkey","Coleslaw"],0,"Tampa's version adds salami thanks to its Italian community."],
+ ["ybor","Tampa's famous pirate festival is called what?",["Gasparilla","Mardi Gras","Fantasy Fest","Pirate Week"],0,"Gasparilla has invaded Tampa since 1904."],
+ ["ybor","Which Tampa NFL team's colors are red and pewter?",["Buccaneers","Dolphins","Jaguars","Raiders"],0,"The Bucs won Super Bowls XXXVII and LV."],
+ ["ybor","Tampa's hockey team is the…",["Lightning","Panthers","Thunder","Storm"],0,"The Bolts won the Stanley Cup in 2004, 2020 and 2021."],
+ ["ybor","The historic streetcar in Tampa runs between Ybor City and…",["Downtown / Channelside","St. Petersburg","Clearwater","Brandon"],0,"The TECO Line Streetcar is free to ride."],
+ // florida
+ ["florida","What is Florida's state nickname?",["The Sunshine State","The Orange State","The Peninsula State","The Gulf State"],0,"Adopted officially in 1970."],
+ ["florida","Which city is the capital of Florida?",["Tallahassee","Miami","Orlando","Jacksonville"],0,"Tallahassee has been the capital since 1824."],
+ ["florida","The oldest continuously occupied European-founded city in the US is…",["St. Augustine","Pensacola","Key West","Tampa"],0,"Founded by the Spanish in 1565."],
+ ["florida","Florida's state reptile is the…",["American alligator","Gopher tortoise","Burmese python","Green iguana"],0,"Gators are found in all 67 Florida counties."],
+ ["florida","Which Florida island chain ends at Key West?",["The Florida Keys","The Barrier Isles","The Ten Thousand Islands","The Sea Islands"],0,"The Overseas Highway runs 113 miles to Key West."],
+ ["florida","What is the large wetland in southern Florida called?",["The Everglades","The Okefenokee","The Bayou","The Big Thicket"],0,"The Everglades is a slow-moving river of grass."],
+ ["florida","Which Florida city hosts NASA's Kennedy Space Center?",["Cape Canaveral / Merritt Island","Daytona Beach","Gainesville","Naples"],0,"Rockets launch from the Space Coast."],
+ // usa
+ ["usa","How many stars are on the US flag?",["50","48","52","13"],0,"One for each state; 13 stripes for the original colonies."],
+ ["usa","Who was the first President of the United States?",["George Washington","Thomas Jefferson","John Adams","Benjamin Franklin"],0,"Washington served 1789–1797."],
+ ["usa","The Declaration of Independence was signed in which year?",["1776","1783","1789","1812"],0,"July 4, 1776, in Philadelphia."],
+ ["usa","Which is the longest river in the United States?",["Missouri","Mississippi","Colorado","Ohio"],0,"The Missouri edges out the Mississippi by about 100 miles."],
+ ["usa","What do the stripes on the US flag represent?",["The 13 original colonies","The 13 presidents","13 wars","13 ships"],0,"Seven red and six white."],
+ ["usa","The Statue of Liberty was a gift from which country?",["France","Spain","England","Italy"],0,"Dedicated in 1886."],
+ ["usa","Which state is the largest by area?",["Alaska","Texas","California","Montana"],0,"Alaska is more than twice the size of Texas."],
+ // pirates
+ ["pirates","Legendary pirate José Gaspar supposedly terrorized which coast?",["Florida's Gulf Coast","The Carolinas","Maine","Oregon"],0,"Gasparilla is named for him."],
+ ["pirates","What flag did pirates fly to signal no mercy?",["A red flag","A black flag","A white flag","A green flag"],0,"The Jolly Roger was black; red meant no quarter."],
+ ["pirates","Blackbeard's real name was…",["Edward Teach","Henry Morgan","William Kidd","Bartholomew Roberts"],0,"He lit fuses in his beard to terrify enemies."],
+ ["pirates","What is a pirate's 'booty'?",["Stolen treasure","A boot","A cannon","A parrot"],0,"Also called plunder, loot or swag."],
+ ["pirates","'Avast' means…",["Stop / pay attention","Go faster","Fire the cannons","Eat"],0,"From the Dutch 'hou vast' — hold fast."],
+ ["pirates","Which disease did pirates fight with citrus?",["Scurvy","Malaria","Plague","Gout"],0,"Vitamin C deficiency — hence 'limeys'."],
+ ["pirates","The side of a ship on the right when facing forward is…",["Starboard","Port","Aft","Bow"],0,"Port is left; red light port, green light starboard."],
+ ["pirates","A pirate's 'Davy Jones' Locker' is…",["The bottom of the sea","A treasure chest","The brig","The captain's cabin"],0,"Where drowned sailors go."],
+ // movies
+ ["movies","In 'Pirates of the Caribbean', Jack Sparrow's ship is the…",["Black Pearl","Flying Dutchman","Queen Anne's Revenge","Jolly Roger"],0,"Captain Jack Sparrow, if you please."],
+ ["movies","Which 1985 film has kids hunting One-Eyed Willy's treasure?",["The Goonies","Hook","Stand By Me","Treasure Planet"],0,"Hey you guys!"],
+ ["movies","Who played Captain Hook in the 1991 film 'Hook'?",["Dustin Hoffman","Robin Williams","Bob Hoskins","Tom Hanks"],0,"Robin Williams played the grown-up Peter Pan."],
+ ["movies","'Captain Phillips' (2013) stars which actor?",["Tom Hanks","Russell Crowe","Denzel Washington","Brad Pitt"],0,"Based on the 2009 Maersk Alabama hijacking."],
+ ["movies","'The Princess Bride' features the Dread Pirate…",["Roberts","Rogers","Richards","Randall"],0,"As you wish."],
+ ["movies","Which film's shark is named Bruce by the crew?",["Jaws","Finding Nemo","The Meg","Deep Blue Sea"],0,"Named after Spielberg's lawyer."],
+ ["movies","Which movie features the line 'I'm the king of the world!'?",["Titanic","Master and Commander","Pirates of the Caribbean","Waterworld"],0,"Leonardo DiCaprio on the bow of the Titanic."],
+ ["movies","Muppet Treasure Island is based on a novel by…",["Robert Louis Stevenson","Jules Verne","Daniel Defoe","Herman Melville"],0,"Treasure Island was published in 1883."],
+ // grotto
+ ["grotto","Gaspar's Grotto sits on which Ybor City street?",["7th Avenue","Bayshore Blvd","Dale Mabry","Channelside Dr"],0,"La Séptima — right in the heart of the strip."],
+ ["grotto","Gaspar's Grotto is named for which legend?",["José Gaspar","Henry Morgan","Blackbeard","Anne Bonny"],0,"The pirate of Tampa Bay lore."],
+ ["grotto","Who is the famous bar cat of the Pirates of Ybor crew?",["Pops","Pippy","Tanker Ray","Shere"],0,"Pops carries on the legacy started by Tanker Ray."],
+ ["grotto","Pippy, the pirate first mate, is what kind of animal?",["Chihuahua","Cat","Parrot","Monkey"],0,"A she-pirate chihuahua in full pirate clothes."],
+ ["grotto","What is the VIP space you can book at Gaspar's Grotto?",["The Plank Bar","The Crow's Nest","The Brig","The Galley"],0,"Private bookings run through this site."],
+ ["grotto","The Pirates of Ybor All Access pass costs how much per year?",["$1","$10","$50","$100"],0,"Plus tax and payment processing fees."],
+];
+let pool=[],i=0,scores=[0,0],turn=0,np=1,t=null,left=15;
+function shuffle(a){for(let k=a.length-1;k>0;k--){const j=Math.floor(Math.random()*(k+1));[a[k],a[j]]=[a[j],a[k]];}return a;}
+document.getElementById("start").onclick=()=>{
+  const c=document.getElementById("cat").value;np=+document.getElementById("players").value;
+  pool=shuffle(Q.filter(q=>c==="all"||q[0]===c)).slice(0,10);
+  document.getElementById("setup").style.display="none";document.getElementById("game").style.display="block";show();
+};
+function show(){
+  const q=pool[i];document.getElementById("q").textContent=q[1];document.getElementById("fact").textContent="";
+  document.getElementById("qnum").textContent=`Q ${i+1}/${pool.length}`;document.getElementById("turn").textContent=np===2?`Player ${turn+1}`:"Solo";
+  document.getElementById("score").textContent=np===2?`P1 ${scores[0]} · P2 ${scores[1]}`:`${scores[0]} pts`;
+  const idx=shuffle(q[2].map((_,k)=>k));const ch=document.getElementById("choices");ch.innerHTML="";
+  idx.forEach(k=>{const b=document.createElement("button");b.className="choice";b.textContent=q[2][k];b.onclick=()=>answer(b,k===q[3]);ch.appendChild(b);});
+  document.getElementById("next").style.display="none";left=15;tick();
+}
+function tick(){clearInterval(t);document.getElementById("timer").textContent=left+"s";t=setInterval(()=>{left--;document.getElementById("timer").textContent=left+"s";if(left<=0){clearInterval(t);answer(null,false);}},1000);}
+function answer(btn,ok){
+  clearInterval(t);const q=pool[i];
+  document.querySelectorAll(".choice").forEach(b=>{b.disabled=true;if(b.textContent===q[2][q[3]])b.classList.add("right");});
+  if(btn&&!ok)btn.classList.add("wrong");
+  if(ok)scores[turn]+=100+left*10;
+  document.getElementById("fact").textContent=(ok?"⚓ Aye! ":"☠ Nay. ")+q[4];
+  document.getElementById("score").textContent=np===2?`P1 ${scores[0]} · P2 ${scores[1]}`:`${scores[0]} pts`;
+  document.getElementById("next").style.display="inline-block";
+}
+document.getElementById("next").onclick=()=>{i++;if(np===2)turn=1-turn;if(i>=pool.length)finish();else show();};
+function finish(){PY.celebrate();
+  document.getElementById("game").style.display="none";document.getElementById("done").style.display="block";
+  let r;if(np===2)r=scores[0]===scores[1]?`Tie at ${scores[0]}!`:`Player ${scores[0]>scores[1]?1:2} wins — ${Math.max(...scores)} to ${Math.min(...scores)}.`;
+  else r=`You scored ${scores[0]} points.`;
+  document.getElementById("result").textContent=r;
+  const b=PY.best("trivia",Math.max(...scores));document.getElementById("best").textContent=`Ship record on this device: ${b}`;
+}
+</script>
+</body></html>

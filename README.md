@@ -1,7 +1,7 @@
 # Pirates of Ybor
 
-Website for the Pirates of Ybor krewe (Piratesofybor.com): a public home page,
-member sign-up and sign-in, and a members-only page.
+Website for The Pirates of Ybor (piratesofyborcity.com): home page, Arcade games,
+open world, Crew, Merch and Plank Bar pages, plus member sign-in and a members-only page.
 
 Plain HTML/CSS/JS with no build step. It's published to GitHub Pages by
 `.github/workflows/pages.yml` on every push to `main`. Sign-in uses
