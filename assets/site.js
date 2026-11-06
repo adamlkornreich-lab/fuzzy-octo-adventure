@@ -19,7 +19,19 @@
 
   document.querySelectorAll("[data-signout]").forEach(function (btn) {
     btn.addEventListener("click", async function () {
-      if (client) await client.auth.signOut();
+      btn.disabled = true;
+      if (client) {
+        var res = await client.auth.signOut();
+        if (res.error) {
+          // Server-side sign-out failed (e.g. offline); still clear this browser's session.
+          var local = await client.auth.signOut({ scope: "local" });
+          if (local.error) {
+            btn.disabled = false;
+            window.alert("Couldn't sign out: " + local.error.message);
+            return;
+          }
+        }
+      }
       window.location.href = "./";
     });
   });

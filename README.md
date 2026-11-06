@@ -30,13 +30,25 @@ The site will be at `https://adamlkornreich-lab.github.io/fuzzy-octo-adventure/`
 4. **Settings → API:** copy the *Project URL* and the *anon public* key into
    `SUPABASE_URL` and `SUPABASE_ANON_KEY` in `config.js`, then push.
 
+5. **Email (required before opening sign-up to the public):** Supabase's built-in
+   email sender only delivers to your project's team members and is limited to a few
+   emails per hour, so other people won't get confirmation or password-reset emails.
+   Under **Authentication → Emails → SMTP Settings**, turn on *Custom SMTP* and enter
+   the details from an email provider (for example Resend, Postmark, SendGrid or
+   Amazon SES; most have a free tier). Use a sender address on your own domain, e.g.
+   `crew@piratesofybor.com`. Then raise the email rate limit under
+   **Authentication → Rate Limits** if needed.
+
 The anon key is meant to be public. Members-only data is protected by the
 row-level security policy in `setup.sql`, not by hiding the page.
 
 ### 3. Use Piratesofybor.com (optional)
 Under **Settings → Pages → Custom domain**, enter `piratesofybor.com`, then at your
 domain registrar add the DNS records GitHub shows there. After it verifies, tick
-**Enforce HTTPS** and update the Supabase Site URL to `https://piratesofybor.com/`.
+**Enforce HTTPS**. Then, in Supabase under **Authentication → URL Configuration**,
+change *Site URL* to `https://piratesofybor.com/` and add
+`https://piratesofybor.com/members.html` to *Redirect URLs*. Without that redirect
+entry, confirmation and password-reset links from the custom domain won't work.
 
 ## Preview locally
 
