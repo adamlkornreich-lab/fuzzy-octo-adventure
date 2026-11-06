@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="stylesheet" href="assets/site.css">
+<title>Riviera Open World</title>
+
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+  #enter { position: fixed; z-index: 4; left: 50%; transform: translateX(-50%); bottom: calc(160px + env(safe-area-inset-bottom, 0px)); background: #e8b84a; color: #2a1d05; font: 800 16px var(--display); padding: 12px 18px; border-radius: 10px; border: 0; cursor: pointer; text-decoration: none; box-shadow: 0 6px 20px rgba(20,40,50,.3); white-space: nowrap; max-width: calc(100% - 32px); }
+  #tribute { left: 50%; transform: translateX(-50%); top: calc(84px + env(safe-area-inset-top, 0px)); width: min(440px, calc(100% - 32px)); font-size: 14px; line-height: 1.5; }
+  #tribute b { font-family: var(--display); font-size: 18px; display: block; color: var(--accent); }
+  #backlink { top: calc(12px + env(safe-area-inset-top, 0px)); right: max(16px, env(safe-area-inset-right, 0px)); font-size: 12px; color: var(--accent); font-weight: 600; text-decoration: none; }
+  .pp-watermark { right: 8px !important; bottom: auto !important; top: 56px; width: 110px !important; }
+  @media (max-width: 640px) { #place .name { font-size: 16px; } #place { max-width: calc(100% - 130px); } }
+  /* Layout: full-bleed 3D world, small HUD cards pinned to the corners. Single look (sunny afternoon), set explicitly. */
+  :root {
+    --sky: #9fd3e8;
+    --ink: #1d2a30;
+    --card: rgba(250, 247, 240, 0.92);
+    --accent: #b5432a;
+    --muted: #55656c;
+    --display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    color-scheme: light;
+  }
+  html, body { height: 100%; }
+  body { background: var(--sky); color: var(--ink); overflow: hidden; font-family: var(--mono); }
+  #world { position: fixed; inset: 0; display: block; width: 100%; height: 100%; touch-action: none; }
+  .hud {
+    position: fixed; z-index: 2; background: var(--card); border-radius: 10px;
+    padding: 10px 14px; box-shadow: 0 6px 20px rgba(20, 40, 50, 0.18);
+  }
+  #place {
+    top: calc(12px + env(safe-area-inset-top, 0px)); left: max(16px, env(safe-area-inset-left, 0px));
+    max-width: calc(100% - 32px);
+  }
+  #place .label { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+  #place .name { font-family: var(--display); font-weight: 800; font-size: 22px; line-height: 1.1; text-wrap: balance; }
+  #help {
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px)); right: max(16px, env(safe-area-inset-right, 0px));
+    font-size: 12px; line-height: 1.6; max-width: 260px;
+  }
+  #help b { color: var(--accent); font-weight: 600; }
+  #stick {
+    position: fixed; z-index: 3; width: 120px; height: 120px; border-radius: 50%;
+    left: max(24px, env(safe-area-inset-left, 0px)); bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+    background: rgba(250, 247, 240, 0.35); border: 2px solid rgba(250, 247, 240, 0.8); touch-action: none;
+  }
+  #knob {
+    position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px 0 0 -26px;
+    border-radius: 50%; background: var(--card); box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  }
+  @media (hover: hover) and (pointer: fine) { #stick { display: none; } }
+  @media (hover: none) { .desk { display: none; } }
+  @media (hover: hover) and (pointer: fine) { .touch-only { display: none; } }
+</style>
+
+</head><body data-bare>
+<canvas id="world" aria-label="3D open world with Riviera Schools"></canvas>
+<div class="hud" id="place"><div class="label">You are at</div><div class="name" id="placeName">Riviera Ave</div></div>
+<div class="hud" id="help">
+  <b>Crossword Cabin:</b> Cross St, east side.<br><b>Jen's Island + Rumor Mill:</b> Cross St, far west, over the bridge.<br><b>Ruben's Cliff + the Hospital:</b> far west, north of Cross St.<br><b>Rene's Guitar Shack:</b> Cross St, east side.<br><span class="desk"><b>E</b> enter · <b>WASD / arrows</b> walk · <b>Shift</b> run · <b>Space</b> jump · <b>drag</b> to look</span>
+  <span class="touch-only">Left stick to walk · drag anywhere to look</span>
+</div>
+<a class="hud" id="backlink" href="arcade.html">⚓ Arcade</a>
+<a id="enter" href="crossword.html" hidden>✒ Play Laura &amp; Dom's Crossword</a>
+<div class="hud" id="tribute" hidden><b id="tribT"></b><span id="tribB"></span></div>
+<div id="stick"><div id="knob"></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(() => {
+  const canvas = document.getElementById('world');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x9fd3e8);
+  scene.fog = new THREE.Fog(0x9fd3e8, 120, 380);
+  const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 800);
+
+  scene.add(new THREE.HemisphereLight(0xdff3ff, 0x6b7a4a, 0.75));
+  const sun = new THREE.DirectionalLight(0xfff1d6, 0.9);
+  sun.position.set(80, 120, 40);
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -140, right: 140, top: 140, bottom: -140, far: 400 });
+  scene.add(sun);
+
+  const mat = (c, o = {}) => new THREE.MeshLambertMaterial(Object.assign({ color: c }, o));
+  const colliders = []; // {minX,maxX,minZ,maxZ,top}
+  function box(w, h, d, x, y, z, color, solid = true, parent = scene) {
+    const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), typeof color === 'object' ? color : mat(color));
+    m.position.set(x, y + h / 2, z);
+    m.castShadow = m.receiveShadow = true;
+    parent.add(m);
+    if (solid) colliders.push({ minX: x - w / 2, maxX: x + w / 2, minZ: z - d / 2, maxZ: z + d / 2, top: y + h });
+    return m;
+  }
+  function textTexture(text, { w = 1024, h = 256, bg = '#f4ead6', fg = '#7a2a18', font = '800 150px "Bricolage Grotesque", sans-serif' } = {}) {
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const g = c.getContext('2d');
+    g.fillStyle = bg; g.fillRect(0, 0, w, h);
+    g.fillStyle = fg; g.font = font; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(text, w / 2, h / 2 + 8);
+    const t = new THREE.CanvasTexture(c); t.anisotropy = 4; return t;
+  }
+
+  // ---------- Ground & roads ----------
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(800, 800), mat(0x86a65a));
+  ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+  const road = mat(0x3d4144), line = mat(0xf1d36b), walk = mat(0xc9c2b4);
+  function flat(w, d, x, z, m, y = 0.02) {
+    const p = new THREE.Mesh(new THREE.PlaneGeometry(w, d), m);
+    p.rotation.x = -Math.PI / 2; p.position.set(x, y, z); p.receiveShadow = true; scene.add(p); return p;
+  }
+  flat(16, 600, 0, 0, road);            // Riviera Ave (north-south)
+  flat(600, 16, 0, 70, road, 0.021);    // Cross street
+  for (let z = -295; z < 300; z += 12) flat(0.4, 5, 0, z, line, 0.03);
+  for (let x = -295; x < 300; x += 12) flat(5, 0.4, x, 70, line, 0.031);
+  flat(4, 600, -10, 0, walk, 0.025); flat(4, 600, 10, 0, walk, 0.025);
+
+  // ---------- Riviera Schools campus (east of Riviera Ave) ----------
+  const stucco = mat(0xe9d8b8), trim = mat(0xf7f0e2), tile = mat(0xb5532f), glass = mat(0x4f7d93), door = mat(0x6e3b22);
+  const campus = { minX: 14, maxX: 150, minZ: -90, maxZ: 60 };
+  flat(campus.maxX - campus.minX, campus.maxZ - campus.minZ, (campus.minX + campus.maxX) / 2, (campus.minZ + campus.maxZ) / 2, mat(0x7fa452), 0.01);
+
+  function tileRoof(w, d, x, y, z, rotY = 0) {
+    const g = new THREE.CylinderGeometry(0.01, Math.SQRT2 * Math.max(w, d) / 2, 4, 4, 1);
+    const r = new THREE.Mesh(g, tile);
+    r.rotation.y = Math.PI / 4 + rotY;
+    r.scale.set(w / Math.max(w, d), 1, d / Math.max(w, d));
+    r.position.set(x, y + 2, z); r.castShadow = true; scene.add(r);
+  }
+  function windowsAlong(len, count, x0, z, y, face) {
+    for (let i = 0; i < count; i++) {
+      const x = x0 - len / 2 + (i + 0.5) * (len / count);
+      box(2.2, 2.2, 0.2, x, y, z + face * 0.1, glass, false);
+      box(2.6, 0.3, 0.4, x, y - 0.3, z + face * 0.15, trim, false);
+    }
+  }
+  // Main building: two-story, long, faces the avenue (west)
+  const mainX = 40, mainZ = -10;
+  box(16, 9, 60, mainX, 0, mainZ, stucco);
+  tileRoof(17.5, 61.5, mainX, 9, mainZ);
+  // west facade windows (rotate logic: place along z on x face)
+  for (let i = 0; i < 10; i++) {
+    const z = mainZ - 30 + (i + 0.5) * 6;
+    if (Math.abs(z - mainZ) < 5) continue;
+    for (const y of [1.6, 5.6]) box(0.2, 2.2, 2.4, mainX - 8.1, y, z, glass, false);
+  }
+  // Entrance portico with arches
+  box(6, 7, 12, mainX - 11, 0, mainZ, stucco, false);
+  box(6.6, 0.8, 12.6, mainX - 11, 7, mainZ, trim, false);
+  for (const z of [-4.5, 0, 4.5]) box(0.25, 4, 3, mainX - 14.05, 0, mainZ + z, door, false);
+  colliders.push({ minX: mainX - 14, maxX: mainX - 8, minZ: mainZ - 6, maxZ: mainZ - 5, top: 7 });
+  colliders.push({ minX: mainX - 14, maxX: mainX - 8, minZ: mainZ + 5, maxZ: mainZ + 6, top: 7 });
+  // Bell tower
+  box(7, 16, 7, mainX - 2, 0, mainZ - 24, stucco);
+  box(7.6, 0.6, 7.6, mainX - 2, 16, mainZ - 24, trim, false);
+  tileRoof(7.8, 7.8, mainX - 2, 16.4, mainZ - 24);
+  const bell = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2), mat(0xc9a14a));
+  bell.rotation.x = Math.PI; bell.position.set(mainX - 5.6, 14, mainZ - 24); scene.add(bell);
+
+  // RIVERA sign over the entrance + monument sign by the street
+  const signMat = new THREE.MeshBasicMaterial({ map: textTexture('RIVIERA') });
+  const sign = new THREE.Mesh(new THREE.PlaneGeometry(10, 2.5), signMat);
+  sign.rotation.y = -Math.PI / 2; sign.position.set(mainX - 14.12, 8.4, mainZ); scene.add(sign);
+  box(1.2, 3.4, 11, 17, 0, -2, mat(0x8a7a63));
+  const mono = new THREE.Mesh(new THREE.PlaneGeometry(10.4, 2.6),
+    new THREE.MeshBasicMaterial({ map: textTexture('RIVIERA SCHOOLS', { bg: '#efe4cc', font: '800 104px "Bricolage Grotesque", sans-serif' }) }));
+  mono.rotation.y = -Math.PI / 2; mono.position.set(16.38, 1.8, -2); scene.add(mono);
+
+  // Classroom wings (single-story, with covered walkways)
+  for (const [x, z] of [[72, -55], [72, -25], [72, 5]]) {
+    box(30, 5, 10, x, 0, z, stucco);
+    tileRoof(31, 11, x, 5, z);
+    windowsAlong(30, 6, x, z - 5, 1.4, -1);
+    windowsAlong(30, 6, x, z + 5, 1.4, 1);
+  }
+  // Breezeway roofs connecting main building to wings
+  for (const z of [-55, -25, 5]) {
+    box(9, 0.4, 3, 52.5, 3.6, z, tile, false);
+    for (const x of [49, 56]) box(0.4, 3.6, 0.4, x, 0, z + 1.2, trim, false);
+  }
+  // Gym
+  box(28, 11, 24, 120, 0, -60, mat(0xd9c6a1));
+  const gymRoof = new THREE.Mesh(new THREE.CylinderGeometry(12, 12, 28, 24, 1, false, 0, Math.PI), mat(0x8f9aa0));
+  gymRoof.rotation.z = Math.PI / 2; gymRoof.rotation.y = Math.PI / 2; gymRoof.scale.set(1, 1, 0.35);
+  gymRoof.rotation.set(0, 0, Math.PI / 2); gymRoof.position.set(120, 11, -60); gymRoof.scale.set(0.35, 1, 1);
+  scene.add(gymRoof);
+  const gymSign = new THREE.Mesh(new THREE.PlaneGeometry(12, 2.4),
+    new THREE.MeshBasicMaterial({ map: textTexture('GYM', { bg: '#d9c6a1', fg: '#7a2a18' }) }));
+  gymSign.rotation.y = -Math.PI / 2; gymSign.position.set(105.9, 8, -60); scene.add(gymSign);
+
+  // Athletic field with track
+  const track = new THREE.Mesh(new THREE.RingGeometry(18, 24, 48), mat(0xb4513a));
+  track.rotation.x = -Math.PI / 2; track.scale.set(1.9, 1, 1); track.position.set(110, 0.04, 20); scene.add(track);
+  const turf = new THREE.Mesh(new THREE.CircleGeometry(18, 48), mat(0x4f9a3d));
+  turf.rotation.x = -Math.PI / 2; turf.scale.set(1.9, 1, 1); turf.position.set(110, 0.05, 20); scene.add(turf);
+  for (const x of [-26, -13, 0, 13, 26]) flat(0.3, 22, 110 + x, 20, mat(0xffffff), 0.06);
+  for (const x of [80, 140]) { box(0.3, 6, 0.3, x, 0, 17, trim, false); box(0.3, 6, 0.3, x, 0, 23, trim, false); box(0.3, 0.3, 6, x, 5, 20, trim, false); }
+  // Bleachers
+  for (let i = 0; i < 4; i++) box(40, 0.6, 1.6, 110, i * 0.8, 49 + i * 1.6, mat(0x9aa3a8));
+  colliders.push({ minX: 90, maxX: 130, minZ: 48, maxZ: 55, top: 3.4 });
+
+  // Flagpole
+  box(0.3, 14, 0.3, 22, 0, 10, mat(0xdddddd));
+  const flag = new THREE.Mesh(new THREE.PlaneGeometry(3, 2), mat(0xb5432a, { side: THREE.DoubleSide }));
+  flag.position.set(23.6, 12.6, 10); scene.add(flag);
+
+  // Parking lot + quad
+  flat(30, 26, 30, 42, mat(0x55595c), 0.02);
+  for (let x = 17; x <= 43; x += 4) flat(0.25, 6, x, 33, mat(0xffffff), 0.03);
+  flat(18, 70, 56, -25, mat(0xd6cbb2), 0.015);
+
+  // ---------- Neighborhood ----------
+  const houseColors = [0xf2d4b4, 0xcfe0d8, 0xe8c6c0, 0xd9d2e9, 0xf3e3a8, 0xc8d8e8];
+  const roofColors = [0x6d4a3a, 0x4a5560, 0xa0522d, 0x5b4a6b];
+  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  function house(x, z, faceEast) {
+    const w = 9 + rnd() * 4, d = 9 + rnd() * 3, h = 4 + rnd() * 2;
+    box(w, h, d, x, 0, z, houseColors[Math.floor(rnd() * houseColors.length)]);
+    const roof = new THREE.Mesh(new THREE.ConeGeometry(Math.max(w, d) * 0.75, 3.5, 4), mat(roofColors[Math.floor(rnd() * roofColors.length)]));
+    roof.rotation.y = Math.PI / 4; roof.position.set(x, h + 1.75, z); roof.castShadow = true; scene.add(roof);
+    box(0.2, 2.6, 1.4, x + (faceEast ? w / 2 + 0.1 : -w / 2 - 0.1), 0, z, door, false);
+  }
+  for (let z = -280; z <= 280; z += 22) {
+    if (Math.abs(z - 70) < 16) continue;
+    house(-26, z, true);
+    if (rnd() > 0.3) house(-52, z + 8, false);
+    if (z > 80 || z < -100) house(26, z, false);
+  }
+  // Corner store
+  box(20, 6, 14, -28, 0, 92, mat(0xf0f0ea));
+  const store = new THREE.Mesh(new THREE.PlaneGeometry(14, 2.2),
+    new THREE.MeshBasicMaterial({ map: textTexture('CORNER MARKET', { bg: '#2f6f6a', fg: '#fff6e0', font: '800 110px "Bricolage Grotesque", sans-serif' }) }));
+  store.rotation.y = Math.PI / 2; store.position.set(-17.9, 4.6, 92); scene.add(store);
+
+  // Laura & Dom's Crossword Cabin (Cross St, east side, door faces the street)
+  const cabin = { x: 48, z: 92 };
+  box(20, 7, 16, cabin.x, 0, cabin.z, mat(0x6e4a2c));
+  const cabinRoof = new THREE.Mesh(new THREE.ConeGeometry(15.5, 5, 4), mat(0x2d3f57));
+  cabinRoof.rotation.y = Math.PI / 4; cabinRoof.scale.set(1, 1, 0.85); cabinRoof.position.set(cabin.x, 9.5, cabin.z); cabinRoof.castShadow = true; scene.add(cabinRoof);
+  box(3, 4.4, 0.2, cabin.x, 0, cabin.z - 8.1, door, false);
+  for (const dx of [-6.5, 6.5]) box(3, 2.4, 0.2, cabin.x + dx, 2, cabin.z - 8.1, glass, false);
+  const cabinSign = new THREE.Mesh(new THREE.PlaneGeometry(17, 2.4), new THREE.MeshBasicMaterial({ map: textTexture("LAURA & DOM'S CROSSWORD", { w: 1536, bg: '#f4ead6', fg: '#7a2a18', font: '800 104px "Bricolage Grotesque", sans-serif' }) }));
+  cabinSign.rotation.y = Math.PI; cabinSign.position.set(cabin.x, 5.7, cabin.z - 8.13); scene.add(cabinSign);
+  flat(5, 8, cabin.x, cabin.z - 12, walk, 0.03);
+  // Floating crossword tiles above the roof mark the spot from far away
+  const tiles = new THREE.Group();
+  [['L', -2.4, 0], ['A', 0, 0], ['D', 2.4, 0], ['O', 2.4, -2.4], ['M', 2.4, -4.8]].forEach(([ch, tx, ty]) => {
+    const t = new THREE.Mesh(new THREE.BoxGeometry(2.2, 2.2, 0.5), new THREE.MeshBasicMaterial({ map: textTexture(ch, { w: 256, h: 256, bg: '#f6d67a', fg: '#2a1d05', font: '800 190px "Bricolage Grotesque", sans-serif' }) }));
+    t.position.set(tx, ty, 0); tiles.add(t);
+  });
+  tiles.position.set(cabin.x, 20, cabin.z); scene.add(tiles);
+
+  // Jen's Island: a sand island in a lagoon, reached by a bridge from Cross St
+  const isle = { x: -170, z: 130, sand: 34, lagoon: 50 };
+  const lagoon = new THREE.Mesh(new THREE.CircleGeometry(isle.lagoon, 48), mat(0x2f8fb0));
+  lagoon.rotation.x = -Math.PI / 2; lagoon.position.set(isle.x, 0.04, isle.z); scene.add(lagoon);
+  const sand = new THREE.Mesh(new THREE.CircleGeometry(isle.sand, 48), mat(0xe8d39a));
+  sand.rotation.x = -Math.PI / 2; sand.position.set(isle.x, 0.06, isle.z); sand.receiveShadow = true; scene.add(sand);
+  flat(6, 24, isle.x, isle.z - 42, mat(0x7a5a38), 0.08);
+  box(14, 5, 12, isle.x, 0, isle.z + 2, mat(0x9a7a4e));
+  const hutRoof = new THREE.Mesh(new THREE.ConeGeometry(11.5, 5, 4), mat(0xc7a45e));
+  hutRoof.rotation.y = Math.PI / 4; hutRoof.position.set(isle.x, 7.5, isle.z + 2); hutRoof.castShadow = true; scene.add(hutRoof);
+  box(3, 3.8, 0.2, isle.x, 0, isle.z - 4.1, door, false);
+  const hutSign = new THREE.Mesh(new THREE.PlaneGeometry(13, 1.6), new THREE.MeshBasicMaterial({ map: textTexture("JEN'S ISLAND", { bg: '#f4ead6', fg: '#7a2a18', font: '800 130px "Bricolage Grotesque", sans-serif' }) }));
+  hutSign.rotation.y = Math.PI; hutSign.position.set(isle.x, 4.2, isle.z - 4.13); scene.add(hutSign);
+  for (const [dx, dz] of [[-20, -8], [20, -10], [-16, 18], [18, 16]]) palm(isle.x + dx, isle.z + dz);
+
+  // Rumor Mill hut, south side of the island
+  box(10, 4, 8, isle.x, 0, isle.z + 22, mat(0x7a5a38));
+  const rumorRoof = new THREE.Mesh(new THREE.ConeGeometry(8.5, 4, 4), mat(0xb5532f));
+  rumorRoof.rotation.y = Math.PI / 4; rumorRoof.position.set(isle.x, 6, isle.z + 22); rumorRoof.castShadow = true; scene.add(rumorRoof);
+  const rumorSign = new THREE.Mesh(new THREE.PlaneGeometry(9, 1.3), new THREE.MeshBasicMaterial({ map: textTexture('RUMOR MILL', { bg: '#f4ead6', fg: '#7a2a18', font: '800 140px "Bricolage Grotesque", sans-serif' }) }));
+  rumorSign.rotation.y = Math.PI; rumorSign.position.set(isle.x, 3.2, isle.z + 17.87); scene.add(rumorSign);
+
+  // Rene's Guitar Shack, Cross St east of the Cabin
+  const shack = { x: 84, z: 90 };
+  box(14, 5, 10, shack.x, 0, shack.z, mat(0x8a5a2c));
+  const shackRoof = new THREE.Mesh(new THREE.ConeGeometry(11, 3.5, 4), mat(0x2f6f6a));
+  shackRoof.rotation.y = Math.PI / 4; shackRoof.position.set(shack.x, 6.75, shack.z); shackRoof.castShadow = true; scene.add(shackRoof);
+  const shackSign = new THREE.Mesh(new THREE.PlaneGeometry(12, 1.5), new THREE.MeshBasicMaterial({ map: textTexture("RENE'S GUITAR SHACK", { w: 1536, bg: '#f4ead6', fg: '#2f6f6a', font: '800 110px "Bricolage Grotesque", sans-serif' }) }));
+  shackSign.rotation.y = Math.PI; shackSign.position.set(shack.x, 3.9, shack.z - 5.03); scene.add(shackSign);
+  box(3, 3, 0.2, shack.x, 0, shack.z - 5.1, door, false);
+
+  // The hospital that saved Ruben's life
+  const hosp = { x: -125, z: 25 };
+  box(30, 13, 18, hosp.x, 0, hosp.z, mat(0xeef1f2));
+  for (const dx of [-10, -3.5, 3.5, 10]) for (const y of [2, 6, 10]) box(3, 2, 0.2, hosp.x + dx, y, hosp.z + 9.1, glass, false);
+  const hospSign = new THREE.Mesh(new THREE.PlaneGeometry(22, 2.2), new THREE.MeshBasicMaterial({ map: textTexture('THE HOSPITAL THAT SAVED RUBEN', { w: 1792, bg: '#1f4f8a', fg: '#ffffff', font: '800 96px "Bricolage Grotesque", sans-serif' }) }));
+  hospSign.position.set(hosp.x, 11.5, hosp.z + 9.15); scene.add(hospSign);
+  flat(5, 37, hosp.x, 52, walk, 0.03);
+
+  // Ruben's Cliff, Chile: sea, rock and Ruben leaping off the edge
+  const cliff = { x: -190, z: 20, top: 18 };
+  flat(100, 110, -255, 20, mat(0x2f8fb0), 0.05);
+  box(26, cliff.top, 34, cliff.x, 0, cliff.z, mat(0x7a7468));
+  box(18, 4, 24, cliff.x + 14, 0, cliff.z + 4, mat(0x8a8376));
+  const cliffSign = new THREE.Mesh(new THREE.PlaneGeometry(13, 1.8), new THREE.MeshBasicMaterial({ map: textTexture("RUBEN'S CLIFF · CHILE", { w: 1536, bg: '#f4ead6', fg: '#7a2a18', font: '800 110px "Bricolage Grotesque", sans-serif' }) }));
+  cliffSign.position.set(cliff.x + 4, 5.2, cliff.z + 17.05); scene.add(cliffSign);
+  const ruben = new THREE.Group();
+  const rBody = new THREE.Mesh(new THREE.BoxGeometry(1, 1.4, 0.6), mat(0x2f6f6a)); rBody.position.y = 1.7;
+  const rHead = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), mat(0xc98d62)); rHead.position.y = 2.8;
+  const rArmL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.3, 0.3), mat(0xc98d62)); rArmL.position.set(-0.7, 2.5, 0); rArmL.rotation.z = 2.5;
+  const rArmR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 1.3, 0.3), mat(0xc98d62)); rArmR.position.set(0.7, 2.5, 0); rArmR.rotation.z = -2.5;
+  const rLegs = new THREE.Mesh(new THREE.BoxGeometry(0.9, 1.1, 0.5), mat(0x2d3f57)); rLegs.position.y = 0.55;
+  [rBody, rHead, rArmL, rArmR, rLegs].forEach(m => { m.castShadow = true; ruben.add(m); });
+  ruben.position.set(cliff.x - 13, cliff.top, cliff.z); scene.add(ruben);
+
+  // Trees
+  const trunk = mat(0x6b4a2f), leaves = [mat(0x4c7a3a), mat(0x5c8c3e), mat(0x3f6b34)];
+  function tree(x, z, s = 1) {
+    box(0.6 * s, 3 * s, 0.6 * s, x, 0, z, trunk);
+    const c = new THREE.Mesh(new THREE.IcosahedronGeometry(2.6 * s, 0), leaves[Math.floor(rnd() * 3)]);
+    c.position.set(x, 4.4 * s, z); c.castShadow = true; scene.add(c);
+  }
+  function palm(x, z) {
+    box(0.5, 10, 0.5, x, 0, z, mat(0x8a6a48));
+    for (let i = 0; i < 6; i++) {
+      const f = new THREE.Mesh(new THREE.BoxGeometry(4.5, 0.15, 0.9), mat(0x4f8a3a));
+      f.position.set(x + Math.cos(i) * 2, 9.8, z + Math.sin(i) * 2); f.rotation.y = -i; f.rotation.z = -0.35;
+      f.castShadow = true; scene.add(f);
+    }
+  }
+  for (let z = -60; z <= 50; z += 14) palm(18, z);
+  for (let i = 0; i < 120; i++) {
+    const x = (rnd() - 0.5) * 560, z = (rnd() - 0.5) * 560;
+    const inCampus = x > campus.minX - 4 && x < campus.maxX + 4 && z > campus.minZ - 4 && z < campus.maxZ + 4;
+    const atCabin = (Math.abs(x - cabin.x) < 18 && Math.abs(z - cabin.z) < 20) || Math.hypot(x - isle.x, z - isle.z) < isle.lagoon + 3 || (x < -105 && z > -45 && z < 62) || (Math.abs(x - shack.x) < 12 && Math.abs(z - shack.z) < 12);
+    if (Math.abs(x) < 34 || Math.abs(z - 70) < 14 || inCampus || atCabin) continue;
+    tree(x, z, 0.8 + rnd() * 0.7);
+  }
+  // Distant hills
+  for (let i = 0; i < 14; i++) {
+    const a = (i / 14) * Math.PI * 2, r = 330;
+    const hill = new THREE.Mesh(new THREE.SphereGeometry(60 + rnd() * 40, 16, 10), mat(0x7d9a63));
+    hill.position.set(Math.cos(a) * r, -30, Math.sin(a) * r); hill.scale.y = 0.6; scene.add(hill);
+  }
+  // Clouds
+  const clouds = [];
+  for (let i = 0; i < 18; i++) {
+    const g = new THREE.Group();
+    for (let j = 0; j < 4; j++) {
+      const p = new THREE.Mesh(new THREE.SphereGeometry(5 + rnd() * 4, 10, 8), new THREE.MeshLambertMaterial({ color: 0xffffff }));
+      p.position.set(j * 6 - 9, rnd() * 2, rnd() * 4); g.add(p);
+    }
+    g.position.set((rnd() - 0.5) * 600, 70 + rnd() * 30, (rnd() - 0.5) * 600); scene.add(g); clouds.push(g);
+  }
+
+  // ---------- Player ----------
+  const player = new THREE.Group();
+  const shirt = mat(0xb5432a), pants = mat(0x2d3f57), skin = mat(0xd8a47f);
+  const body = new THREE.Mesh(new THREE.BoxGeometry(1.1, 1.3, 0.6), shirt); body.position.y = 1.75;
+  const head = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.7, 0.7), skin); head.position.y = 2.8;
+  const legL = new THREE.Mesh(new THREE.BoxGeometry(0.45, 1.1, 0.5), pants), legR = legL.clone();
+  legL.position.set(-0.28, 0.55, 0); legR.position.set(0.28, 0.55, 0);
+  const pack = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.9, 0.35), mat(0x2f6f6a)); pack.position.set(0, 1.8, 0.45);
+  [body, head, legL, legR, pack].forEach(m => { m.castShadow = true; player.add(m); });
+  player.position.set(-4, 0, 12);
+  scene.add(player);
+
+  const state = { vy: 0, yaw: -Math.PI / 2, camYaw: -Math.PI / 2 + 0.3, camPitch: 0.35, grounded: true, t: 0 };
+  if (location.hash === '#cabin') { player.position.set(cabin.x, 0, cabin.z - 13); state.camYaw = Math.PI; state.yaw = 0; }
+  if (location.hash === '#rene') { player.position.set(shack.x, 0, shack.z - 9); state.camYaw = Math.PI; state.yaw = 0; }
+  if (location.hash === '#ruben') { player.position.set(hosp.x - 40, 0, 45); state.camYaw = -0.6; state.yaw = 0; }
+  if (location.hash === '#rumor') { player.position.set(isle.x, 0, isle.z + 12); state.camYaw = Math.PI; state.yaw = 0; }
+  if (location.hash === '#jen') { player.position.set(isle.x, 0, isle.z - 12); state.camYaw = Math.PI; state.yaw = 0; }
+  const enter = document.getElementById('enter');
+  const keys = {};
+  addEventListener('keydown', e => { keys[e.code] = true; if (e.code === 'KeyE' && !enter.hidden) enter.click(); if (e.code === 'Space') e.preventDefault(); });
+  addEventListener('keyup', e => { keys[e.code] = false; });
+
+  // Look by dragging
+  let drag = null;
+  canvas.addEventListener('pointerdown', e => { drag = { x: e.clientX, y: e.clientY, id: e.pointerId }; canvas.setPointerCapture(e.pointerId); });
+  canvas.addEventListener('pointermove', e => {
+    if (!drag || drag.id !== e.pointerId) return;
+    state.camYaw -= (e.clientX - drag.x) * 0.006;
+    state.camPitch = Math.min(1.2, Math.max(0.05, state.camPitch + (e.clientY - drag.y) * 0.004));
+    drag.x = e.clientX; drag.y = e.clientY;
+  });
+  const endDrag = () => { drag = null; };
+  canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
+
+  // Touch stick
+  const stick = document.getElementById('stick'), knob = document.getElementById('knob');
+  const joy = { x: 0, y: 0, id: null };
+  function setJoy(e) {
+    const r = stick.getBoundingClientRect();
+    let dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+    const len = Math.hypot(dx, dy), max = r.width / 2 - 10;
+    if (len > max) { dx *= max / len; dy *= max / len; }
+    knob.style.transform = `translate(${dx}px, ${dy}px)`;
+    joy.x = dx / max; joy.y = dy / max;
+  }
+  stick.addEventListener('pointerdown', e => { joy.id = e.pointerId; stick.setPointerCapture(e.pointerId); setJoy(e); });
+  stick.addEventListener('pointermove', e => { if (e.pointerId === joy.id) setJoy(e); });
+  const endJoy = () => { joy.id = null; joy.x = joy.y = 0; knob.style.transform = ''; };
+  stick.addEventListener('pointerup', endJoy); stick.addEventListener('pointercancel', endJoy);
+
+  // ---------- Places ----------
+  const placeName = document.getElementById('placeName');
+  const places = [
+    { name: "Ruben's Cliff, Chile", test: p => p.x < -150 && p.z > -45 && p.z < 62 },
+    { name: 'The Hospital That Saved Ruben', test: p => p.x >= -150 && p.x < -105 && p.z > 5 && p.z < 62 },
+    { name: "Rene's Guitar Shack", test: p => Math.abs(p.x - shack.x) < 12 && p.z > 78 && p.z < 100 },
+    { name: "Ronnie & Joe's Rumor Mill", test: p => Math.hypot(p.x - isle.x, p.z - (isle.z + 20)) < 11 },
+    { name: "Jen's Island", test: p => Math.hypot(p.x - isle.x, p.z - isle.z) < isle.lagoon || (Math.abs(p.x - isle.x) < 4 && p.z > 78 && p.z < isle.z) },
+    { name: "Laura & Dom's Crossword Cabin", test: p => p.x > 34 && p.x < 62 && p.z > 78 && p.z < 104 },
+    { name: 'Riviera Schools · Front Entrance', test: p => p.x > 14 && p.x < 34 && p.z > -20 && p.z < 10 },
+    { name: 'Riviera Schools · Athletic Field', test: p => p.x > 70 && p.x < 150 && p.z > 0 && p.z < 60 },
+    { name: 'Riviera Schools · Gym', test: p => p.x > 100 && p.x < 140 && p.z > -80 && p.z < -40 },
+    { name: 'Riviera Schools · Quad', test: p => p.x > 46 && p.x < 90 && p.z > -70 && p.z < 15 },
+    { name: 'Riviera Schools · Parking Lot', test: p => p.x > 14 && p.x < 46 && p.z > 28 && p.z < 60 },
+    { name: 'Riviera Schools Campus', test: p => p.x > campus.minX && p.x < campus.maxX && p.z > campus.minZ && p.z < campus.maxZ },
+    { name: 'Corner Market', test: p => p.x < -12 && p.x > -45 && p.z > 78 && p.z < 106 },
+    { name: 'Riviera Ave & Cross St', test: p => Math.abs(p.x) < 14 && Math.abs(p.z - 70) < 14 },
+    { name: 'Riviera Ave', test: p => Math.abs(p.x) < 14 },
+    { name: 'The Neighborhood', test: () => true },
+  ];
+  let lastPlace = '';
+
+  // ---------- Physics ----------
+  const R = 0.6;
+  function blocked(x, z, y) {
+    const dIsle = Math.hypot(x - isle.x, z - isle.z);
+    if (dIsle > isle.sand - R && dIsle < isle.lagoon + R && !(Math.abs(x - isle.x) < 3 - R / 2 && z < isle.z)) return { top: 99 };
+    for (const c of colliders) {
+      if (y >= c.top - 0.05) continue;
+      if (x + R > c.minX && x - R < c.maxX && z + R > c.minZ && z - R < c.maxZ) return c;
+    }
+    return null;
+  }
+  function floorAt(x, z, y) {
+    let f = 0;
+    for (const c of colliders) if (y >= c.top - 0.3 && x + R > c.minX && x - R < c.maxX && z + R > c.minZ && z - R < c.maxZ) f = Math.max(f, c.top);
+    return f;
+  }
+
+  function resize() {
+    const w = innerWidth, h = innerHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix();
+  }
+  addEventListener('resize', resize); resize();
+
+  const clock = new THREE.Clock();
+  function frame() {
+    const dt = Math.min(clock.getDelta(), 0.05);
+    state.t += dt;
+    let fx = 0, fz = 0;
+    if (keys.KeyW || keys.ArrowUp) fz += 1;
+    if (keys.KeyS || keys.ArrowDown) fz -= 1;
+    if (keys.KeyA || keys.ArrowLeft) fx -= 1;
+    if (keys.KeyD || keys.ArrowRight) fx += 1;
+    fx += joy.x; fz -= joy.y;
+    const mag = Math.min(1, Math.hypot(fx, fz));
+    const run = keys.ShiftLeft || keys.ShiftRight || Math.hypot(joy.x, joy.y) > 0.9;
+    const speed = (run ? 14 : 7) * mag;
+    const p = player.position;
+    if (mag > 0.05) {
+      // camera-relative movement
+      const fwdX = -Math.sin(state.camYaw), fwdZ = -Math.cos(state.camYaw);
+      const rgtX = -fwdZ, rgtZ = fwdX;
+      let mx = fwdX * fz + rgtX * fx, mz = fwdZ * fz + rgtZ * fx;
+      const l = Math.hypot(mx, mz); mx /= l; mz /= l;
+      const nx = p.x + mx * speed * dt, nz = p.z + mz * speed * dt;
+      if (!blocked(nx, p.z, p.y)) p.x = nx;
+      if (!blocked(p.x, nz, p.y)) p.z = nz;
+      p.x = Math.max(-290, Math.min(290, p.x)); p.z = Math.max(-290, Math.min(290, p.z));
+      const target = Math.atan2(mx, mz);
+      let d = target - state.yaw; d = Math.atan2(Math.sin(d), Math.cos(d));
+      state.yaw += d * Math.min(1, dt * 12);
+      const swing = Math.sin(state.t * (run ? 16 : 10)) * 0.6 * mag;
+      legL.rotation.x = swing; legR.rotation.x = -swing;
+    } else { legL.rotation.x *= 0.8; legR.rotation.x *= 0.8; }
+    player.rotation.y = state.yaw;
+
+    const floor = floorAt(p.x, p.z, p.y);
+    if (keys.Space && state.grounded) { state.vy = 9; state.grounded = false; }
+    state.vy -= 24 * dt; p.y += state.vy * dt;
+    if (p.y <= floor) { p.y = floor; state.vy = 0; state.grounded = true; }
+
+    // camera follow
+    const dist = 12;
+    const cx = p.x + Math.sin(state.camYaw) * Math.cos(state.camPitch) * dist;
+    const cz = p.z + Math.cos(state.camYaw) * Math.cos(state.camPitch) * dist;
+    const cy = p.y + 2 + Math.sin(state.camPitch) * dist;
+    camera.position.lerp(new THREE.Vector3(cx, cy, cz), Math.min(1, dt * 8));
+    camera.lookAt(p.x, p.y + 2.2, p.z);
+
+    sun.position.set(p.x + 80, 120, p.z + 40); sun.target.position.copy(p); sun.target.updateMatrixWorld();
+    flag.rotation.y = Math.sin(state.t * 2) * 0.25;
+    for (const c of clouds) { c.position.x += dt * 2; if (c.position.x > 320) c.position.x = -320; }
+
+    tiles.rotation.y = Math.sin(state.t * 0.8) * 0.5;
+    const rt = (state.t % 5) / 2.2;
+    if (rt < 1) { ruben.position.set(cliff.x - 13 - rt * 22, cliff.top + 4 * rt - 22 * rt * rt + 0.1, cliff.z); ruben.rotation.x = rt * 2.4; ruben.visible = true; }
+    else if (rt < 1.4) { ruben.visible = false; }
+    else { ruben.position.set(cliff.x - 13, cliff.top, cliff.z); ruben.rotation.x = 0; ruben.visible = true; }
+    const tribute = document.getElementById('tribute');
+    const nearHosp = Math.hypot(p.x - hosp.x, p.z - (hosp.z + 14)) <= 14, nearCliff = p.x < -150 && p.z > -45 && p.z < 62;
+    tribute.hidden = !(nearHosp || nearCliff);
+    if (nearHosp && tribute.dataset.t !== 'h') { tribute.dataset.t = 'h'; document.getElementById('tribT').textContent = 'The hospital that saved Ruben'; document.getElementById('tribB').textContent = "This hospital saved my brother's life. Thank you to everyone there."; }
+    if (nearCliff && tribute.dataset.t !== 'c') { tribute.dataset.t = 'c'; document.getElementById('tribT').textContent = 'Ruben, leaping into Chile'; document.getElementById('tribB').textContent = "Ruben is my brother. I wouldn't have made it without his help. — Adam"; }
+    const nearRene = Math.hypot(p.x - shack.x, p.z - (shack.z - 7)) <= 8;
+    const nearCabin = Math.hypot(p.x - cabin.x, p.z - (cabin.z - 8)) <= 9, nearJen = Math.hypot(p.x - isle.x, p.z - (isle.z - 4)) <= 9, nearRumor = Math.hypot(p.x - isle.x, p.z - (isle.z + 18)) <= 8;
+    enter.hidden = !(nearCabin || nearJen || nearRumor || nearRene);
+    if (nearRene && enter.dataset.t !== 'g') { enter.dataset.t = 'g'; enter.href = 'guitar.html'; enter.textContent = "🎸 Play Rene's Guitar School"; }
+    if (nearRumor && enter.dataset.t !== 'r') { enter.dataset.t = 'r'; enter.href = 'rumors.html'; enter.textContent = "🐒 Play Ronnie & Joe's Rumor Mill"; }
+    if (nearJen && enter.dataset.t !== 'j') { enter.dataset.t = 'j'; enter.href = 'jen.html'; enter.textContent = '📋 Play Jen Runs the Ship'; }
+    if (nearCabin && enter.dataset.t !== 'c') { enter.dataset.t = 'c'; enter.href = 'crossword.html'; enter.textContent = "✒ Play Laura & Dom's Crossword"; }
+    const place = places.find(pl => pl.test(p)).name;
+    if (place !== lastPlace) { placeName.textContent = place; lastPlace = place; }
+
+    renderer.render(scene, camera);
+    requestAnimationFrame(frame);
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => {
+    signMat.map = textTexture('RIVIERA'); signMat.needsUpdate = true;
+  });
+  frame();
+})();
+</script>
+<script src="assets/site.js"></script>
+</body></html>

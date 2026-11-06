@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ronnie &amp; Joe's Rumor Mill</title><link rel="stylesheet" href="assets/site.css">
+<style>
+.rh{padding:18px 0 6px}.rh h1{margin:0;color:var(--gold2);font-size:clamp(1.7rem,6vw,2.6rem);text-wrap:balance}.rh p{margin:4px 0 0;color:var(--mute);max-width:65ch}
+.pickrow{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 14px}
+.chip{padding:9px 12px;border-radius:999px;border:1px solid rgba(232,184,74,.4);background:var(--panel2);color:var(--fog);font:inherit;font-size:.95rem;cursor:pointer}
+.chip.on{background:var(--gold);color:#2a1d05;font-weight:bold}
+.chip:focus-visible,.isl:focus-visible,.btn:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+.say{background:#f3e6c8;color:#2b2013;border-radius:14px;padding:12px 16px;font-size:1.08rem;margin:10px 0;min-height:3.2em}
+.sea{background:#1f6f8f;border-radius:18px;padding:clamp(10px,3vw,20px);max-width:520px;margin:0 auto}
+#isle{display:grid;gap:6px;background:#e8d39a;border-radius:16px;padding:10px;box-shadow:0 0 0 6px rgba(246,214,122,.35)}
+.isl{aspect-ratio:1;min-width:0;border:3px solid transparent;border-radius:12px;background:rgba(255,255,255,.35);font-size:clamp(1.3rem,6.5vw,2.2rem);cursor:default;padding:0;position:relative;color:#20150a}
+.isl.red{border-color:#b5532a}.isl.blue{border-color:#2a6fa8}
+.isl.gold{border-color:#a97c10;background:#f6d67a}.isl.ready{cursor:pointer;box-shadow:0 0 0 3px var(--sea);animation:pulse 1.2s infinite}
+.isl small{position:absolute;right:3px;bottom:1px;font:bold .68rem Georgia,serif}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(42,163,168,.35)}}
+@media (prefers-reduced-motion:reduce){.isl.ready{animation:none}}
+.key{color:var(--mute);font-size:.92rem;text-align:center;margin-top:8px}
+</style></head>
+<body>
+<main class="wrap">
+  <div class="rh"><h1>Ronnie &amp; Joe's Rumor Mill</h1><p>Ronnie and Joe from Bad Monkey have a ridiculous rumor to spread. By the time it crosses the island, nobody remembers why they were on different teams.</p></div>
+  <section class="panel" id="make">
+    <h2 id="mT"></h2>
+    <p style="margin:0;color:var(--mute)">Who?</p><div class="pickrow" id="p0"></div>
+    <p style="margin:0;color:var(--mute)">Did what?</p><div class="pickrow" id="p1"></div>
+    <p style="margin:0;color:var(--mute)">Where?</p><div class="pickrow" id="p2"></div>
+    <div class="say" id="preview" aria-live="polite"></div>
+    <button class="btn rum" id="go">Start the whisper</button>
+  </section>
+  <section id="play" hidden style="padding-top:0">
+    <div class="hud"><span class="stat" id="lv"></span><span class="stat" id="wh"></span><span class="stat" id="team"></span></div>
+    <div class="say" id="now" aria-live="polite"></div>
+    <div class="sea"><div id="isle"></div></div>
+    <p class="key">Tap a glowing islander to pass the rumor to everyone beside them. Grumps 🙄 need to hear it from two people. Red and blue become gold when they join the same team.</p>
+    <p id="msg" style="text-align:center;color:var(--gold2);min-height:1.5em"></p>
+    <p style="text-align:center"><button class="btn ghost" id="redo">Restart this island</button></p>
+  </section>
+  <section class="panel" id="end" hidden>
+    <h2 id="eT"></h2><p id="e1"></p><p id="e2"></p>
+    <p class="row"><button class="btn" id="eNext"></button><a class="btn ghost" href="arcade.html">⚔ Arcade</a><a class="btn ghost" href="world.html#rumor">🏝 Back to the island</a></p>
+  </section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+const $=i=>document.getElementById(i),R=n=>Math.floor(Math.random()*n),pick=a=>a[R(a.length)];
+const WHO=["Pops the bar cat","Pippy","Ronnie","Joe","The ship's parrot","The kraken"];
+const DID=["learned to play the banjo","opened a taco stand","won a dance-off","bought a tiny submarine","started a hat collection","joined a barbershop quartet"];
+const WHERE=["behind the tiki hut","on the bridge","at the Crossword Cabin","in the lagoon","on the roof","at midnight on the beach"];
+const SWAP=["a pair of pants","a giant coconut","a very small horse","forty lobsters","a disco ball","somebody's left shoe","a confused pelican","three accordions"];
+const SIZES=[3,4,4,5,5];const GRUMPS=[0,1,2,3,5];
+let lvl=0,pickd=[0,0,0],rumor="",orig="",N=3,cells=[],left=0,cap=0;
+const nbrs=(i,n)=>{const x=i%n,y=(i/n)|0,o=[];if(x>0)o.push(i-1);if(x<n-1)o.push(i+1);if(y>0)o.push(i-n);if(y<n-1)o.push(i+n);return o;};
+/* Plan the fewest-ish whispers by always picking the teller who reaches the most new people. */
+function solve(c,n,start){const heard=c.map(()=>new Set()),in_=c.map(()=>false),told=c.map(()=>false);in_[start]=true;let count=0;
+ const need=i=>c[i].grump?2:1;
+ for(;;){if(in_.every(Boolean))return count;let best=-1,gain=-1;for(let i=0;i<c.length;i++){if(!in_[i]||told[i])continue;const g=nbrs(i,n).filter(j=>!in_[j]&&(heard[j].size+1>=need(j))).length*10+nbrs(i,n).filter(j=>!in_[j]).length;if(g>gain){gain=g;best=i;}}
+  if(best<0||gain<=0)return -1;told[best]=true;count++;nbrs(best,n).forEach(j=>{heard[j].add(best);if(heard[j].size>=need(j))in_[j]=true;});}}
+function buildLevel(l){const n=SIZES[l],T=n*n;for(;;){const c=Array.from({length:T},()=>({team:R(2),grump:false,heard:new Set(),inn:false,told:false}));
+ const s=R(T);let g=GRUMPS[l],guard=0;while(g>0&&guard++<200){const i=R(T);if(i!==s&&!c[i].grump&&nbrs(i,n).length>=3){c[i].grump=true;g--;}}
+ const v=solve(c,n,s);if(v<0)continue;c[s].inn=true;return{c,n,s,cap:v+1};}}
+function drawMake(){$("mT").textContent=`Island ${lvl+1} of ${SIZES.length}: cook up a rumor`;[[WHO,0],[DID,1],[WHERE,2]].forEach(([a,k])=>{$("p"+k).innerHTML=a.map((t,i)=>`<button class="chip ${pickd[k]===i?"on":""}" data-k="${k}" data-i="${i}">${t}</button>`).join("");});
+ $("preview").textContent=`Ronnie: "Joe, did you hear? ${text()}"`;$("make").hidden=false;$("play").hidden=true;$("end").hidden=true;}
+const text=()=>`${WHO[pickd[0]]} ${DID[pickd[1]]} ${WHERE[pickd[2]]}!`;
+document.querySelectorAll(".pickrow").forEach(p=>p.onclick=e=>{const b=e.target.closest(".chip");if(!b)return;pickd[+b.dataset.k]=+b.dataset.i;drawMake();});
+function begin(){orig=rumor=text();const L=buildLevel(lvl);cells=L.c;N=L.n;cap=L.cap;left=cap;$("isle").style.gridTemplateColumns=`repeat(${N},1fr)`;$("make").hidden=true;$("end").hidden=true;$("play").hidden=false;$("msg").textContent="";draw();}
+let saved=null;
+const mood=c=>c.inn?"😄":c.grump?"🙄":"😠";
+function draw(){$("lv").textContent=`Island ${lvl+1} of ${SIZES.length}`;$("wh").textContent=`Whispers left: ${left}`;const n=cells.filter(c=>c.inn).length;$("team").textContent=`Same team: ${n}/${cells.length}`;$("now").textContent=`Latest version: "${rumor}"`;
+ $("isle").innerHTML=cells.map((c,i)=>{const can=c.inn&&!c.told&&nbrs(i,N).some(j=>!cells[j].inn);return `<button class="isl ${c.inn?"gold":c.team?"blue":"red"} ${can?"ready":""}" data-i="${i}" ${can?"":"tabindex=\"-1\""} aria-label="Islander ${i+1}${c.inn?", on the same team":c.grump?", grump":""}">${mood(c)}${c.grump&&!c.inn?`<small>${c.heard.size}/2</small>`:""}</button>`;}).join("");}
+function garble(){const parts=[DID,WHERE,WHO].flat().filter(p=>rumor.includes(p));const s=pick(SWAP);if(parts.length){rumor=rumor.replace(pick(parts),s);}else{const w=rumor.replace(/!$/,"").split(" ");w[R(w.length)]=pick(["pants","coconuts","lobsters","disco"]);rumor=w.join(" ")+"!";}}
+$("isle").onclick=e=>{const b=e.target.closest(".isl");if(!b)return;const i=+b.dataset.i,c=cells[i];if(!c.inn||c.told||left<=0||!nbrs(i,N).some(j=>!cells[j].inn))return;c.told=true;left--;
+ nbrs(i,N).forEach(j=>{cells[j].heard.add(i);if(cells[j].heard.size>=(cells[j].grump?2:1))cells[j].inn=true;});garble();draw();
+ if(cells.every(c=>c.inn))return won();if(left<=0)$("msg").textContent="Out of whispers. Restart this island and try a different order.";else $("msg").textContent=pick(["Did you hear?!","No way!","That's not what I heard…","Pass it on!"]);};
+function won(){PY.celebrate();PY.best("rumors",lvl+1);$("play").hidden=true;$("end").hidden=false;const last=lvl===SIZES.length-1;$("eT").textContent=last?"Everyone's on the same team again! 🏴‍☠️":"The whole island is laughing together";$("e1").textContent=`Ronnie started with: "${orig}"`;$("e2").textContent=`Joe heard it back as: "${rumor}"`;$("eNext").textContent=last?"Play again":"Next island";}
+$("go").onclick=begin;$("redo").onclick=()=>begin();$("eNext").onclick=()=>{lvl=lvl===SIZES.length-1?0:lvl+1;drawMake();};
+drawMake();
+</script>
+</body></html>

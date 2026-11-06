@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flip Cup — The Pirates of Ybor</title><link rel="stylesheet" href="assets/site.css"></head>
+<body>
+<main class="wrap">
+  <section class="hero"><h1>🍺 Flip Cup</h1><p class="lead">Mash your button to flip the cup. First to 15 flips wins. Player 1 taps the left button (or F key); Player 2 the right (or J). Solo plays the Ship AI.</p></section>
+  <section class="panel">
+    <div class="hud"><select id="mode" style="width:auto"><option value="ai">Vs Ship AI</option><option value="2p">Two players</option></select><button class="btn" id="start">Start</button><span class="stat" id="msg">Ready?</span></div>
+    <div class="row" style="justify-content:space-around;margin:20px 0">
+      <div style="text-align:center"><div style="font-size:4rem" id="c1">🥤</div><div class="stat">P1: <span id="s1">0</span></div><button class="btn rum" id="b1" style="margin-top:10px;font-size:1.3rem;padding:18px 40px">FLIP (F)</button></div>
+      <div style="text-align:center"><div style="font-size:4rem" id="c2">🥤</div><div class="stat"><span id="n2">P2</span>: <span id="s2">0</span></div><button class="btn" id="b2" style="margin-top:10px;font-size:1.3rem;padding:18px 40px">FLIP (J)</button></div>
+    </div>
+  </section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+let s=[0,0],run=false,ai=null;const GOAL=15;
+const msg=m=>document.getElementById("msg").textContent=m;
+function flip(i){if(!run)return;if(Math.random()<.6){s[i]++;document.getElementById(i?"c2":"c1").textContent=s[i]%2?"🍺":"🥤";}
+  document.getElementById("s1").textContent=s[0];document.getElementById("s2").textContent=s[1];
+  if(s[i]>=GOAL){run=false;clearInterval(ai);msg((i===0?"Player 1":(document.getElementById("mode").value==="ai"?"Ship AI":"Player 2"))+" wins! 🏴‍☠️");if(i===0||document.getElementById("mode").value==="2p")PY.celebrate();if(i===0)PY.best("flipcup",PY.best("flipcup")+1);}}
+document.getElementById("start").onclick=()=>{s=[0,0];run=true;msg("GO!");document.getElementById("s1").textContent=0;document.getElementById("s2").textContent=0;
+  const m=document.getElementById("mode").value;document.getElementById("n2").textContent=m==="ai"?"AI":"P2";document.getElementById("b2").disabled=m==="ai";clearInterval(ai);if(m==="ai")ai=setInterval(()=>flip(1),330);};
+document.getElementById("b1").onclick=()=>flip(0);document.getElementById("b2").onclick=()=>{if(document.getElementById("mode").value==="2p")flip(1);};
+document.getElementById("mode").onchange=()=>{run=false;clearInterval(ai);s=[0,0];document.getElementById("s1").textContent=0;document.getElementById("s2").textContent=0;msg("Ready?");};
+window.addEventListener("keydown",e=>{if(e.repeat)return;const k=e.key.toLowerCase();if(k==="f")flip(0);if(k==="j"&&document.getElementById("mode").value==="2p")flip(1);});
+</script>
+</body></html>

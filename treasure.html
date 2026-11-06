@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Treasure Hunt — The Pirates of Ybor</title><link rel="stylesheet" href="assets/site.css"></head>
+<body>
+<main class="wrap">
+  <section class="hero"><h1>💰 Treasure Hunt</h1><p class="lead">Gaspar buried his chest somewhere on this 6×6 island. Each dig tells you how far away it is. Find it before your shovels break.</p></section>
+  <section class="panel">
+    <div class="hud"><span class="stat" id="shovels">Shovels: 10</span><span class="stat" id="msg">Dig anywhere</span><span class="stat" id="wins">Chests found: 0</span></div>
+    <div class="tgrid" id="grid"></div>
+    <p style="text-align:center;margin-top:14px"><button class="btn" id="reset">New Island</button></p>
+    <p style="color:var(--mute);text-align:center">🔥 = 1 tile away · 🌡 = 2 · 🧊 = 3+ · ⚠ a dug tile can also reveal a trap that costs an extra shovel.</p>
+  </section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+const N=6;let tx,ty,shovels,over,wins=+(PY.best("treasure")||0);
+const g=document.getElementById("grid");
+function start(){tx=Math.floor(Math.random()*N);ty=Math.floor(Math.random()*N);shovels=10;over=false;g.innerHTML="";
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){const d=document.createElement("div");d.className="tile";d.textContent="🌴";d.onclick=()=>dig(d,x,y);g.appendChild(d);}
+  hud("Dig anywhere");}
+function hud(m){document.getElementById("shovels").textContent="Shovels: "+shovels;document.getElementById("msg").textContent=m;document.getElementById("wins").textContent="Chests found: "+wins;}
+function dig(d,x,y){if(over||d.classList.contains("dug"))return;d.classList.add("dug");shovels--;
+  const dist=Math.max(Math.abs(x-tx),Math.abs(y-ty));
+  if(dist===0){d.textContent="💰";over=true;wins++;PY.celebrate();PY.best("treasure",wins);hud("☠ Treasure found! Gaspar's gold is yours.");return;}
+  if(Math.random()<0.12&&shovels>0){shovels--;d.textContent="💀";hud("A trap! Lost an extra shovel.");}
+  else{d.textContent=dist===1?"🔥":dist===2?"🌡":"🧊";hud(dist===1?"Burning hot!":dist===2?"Warm…":"Ice cold.");}
+  if(shovels<=0&&!over){over=true;hud("Shovels broke. The chest stays buried.");g.children[ty*N+tx].textContent="💰";}}
+document.getElementById("reset").onclick=start;start();
+</script>
+</body></html>
