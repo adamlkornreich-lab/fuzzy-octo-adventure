@@ -58,7 +58,7 @@
 <canvas id="world" aria-label="3D open world with Riviera Schools"></canvas>
 <div class="hud" id="place"><div class="label">You are at</div><div class="name" id="placeName">Riviera Ave</div></div>
 <div class="hud" id="help">
-  <b>Crossword Cabin:</b> Cross St, east side.<br><b>Jen's Island + Rumor Mill:</b> Cross St, far west, over the bridge.<br><b>Ruben's Cliff + the Hospital:</b> far west, north of Cross St.<br><b>Rene's Guitar Shack:</b> Cross St, east side.<br><span class="desk"><b>E</b> enter · <b>WASD / arrows</b> walk · <b>Shift</b> run · <b>Space</b> jump · <b>drag</b> to look</span>
+  <b>Crossword Cabin:</b> Cross St, east side.<br><b>Jen's Island + Rumor Mill:</b> Cross St, far west, over the bridge.<br><b>Ruben's Cliff + the Hospital:</b> far west, north of Cross St.<br><b>Rene's Guitar Shack:</b> Cross St, east side.<br><b>Acropolis Dragon Table:</b> 7th Ave block, Cross St west side.<br><span class="desk"><b>E</b> enter · <b>WASD / arrows</b> walk · <b>Shift</b> run · <b>Space</b> jump · <b>drag</b> to look</span>
   <span class="touch-only">Left stick to walk · drag anywhere to look</span>
 </div>
 <a class="hud" id="backlink" href="arcade.html">⚓ Arcade</a>
@@ -287,6 +287,31 @@
   shackSign.rotation.y = Math.PI; shackSign.position.set(shack.x, 3.9, shack.z - 5.03); scene.add(shackSign);
   box(3, 3, 0.2, shack.x, 0, shack.z - 5.1, door, false);
 
+  // Acropolis Greek Taverna (1833 E 7th Ave, Ybor) with the Dragon Table room downstairs
+  const acro = { x: -82, z: 48 };
+  const white = mat(0xf4f1ea), aegean = mat(0x1f5fa8);
+  box(24, 8, 12, acro.x, 0, acro.z, white);
+  box(25, 1, 13, acro.x, 8, acro.z, aegean, false);
+  box(10, 2.2, 6, acro.x, 9, acro.z - 1, white, false);
+  for (const dx of [-10, -6, 6, 10]) {
+    const col = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.55, 7, 12), white);
+    col.position.set(acro.x + dx, 3.5, acro.z + 8); col.castShadow = true; scene.add(col);
+  }
+  box(23, 0.6, 3, acro.x, 7, acro.z + 7.5, aegean, false);
+  box(3, 4.6, 0.2, acro.x, 0, acro.z + 6.1, aegean, false);
+  for (const dx of [-7, 7]) box(3.4, 2.6, 0.2, acro.x + dx, 2.2, acro.z + 6.1, glass, false);
+  const acroSign = new THREE.Mesh(new THREE.PlaneGeometry(20, 1.8), new THREE.MeshBasicMaterial({ map: textTexture('ACROPOLIS GREEK TAVERNA', { w: 1792, bg: '#f4f1ea', fg: '#1f5fa8', font: '800 112px "Bricolage Grotesque", sans-serif' }) }));
+  acroSign.position.set(acro.x, 9.6, acro.z + 6.05); scene.add(acroSign);
+  const dragonSign = new THREE.Mesh(new THREE.PlaneGeometry(7, 1), new THREE.MeshBasicMaterial({ map: textTexture('DRAGON TABLE ↓', { bg: '#7a1f1f', fg: '#f6d67a', font: '800 150px "Bricolage Grotesque", sans-serif' }) }));
+  dragonSign.position.set(acro.x, 5.2, acro.z + 6.15); scene.add(dragonSign);
+  box(0.25, 4.5, 0.25, acro.x + 14, 0, acro.z + 11, mat(0x2d3f57), false);
+  const aveSign = new THREE.Mesh(new THREE.PlaneGeometry(5, 1), new THREE.MeshBasicMaterial({ map: textTexture('E 7TH AVE · YBOR', { bg: '#2f6f3a', fg: '#ffffff', font: '800 120px "Bricolage Grotesque", sans-serif' }), side: THREE.DoubleSide }));
+  aveSign.position.set(acro.x + 14, 4.2, acro.z + 11); scene.add(aveSign);
+  flat(5, 8, acro.x, acro.z + 10, walk, 0.03);
+  // A big glowing twenty-sided die floats over the roof so you can find it from far away
+  const bigDie = new THREE.Mesh(new THREE.IcosahedronGeometry(2.4, 0), new THREE.MeshLambertMaterial({ color: 0x9a2a1f, emissive: 0x3a0a05, flatShading: true }));
+  bigDie.position.set(acro.x, 18, acro.z); bigDie.castShadow = true; scene.add(bigDie);
+
   // The hospital that saved Ruben's life
   const hosp = { x: -125, z: 25 };
   box(30, 13, 18, hosp.x, 0, hosp.z, mat(0xeef1f2));
@@ -330,7 +355,7 @@
   for (let i = 0; i < 120; i++) {
     const x = (rnd() - 0.5) * 560, z = (rnd() - 0.5) * 560;
     const inCampus = x > campus.minX - 4 && x < campus.maxX + 4 && z > campus.minZ - 4 && z < campus.maxZ + 4;
-    const atCabin = (Math.abs(x - cabin.x) < 18 && Math.abs(z - cabin.z) < 20) || Math.hypot(x - isle.x, z - isle.z) < isle.lagoon + 3 || (x < -105 && z > -45 && z < 62) || (Math.abs(x - shack.x) < 12 && Math.abs(z - shack.z) < 12);
+    const atCabin = (Math.abs(x - cabin.x) < 18 && Math.abs(z - cabin.z) < 20) || Math.hypot(x - isle.x, z - isle.z) < isle.lagoon + 3 || (x < -105 && z > -45 && z < 62) || (Math.abs(x - shack.x) < 12 && Math.abs(z - shack.z) < 12) || (Math.abs(x - acro.x) < 20 && z > acro.z - 12 && z < acro.z + 16);
     if (Math.abs(x) < 34 || Math.abs(z - 70) < 14 || inCampus || atCabin) continue;
     tree(x, z, 0.8 + rnd() * 0.7);
   }
@@ -368,6 +393,7 @@
   if (location.hash === '#rene') { player.position.set(shack.x, 0, shack.z - 9); state.camYaw = Math.PI; state.yaw = 0; }
   if (location.hash === '#ruben') { player.position.set(hosp.x - 40, 0, 45); state.camYaw = -0.6; state.yaw = 0; }
   if (location.hash === '#rumor') { player.position.set(isle.x, 0, isle.z + 12); state.camYaw = Math.PI; state.yaw = 0; }
+  if (location.hash === '#acropolis') { player.position.set(acro.x, 0, acro.z + 13); state.camYaw = 0; state.yaw = Math.PI; }
   if (location.hash === '#jen') { player.position.set(isle.x, 0, isle.z - 12); state.camYaw = Math.PI; state.yaw = 0; }
   const enter = document.getElementById('enter');
   const keys = {};
@@ -407,6 +433,7 @@
   const places = [
     { name: "Ruben's Cliff, Chile", test: p => p.x < -150 && p.z > -45 && p.z < 62 },
     { name: 'The Hospital That Saved Ruben', test: p => p.x >= -150 && p.x < -105 && p.z > 5 && p.z < 62 },
+    { name: 'Acropolis Greek Taverna · 7th Ave', test: p => Math.abs(p.x - acro.x) < 18 && p.z > acro.z - 10 && p.z < 62 },
     { name: "Rene's Guitar Shack", test: p => Math.abs(p.x - shack.x) < 12 && p.z > 78 && p.z < 100 },
     { name: "Ronnie & Joe's Rumor Mill", test: p => Math.hypot(p.x - isle.x, p.z - (isle.z + 20)) < 11 },
     { name: "Jen's Island", test: p => Math.hypot(p.x - isle.x, p.z - isle.z) < isle.lagoon || (Math.abs(p.x - isle.x) < 4 && p.z > 78 && p.z < isle.z) },
@@ -508,7 +535,10 @@
     if (nearCliff && tribute.dataset.t !== 'c') { tribute.dataset.t = 'c'; document.getElementById('tribT').textContent = 'Ruben, leaping into Chile'; document.getElementById('tribB').textContent = "Ruben is my brother. I wouldn't have made it without his help. — Adam"; }
     const nearRene = Math.hypot(p.x - shack.x, p.z - (shack.z - 7)) <= 8;
     const nearCabin = Math.hypot(p.x - cabin.x, p.z - (cabin.z - 8)) <= 9, nearJen = Math.hypot(p.x - isle.x, p.z - (isle.z - 4)) <= 9, nearRumor = Math.hypot(p.x - isle.x, p.z - (isle.z + 18)) <= 8;
-    enter.hidden = !(nearCabin || nearJen || nearRumor || nearRene);
+    const nearAcro = Math.hypot(p.x - acro.x, p.z - (acro.z + 10)) <= 8;
+    enter.hidden = !(nearCabin || nearJen || nearRumor || nearRene || nearAcro);
+    if (nearAcro && enter.dataset.t !== 'a') { enter.dataset.t = 'a'; enter.href = 'acropolis.html'; enter.textContent = '🐉 Join Landon, Steph & Roger at the Dragon Table'; }
+    bigDie.rotation.x += dt * 0.6; bigDie.rotation.y += dt * 0.9; bigDie.position.y = 18 + Math.sin(state.t * 1.5) * 0.8;
     if (nearRene && enter.dataset.t !== 'g') { enter.dataset.t = 'g'; enter.href = 'guitar.html'; enter.textContent = "🎸 Play Rene's Guitar School"; }
     if (nearRumor && enter.dataset.t !== 'r') { enter.dataset.t = 'r'; enter.href = 'rumors.html'; enter.textContent = "🐒 Play Ronnie & Joe's Rumor Mill"; }
     if (nearJen && enter.dataset.t !== 'j') { enter.dataset.t = 'j'; enter.href = 'jen.html'; enter.textContent = '📋 Play Jen Runs the Ship'; }

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Acropolis Dragon Table</title><link rel="stylesheet" href="assets/site.css">
+<style>
+.ah{padding:18px 0 6px}.ah h1{margin:0;color:var(--gold2);font-size:clamp(1.7rem,6vw,2.6rem);text-wrap:balance}.ah p{margin:4px 0 0;color:var(--mute);max-width:65ch}
+.ah .where{font-size:.85rem;letter-spacing:.12em;text-transform:uppercase;color:var(--sea)}
+.party{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+@media (max-width:560px){.party{grid-template-columns:1fr}}
+.pcard{background:linear-gradient(180deg,var(--panel),var(--deep));border:1px solid rgba(232,184,74,.22);border-radius:12px;padding:12px 14px;min-width:0}
+.pcard.down{opacity:.45;filter:grayscale(.8)}
+.pcard.turn{border-color:var(--gold);box-shadow:0 0 0 2px rgba(232,184,74,.35)}
+.pcard b{display:block;color:var(--gold2);font-family:var(--display);font-size:1.35rem;font-weight:400;line-height:1.1}
+.pcard .cls{color:var(--mute);font-size:.85rem}
+.hp{height:8px;background:#0f1522;border-radius:99px;overflow:hidden;margin:8px 0 4px}.hp i{display:block;height:100%;background:linear-gradient(90deg,#c0412a,#e8b84a);transition:width .4s}
+.stats{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.8rem;color:var(--fog);font-variant-numeric:tabular-nums}
+.table{background:radial-gradient(600px 300px at 50% 0%,#3a2716 0%,#1c130b 70%);border:1px solid rgba(232,184,74,.3);border-radius:16px;padding:clamp(14px,3vw,24px);box-shadow:var(--shadow)}
+.scene-t{font-family:var(--display);color:var(--gold2);font-size:clamp(1.4rem,4.5vw,1.9rem);margin:0 0 6px;line-height:1.1}
+.scene-p{margin:0 0 14px;color:#ecdcc0;max-width:65ch}
+.choices{display:grid;gap:8px}
+.choice{display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;padding:12px 14px;border-radius:10px;border:1px solid rgba(232,184,74,.35);background:rgba(11,14,20,.55);color:var(--fog);font:inherit;cursor:pointer;min-width:0}
+.choice:hover{border-color:var(--gold);background:rgba(232,184,74,.1)}
+.choice:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+.choice:disabled{opacity:.45;cursor:not-allowed}
+.choice small{color:var(--mute);white-space:nowrap;font-variant-numeric:tabular-nums}
+.dice{display:flex;align-items:center;gap:14px;margin:16px 0 4px;min-height:74px}
+.d20{width:70px;height:70px;flex:none;display:grid;place-items:center;background:#7a1f1f;color:#fff3d6;font:400 1.9rem var(--display);clip-path:polygon(50% 0,95% 25%,95% 75%,50% 100%,5% 75%,5% 25%);box-shadow:inset 0 0 0 3px rgba(255,255,255,.12)}
+.d20.spin{animation:roll .6s ease-out}
+.d20.crit{background:#a97c10;color:#1b1305}.d20.fumble{background:#2b2f3a;color:#c9d1e0}
+@keyframes roll{0%{transform:rotate(0) scale(.7)}60%{transform:rotate(540deg) scale(1.1)}100%{transform:rotate(720deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){.d20.spin{animation:none}}
+.res{font-size:1.02rem;color:#ecdcc0;min-width:0}.res b{color:var(--gold2)}
+.res .math{display:block;color:var(--mute);font-size:.85rem;font-variant-numeric:tabular-nums}
+.log{margin-top:14px;max-height:170px;overflow:auto;font-size:.88rem;color:var(--mute);border-top:1px dashed rgba(232,184,74,.25);padding-top:8px}
+.log p{margin:3px 0}
+.bossbar{margin:0 0 12px}.bossbar .hp{height:12px}.bossbar span{font-size:.85rem;color:var(--mute);font-variant-numeric:tabular-nums}
+.end{text-align:center}.end h2{font-family:var(--display);font-weight:400;font-size:2rem}
+</style></head>
+<body>
+<main class="wrap">
+  <div class="ah">
+    <div class="where">Acropolis Greek Taverna · 1833 E 7th Ave, Ybor City</div>
+    <h1>The Dragon Table at Acropolis</h1>
+    <p>Down the back stairs at Acropolis there's a candlelit table, a box of dice and a map nobody remembers drawing. Landon, Steph and Roger sit down for one game. The game has other plans.</p>
+  </div>
+
+  <div class="party" id="party"></div>
+
+  <section class="table" id="tableBox" aria-live="polite">
+    <div class="bossbar" id="bossbar" hidden><span id="bossName"></span><div class="hp"><i id="bossHp"></i></div></div>
+    <h2 class="scene-t" id="sT"></h2>
+    <p class="scene-p" id="sP"></p>
+    <div class="choices" id="choices"></div>
+    <div class="dice"><div class="d20" id="die">20</div><div class="res" id="res">Pick a move. Each one rolls a twenty-sided die plus that hero's bonus against the target number.</div></div>
+    <div class="log" id="log"></div>
+  </section>
+
+  <section class="panel end" id="end" hidden>
+    <h2 id="eT"></h2><p id="eP"></p>
+    <p class="row" style="justify-content:center"><button class="btn" id="again">Roll a new game</button><a class="btn ghost" href="world.html#acropolis">🏛 Back to 7th Ave</a><a class="btn ghost" href="arcade.html">⚔ Arcade</a></p>
+  </section>
+</main>
+<script src="assets/site.js"></script>
+<script>
+const $=i=>document.getElementById(i),R=n=>Math.floor(Math.random()*n),d20=()=>1+R(20);
+const HEROES=[
+ {id:"landon",name:"Landon",cls:"Rogue of the Back Alleys",max:22,st:{Might:1,Cunning:5,Charm:2,Magic:0}},
+ {id:"steph",name:"Steph",cls:"Spellmixer Bard",max:18,st:{Might:0,Cunning:2,Charm:5,Magic:4}},
+ {id:"roger",name:"Roger",cls:"Shieldwall Fighter",max:28,st:{Might:5,Cunning:1,Charm:1,Magic:0}}
+];
+const SCENES=[
+ {t:"The Cellar Door",p:"Behind the wine racks under Acropolis, a door carved with a dragon's eye. It's locked, and something on the other side is breathing.",c:[
+  {who:"landon",stat:"Cunning",dc:12,txt:"Pick the lock",ok:"Click. Landon has the door open before anyone sees him kneel.",bad:"The pick snaps and a dart trap fires.",dmg:4,gold:5},
+  {who:"roger",stat:"Might",dc:14,txt:"Shoulder the door down",ok:"Roger hits it once. The door decides it was never that locked.",bad:"The door wins round one. Roger's shoulder files a complaint.",dmg:5,gold:3},
+  {who:"steph",stat:"Charm",dc:13,txt:"Sweet-talk the carved eye",ok:"Steph compliments the craftsmanship. The eye blinks and the door swings open.",bad:"The eye is not flattered. It glares, and the room goes cold.",dmg:3,gold:4}]},
+ {t:"The Old Cigar Tunnels",p:"The door opens into the bootlegger tunnels that run under 7th Avenue. Tobacco leaves hang from the ceiling. One stretch of floor looks a little too clean.",c:[
+  {who:"landon",stat:"Cunning",dc:13,txt:"Spot the trap first",ok:"Landon taps the fake stone with a boot. The floor drops away into spikes, with nobody standing on it.",bad:"Landon finds the trap the hard way.",dmg:6,gold:6},
+  {who:"steph",stat:"Magic",dc:12,txt:"Light the way with a glowing cocktail",ok:"Steph shakes a drink until it glows green. The pressure plates show up like footprints in snow.",bad:"The drink fizzles. In the dark, someone steps wrong.",dmg:4,gold:5},
+  {who:"roger",stat:"Might",dc:15,txt:"Jump the whole stretch",ok:"Roger clears it with room to spare and hauls the others across.",bad:"Roger lands short, and the spikes catch his boots.",dmg:7,gold:4}]},
+ {t:"The Cigar Wraith",p:"A ghost in a 1920s factory apron drifts out of the smoke. It used to roll cigars here. It wants to know why nobody visits anymore.",c:[
+  {who:"steph",stat:"Charm",dc:14,txt:"Promise to tell its story",ok:"Steph promises the ghost a toast at Gaspar's every Friday. It smiles, and leaves a pouch of doubloons behind.",bad:"The wraith hears a sales pitch and lashes out.",dmg:6,gold:12},
+  {who:"roger",stat:"Might",dc:16,txt:"Stand guard while the others slip past",ok:"Roger plants his shield. The wraith passes straight through him and gets bored.",bad:"Cold hands go right through Roger's armor.",dmg:6,gold:4},
+  {who:"landon",stat:"Cunning",dc:13,txt:"Swipe its lucky cigar box",ok:"Landon palms the box. The wraith follows it like a cat chasing a string, away from the party.",bad:"The wraith catches Landon's wrist and squeezes.",dmg:5,gold:8}]},
+ {t:"The Kraken's Riddle",p:"An underground lagoon. A kraken surfaces, puts on reading glasses and says: \"I have a crown but no head, a key but no lock, and I always come back to Ybor every winter. What am I?\"",c:[
+  {who:"steph",stat:"Magic",dc:12,txt:"Answer: Gasparilla",ok:"The kraken claps all eight arms. \"Correct. Mind the dragon.\"",bad:"Steph hesitates, and the kraken splashes the whole party.",dmg:4,gold:10},
+  {who:"landon",stat:"Charm",dc:15,txt:"Bluff that you already know",ok:"Landon says it like he's known since birth. The kraken is impressed and waves them on.",bad:"The kraken sees through it and ties Landon in a knot.",dmg:6,gold:6},
+  {who:"roger",stat:"Might",dc:17,txt:"Row across before it decides",ok:"Roger rows like the boat owes him money. They're across before the kraken finishes asking.",bad:"A tentacle catches the boat and flips it.",dmg:7,gold:3}]}
+];
+const BOSS={name:"Ignatius, the Dragon Under 7th Avenue",max:34};
+const ATTACKS=[
+ {who:"roger",stat:"Might",dc:13,txt:"Roger: shield bash",hit:[6,10]},
+ {who:"landon",stat:"Cunning",dc:14,txt:"Landon: strike from the shadows",hit:[5,11]},
+ {who:"steph",stat:"Magic",dc:13,txt:"Steph: flaming ouzo spell",hit:[6,9]},
+ {who:"steph",stat:"Charm",dc:12,txt:"Steph: healing song (party +5)",heal:5}
+];
+let hp={},scene=0,gold=0,boss=0,busy=false;
+function hero(id){return HEROES.find(h=>h.id===id);}
+function alive(id){return hp[id]>0;}
+function drawParty(turnId){
+ $("party").innerHTML=HEROES.map(h=>`<div class="pcard ${alive(h.id)?"":"down"} ${turnId===h.id?"turn":""}"><b>${h.name}</b><span class="cls">${h.cls}</span><div class="hp" aria-label="${h.name} health ${hp[h.id]} of ${h.max}"><i style="width:${Math.max(0,hp[h.id])/h.max*100}%"></i></div><div class="stats"><span>❤ ${Math.max(0,hp[h.id])}/${h.max}</span>${Object.entries(h.st).map(([k,v])=>`<span>${k} +${v}</span>`).join("")}</div></div>`).join("");
+}
+function log(t){$("log").insertAdjacentHTML("afterbegin",`<p>${t}</p>`);}
+function showDie(n){const d=$("die");d.className="d20";void d.offsetWidth;d.classList.add("spin");if(n===20)d.classList.add("crit");if(n===1)d.classList.add("fumble");
+ let k=0;const iv=setInterval(()=>{d.textContent=1+R(20);if(++k>8){clearInterval(iv);d.textContent=n;}},55);}
+function roll(h,stat,dc){const n=d20(),mod=h.st[stat],tot=n+mod;return{n,mod,tot,ok:n===20||(n!==1&&tot>=dc),crit:n===20,fumble:n===1};}
+function mathLine(h,stat,r,dc){return `<span class="math">${h.name} rolled ${r.n} + ${r.mod} ${stat} = ${r.tot} vs ${dc}${r.crit?" · natural 20!":r.fumble?" · natural 1":""}</span>`;}
+function renderScene(){
+ busy=false;$("bossbar").hidden=true;const s=SCENES[scene];
+ $("sT").textContent=`${scene+1}. ${s.t}`;$("sP").textContent=s.p;drawParty();
+ $("choices").innerHTML=s.c.map((c,i)=>{const h=hero(c.who),down=!alive(c.who);return `<button class="choice" data-i="${i}" ${down?"disabled":""}><span>${h.name}: ${c.txt}</span><small>${c.stat} +${h.st[c.stat]} · need ${c.dc}${down?" · knocked out":""}</small></button>`;}).join("");
+}
+function pickScene(i){
+ if(busy)return;busy=true;const c=SCENES[scene].c[i],h=hero(c.who),r=roll(h,c.stat,c.dc);showDie(r.n);
+ setTimeout(()=>{
+  if(r.ok){const g=r.crit?c.gold*2:c.gold;gold+=g;$("res").innerHTML=`<b>Success.</b> ${c.ok} +${g} doubloons.${mathLine(h,c.stat,r,c.dc)}`;log(`✔ ${c.ok}`);}
+  else{const dm=r.fumble?c.dmg+3:c.dmg;hp[h.id]-=dm;$("res").innerHTML=`<b>Failure.</b> ${c.bad} ${h.name} takes ${dm} damage.${mathLine(h,c.stat,r,c.dc)}`;log(`✘ ${c.bad} (${h.name} −${dm})`);}
+  drawParty();
+  if(HEROES.every(x=>!alive(x.id)))return setTimeout(lose,900);
+  $("choices").innerHTML=`<button class="choice" id="next"><span>${scene<SCENES.length-1?"Keep going deeper":"Open the last door"}</span><small>🪙 ${gold} doubloons</small></button>`;
+  $("next").onclick=()=>{scene++;scene<SCENES.length?renderScene():startBoss();};
+ },560);
+}
+let turn=0;
+function startBoss(){boss=BOSS.max;turn=0;$("bossbar").hidden=false;$("bossName").textContent=BOSS.name;$("sT").textContent="5. The Dragon's Hoard";
+ $("sP").textContent="A cavern full of gold, old Gasparilla beads and a dragon sleeping on a pile of Cuban sandwiches. One eye opens. It has been waiting for a party exactly this size.";log("🐉 Ignatius wakes up.");bossTurn();}
+function drawBoss(){$("bossHp").style.width=Math.max(0,boss)/BOSS.max*100+"%";$("bossName").textContent=`${BOSS.name} · ❤ ${Math.max(0,boss)}/${BOSS.max}`;}
+function bossTurn(){
+ busy=false;drawBoss();const up=HEROES.filter(h=>alive(h.id));const who=up[turn%up.length];drawParty(who.id);
+ const opts=ATTACKS.filter(a=>a.who===who.id);
+ $("choices").innerHTML=opts.map((a,i)=>`<button class="choice" data-a="${ATTACKS.indexOf(a)}"><span>${a.txt}</span><small>${a.stat} +${who.st[a.stat]} · need ${a.dc}</small></button>`).join("");
+ $("res").innerHTML=`<b>${who.name}'s turn.</b> Choose a move against the dragon.`;
+}
+function attack(ai){
+ if(busy)return;busy=true;const a=ATTACKS[ai],h=hero(a.who),r=roll(h,a.stat,a.dc);showDie(r.n);
+ setTimeout(()=>{
+  let msg="";
+  if(a.heal){if(r.ok){const v=r.crit?a.heal*2:a.heal;HEROES.forEach(x=>{if(alive(x.id))hp[x.id]=Math.min(x.max,hp[x.id]+v);});msg=`<b>Success.</b> Steph's song patches everyone up. Party +${v}.`;log(`♪ Steph heals the party +${v}.`);}
+   else{msg="<b>Failure.</b> The song cracks on the high note.";log("♪ Steph's song misses.");}}
+  else if(r.ok){let dm=a.hit[0]+R(a.hit[1]-a.hit[0]+1);if(r.crit)dm*=2;boss-=dm;msg=`<b>Hit.</b> ${a.txt.split(": ")[1]} lands for ${dm} damage.`;log(`⚔ ${h.name} hits Ignatius for ${dm}.`);}
+  else{msg=`<b>Miss.</b> Ignatius bats it away with his tail.`;log(`… ${h.name} misses.`);}
+  $("res").innerHTML=msg+mathLine(h,a.stat,r,a.dc);drawBoss();drawParty();
+  if(boss<=0)return setTimeout(win,900);
+  setTimeout(dragonActs,900);
+ },560);
+}
+function dragonActs(){
+ const up=HEROES.filter(h=>alive(h.id));const breath=R(3)===0;
+ if(breath){up.forEach(h=>hp[h.id]-=4);log("🔥 Ignatius breathes fire. Everyone takes 4.");$("res").innerHTML="<b>Dragon fire!</b> Ignatius breathes across the whole table. Everyone takes 4 damage.";}
+ else{const t=up[R(up.length)],dm=5+R(4);hp[t.id]-=dm;log(`🐉 Ignatius claws ${t.name} for ${dm}.`);$("res").innerHTML=`<b>Claw.</b> Ignatius swipes at ${t.name} for ${dm} damage.`;}
+ drawParty();if(HEROES.every(x=>!alive(x.id)))return setTimeout(lose,900);
+ turn++;setTimeout(bossTurn,1100);
+}
+function win(){gold+=50;window.PY&&PY.celebrate&&PY.celebrate();const best=window.PY?PY.best("acropolis",gold):gold;
+ $("tableBox").hidden=true;$("end").hidden=false;$("eT").textContent="Ignatius surrenders the hoard 🐉";
+ $("eP").textContent=`Landon, Steph and Roger climb back up into Acropolis with ${gold} doubloons. Best haul so far: ${best}. The dragon asks if they're free next Thursday.`;}
+function lose(){$("tableBox").hidden=true;$("end").hidden=false;$("eT").textContent="The party wakes up at the table";
+ $("eP").textContent=`The candles are out and the dice are cold. Was it real? There are ${gold} doubloons in Landon's pocket that weren't there before.`;}
+function start(){HEROES.forEach(h=>hp[h.id]=h.max);scene=0;gold=0;$("log").innerHTML="";$("end").hidden=true;$("tableBox").hidden=false;$("die").textContent="20";$("die").className="d20";
+ $("res").textContent="Pick a move. Each one rolls a twenty-sided die plus that hero's bonus against the target number.";renderScene();}
+$("choices").addEventListener("click",e=>{const b=e.target.closest(".choice");if(!b||b.disabled)return;if(b.dataset.i!==undefined)pickScene(+b.dataset.i);else if(b.dataset.a!==undefined)attack(+b.dataset.a);});
+$("again").onclick=start;
+start();
+</script>
+</body></html>
