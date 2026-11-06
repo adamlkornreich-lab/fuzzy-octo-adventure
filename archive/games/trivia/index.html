@@ -1,0 +1,314 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Pirates of Ybor Trivia</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Alegreya+Sans:wght@400;500;700;800&display=swap">
+<style>
+/* Layout: one centered "ship's log" card on a night-sea ground; screens swap inside it. Single deliberate dark look. */
+:root{
+  --sea:#0b1626; --deep:#122238; --plank:#1a2e48; --line:#2c4766;
+  --gold:#e8b44a; --gold-soft:#f3d48a; --ink:#eef2f7; --muted:#9fb0c6;
+  --right:#4fbf8b; --wrong:#e2665a;
+  --display:"Pirata One", Georgia, serif;
+  --body:"Alegreya Sans", "Trebuchet MS", system-ui, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+  background:radial-gradient(120% 70% at 50% 0%, #1b3355 0%, var(--sea) 60%) fixed, var(--sea);
+  color:var(--ink); font-family:var(--body); font-size:17px; line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left,0px));
+  padding-right:max(16px, env(safe-area-inset-right,0px));
+  padding-block:24px 32px;
+}
+.wrap{max-width:620px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+header{text-align:center}
+.eyebrow{font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);font-weight:700}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(2.4rem,9vw,3.6rem);line-height:1;margin:.15em 0 .1em;color:var(--gold-soft);text-wrap:balance;text-shadow:0 2px 0 #000a}
+.tag{color:var(--muted);margin:0}
+.card{background:linear-gradient(180deg,var(--plank),var(--deep));border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 18px 40px #0008}
+h2{font-family:var(--display);font-weight:400;font-size:1.9rem;margin:0 0 6px;color:var(--gold-soft);text-wrap:balance}
+.cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:14px}
+.cat{all:unset;cursor:pointer;display:flex;flex-direction:column;gap:2px;padding:14px 16px;border:1px solid var(--line);border-radius:10px;background:#0e1d31}
+.cat:hover,.cat:focus-visible{border-color:var(--gold);background:#132640}
+.cat:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.cat b{font-size:1.1rem}
+.cat small{color:var(--muted)}
+.cat .best{color:var(--gold);font-size:.82rem;font-variant-numeric:tabular-nums}
+.hud{display:flex;justify-content:space-between;align-items:center;gap:10px;font-variant-numeric:tabular-nums;color:var(--muted);font-size:.92rem}
+.hud strong{color:var(--ink)}
+.timer{height:8px;border-radius:99px;background:#0a1525;overflow:hidden;margin:10px 0 18px}
+.timer i{display:block;height:100%;width:100%;background:var(--gold);transform-origin:left;transition:background .3s}
+.q{font-size:1.28rem;font-weight:700;line-height:1.35;margin:0 0 16px;text-wrap:pretty}
+.answers{display:grid;gap:10px}
+.ans{all:unset;cursor:pointer;padding:13px 16px;border-radius:10px;border:1px solid var(--line);background:#0e1d31;font-weight:500;display:flex;gap:12px;align-items:center}
+.ans:hover:not([disabled]),.ans:focus-visible{border-color:var(--gold)}
+.ans:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.ans .k{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#1e3554;color:var(--gold);font-weight:800;font-size:.85rem}
+.ans.right{border-color:var(--right);background:#123a2d}
+.ans.wrong{border-color:var(--wrong);background:#3d1a1a}
+.ans[disabled]{cursor:default}
+.feedback{min-height:1.6em;margin:14px 0 0;color:var(--gold-soft);font-weight:500}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:16px}
+.btn{all:unset;cursor:pointer;padding:12px 22px;border-radius:99px;font-weight:800;background:var(--gold);color:#1a1205;text-align:center}
+.btn.ghost{background:transparent;color:var(--gold);border:1px solid var(--gold)}
+.btn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.score{text-align:center}
+.big{font-family:var(--display);font-size:4.4rem;line-height:1;color:var(--gold);font-variant-numeric:tabular-nums}
+.stars{font-size:1.8rem;letter-spacing:.2em;color:var(--gold)}
+.review{margin-top:18px;text-align:left;display:grid;gap:8px;font-size:.92rem}
+.review div{padding:8px 12px;border-radius:8px;background:#0e1d31;border-left:3px solid var(--line)}
+.review .ok{border-left-color:var(--right)} .review .no{border-left-color:var(--wrong)}
+.review span{color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:.82rem;display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:6px}
+.crest{width:58px;height:58px;opacity:.85}
+.copy{color:var(--gold-soft)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Welcome aboard, matey</div>
+    <h1>Pirates of Ybor Trivia</h1>
+    <p class="tag">10 questions. 20 seconds each. Fast answers earn bonus doubloons.</p>
+  </header>
+
+  <section class="card" id="menu">
+    <h2>Pick yer waters</h2>
+    <p class="tag">Choose a category to set sail.</p>
+    <div class="cats" id="cats"></div>
+  </section>
+
+  <section class="card" id="game" hidden>
+    <div class="hud"><span id="qnum">Question 1 of 10</span><span id="catname"></span><span>Doubloons <strong id="pts">0</strong></span></div>
+    <div class="timer"><i id="bar"></i></div>
+    <p class="q" id="qtext"></p>
+    <div class="answers" id="answers"></div>
+    <p class="feedback" id="fb" aria-live="polite"></p>
+    <div class="row"><button class="btn" id="next" hidden>Next question</button></div>
+  </section>
+
+  <section class="card score" id="end" hidden>
+    <h2 id="endtitle">Land ho!</h2>
+    <div class="big" id="final">0</div>
+    <div class="tag">doubloons · <span id="correct"></span> correct</div>
+    <div class="stars" id="stars"></div>
+    <p class="feedback" id="endmsg"></p>
+    <div class="row">
+      <button class="btn" id="again">Play again</button>
+      <button class="btn ghost" id="tomenu">Change category</button>
+    </div>
+    <div class="review" id="review"></div>
+  </section>
+
+  <footer>
+    <svg class="crest" viewBox="0 0 64 64" aria-hidden="true">
+      <circle cx="32" cy="32" r="30" fill="none" stroke="#e8b44a" stroke-width="2"/>
+      <path d="M18 44 L46 20 M46 44 L18 20" stroke="#e8b44a" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="32" cy="30" r="9" fill="#e8b44a"/>
+      <circle cx="28.5" cy="29" r="2" fill="#122238"/><circle cx="35.5" cy="29" r="2" fill="#122238"/>
+      <path d="M29 35 h6" stroke="#122238" stroke-width="1.6"/>
+    </svg>
+    <div class="copy">© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.</div>
+    <div>Blessed by Pippy · Part of thepiratesofybor.com</div>
+  </footer>
+</div>
+
+<script>
+const BANK = {
+  "Pirates": [
+    ["What was Blackbeard's real name, according to most historians?", ["Edward Teach","William Kidd","Henry Morgan","Jack Rackham"]],
+    ["What was the name of Blackbeard's flagship?", ["Queen Anne's Revenge","The Fancy","Royal Fortune","Adventure Galley"]],
+    ["What is the classic skull-and-crossbones pirate flag called?", ["The Jolly Roger","The Black Spot","The Red Ensign","The Sea Dog"]],
+    ["Which two famous women sailed with Calico Jack Rackham?", ["Anne Bonny and Mary Read","Grace O'Malley and Ching Shih","Mary Read and Ching Shih","Anne Bonny and Grace O'Malley"]],
+    ["\"Pieces of eight\" were what kind of coin?", ["Spanish silver dollars","English gold guineas","Dutch copper pennies","French silver francs"]],
+    ["Which Jamaican port was once called the wickedest city on Earth?", ["Port Royal","Kingston","Montego Bay","Ocho Rios"]],
+    ["A pirate with a government license to raid enemy ships was called a…", ["Privateer","Buccaneer","Corsair","Freebooter"]],
+    ["Where was Blackbeard killed in 1718?", ["Ocracoke Island, North Carolina","Nassau, Bahamas","Charleston, South Carolina","Tortuga"]],
+    ["Who wrote the novel Treasure Island?", ["Robert Louis Stevenson","Charles Dickens","Mark Twain","J.M. Barrie"]],
+    ["What is the name of Long John Silver's parrot?", ["Captain Flint","Polly","Squawk","Captain Hook"]],
+    ["\"Davy Jones' Locker\" refers to…", ["The bottom of the sea","The captain's treasure chest","The ship's jail","A pirate tavern"]],
+    ["Which pirate captured over 400 ships, more than any other in the Golden Age?", ["Bartholomew Roberts","Blackbeard","Captain Kidd","Calico Jack"]],
+    ["International Talk Like a Pirate Day falls on…", ["September 19","October 31","July 4","April 1"]],
+    ["Captain William Kidd was hanged in which city in 1701?", ["London","Boston","Nassau","Port Royal"]],
+    ["What did pirates call a share of the loot written into their rules?", ["The articles","The ledger","The bounty","The charter"]]
+  ],
+  "Movies": [
+    ["In Pirates of the Caribbean, what is Captain Jack Sparrow's ship?", ["The Black Pearl","The Flying Dutchman","The Interceptor","The Jolly Roger"]],
+    ["Who played Captain Hook in the 1991 film Hook?", ["Dustin Hoffman","Robin Williams","Jack Nicholson","Gene Hackman"]],
+    ["In The Goonies, what is the name of the legendary pirate the kids hunt for?", ["One-Eyed Willy","Captain Blood","Black Bart","Long John Silver"]],
+    ["In The Princess Bride, Westley secretly becomes which pirate?", ["The Dread Pirate Roberts","Captain Blood","The Black Corsair","Jean Lafitte"]],
+    ["Who played the title role in Captain Phillips (2013)?", ["Tom Hanks","Matt Damon","Tom Cruise","Russell Crowe"]],
+    ["Which 1975 Steven Spielberg film made audiences afraid of the water?", ["Jaws","The Abyss","Orca","Piranha"]],
+    ["Which film won Best Picture at the Oscars in 1998, about a doomed ship?", ["Titanic","The Perfect Storm","Master and Commander","Poseidon"]],
+    ["In Finding Nemo, what kind of fish is Nemo?", ["Clownfish","Angelfish","Blue tang","Pufferfish"]],
+    ["Who voiced the demigod Maui in Disney's Moana?", ["Dwayne Johnson","Jason Momoa","Vin Diesel","Chris Hemsworth"]],
+    ["Which actor led Master and Commander: The Far Side of the World?", ["Russell Crowe","Hugh Jackman","Kevin Costner","Mel Gibson"]],
+    ["Disney's 2002 film that put Treasure Island in outer space is called…", ["Treasure Planet","Space Pirates","Star Island","Galaxy Quest"]],
+    ["Who played Long John Silver in Muppet Treasure Island?", ["Tim Curry","Christopher Lloyd","Tim Roth","Jim Carrey"]],
+    ["What is the mermaid's name in Disney's The Little Mermaid?", ["Ariel","Marina","Coral","Pearl"]],
+    ["In Pirates of the Caribbean, who plays Elizabeth Swann?", ["Keira Knightley","Natalie Portman","Kate Winslet","Emma Watson"]],
+    ["Geena Davis starred as a pirate captain in which 1995 film?", ["Cutthroat Island","Swashbuckler","Pirates","The Crimson Pirate"]]
+  ],
+  "Tampa & Ybor": [
+    ["Ybor City was founded in 1886 by which cigar maker?", ["Vicente Martinez Ybor","Ignacio Haya","José Martí","Henry Plant"]],
+    ["What industry made Ybor City famous?", ["Cigar making","Shipbuilding","Citrus packing","Phosphate mining"]],
+    ["The Gasparilla Pirate Festival is named after which legendary pirate?", ["José Gaspar","Jean Lafitte","Blackbeard","Black Caesar"]],
+    ["In what year was the first Gasparilla celebration held?", ["1904","1886","1925","1950"]],
+    ["Which Ybor restaurant, founded in 1905, is the oldest in Florida?", ["The Columbia Restaurant","La Segunda","Carmine's","King Corona"]],
+    ["What ingredient makes a Tampa-style Cuban sandwich different?", ["Genoa salami","Turkey","Chorizo","Bacon"]],
+    ["What famous birds roam freely through Ybor City's streets?", ["Chickens","Peacocks","Parrots","Flamingos"]],
+    ["What was the job of el lector in Ybor's cigar factories?", ["Read aloud to the workers","Inspect the tobacco","Count the cigars","Ring the shift bell"]],
+    ["Which krewe leads the famous pirate ship invasion of Tampa?", ["Ye Mystic Krewe of Gasparilla","Krewe of Rex","Krewe of Zulu","Krewe of the Grotto"]],
+    ["What sits in the end zone at Raymond James Stadium?", ["A full-size pirate ship","A giant cigar","A lighthouse","A treasure chest"]],
+    ["The Buccaneers won Super Bowl LV in their home stadium. In what year?", ["2021","2003","2019","2023"]],
+    ["Which Cuban independence leader gave speeches in Ybor City in the 1890s?", ["José Martí","Fidel Castro","Antonio Maceo","Carlos Manuel de Céspedes"]],
+    ["What connects downtown Tampa to Ybor City on rails?", ["The TECO Line Streetcar","The SunRail","The Brightline","A monorail"]],
+    ["La Segunda Central Bakery, opened in 1915, is famous for what?", ["Cuban bread","Key lime pie","Croissants","Bagels"]],
+    ["Ybor City became a National Historic Landmark District in what year?", ["1990","1950","1975","2005"]]
+  ],
+  "General": [
+    ["Which is the largest ocean on Earth?", ["Pacific","Atlantic","Indian","Arctic"]],
+    ["Facing the front of a ship, which side is port?", ["Left","Right","Back","Front"]],
+    ["A ship's speed in knots means nautical miles per…", ["Hour","Minute","Day","Tide"]],
+    ["What is a ship's kitchen called?", ["The galley","The brig","The hold","The bilge"]],
+    ["What is the lookout platform high on the mast called?", ["The crow's nest","The poop deck","The yardarm","The gangway"]],
+    ["What is the chemical symbol for gold?", ["Au","Ag","Gd","Go"]],
+    ["Rum is traditionally made from what?", ["Sugarcane or molasses","Potatoes","Barley","Agave"]],
+    ["A fathom, used to measure water depth, equals how many feet?", ["6","3","10","12"]],
+    ["What is the back of a ship called?", ["The stern","The bow","The keel","The hull"]],
+    ["Which direction does a compass needle point?", ["Magnetic north","True south","East","Toward gold"]],
+    ["What is the ship's jail called?", ["The brig","The galley","The hold","The cabin"]],
+    ["Which bird is famous for mimicking human speech?", ["Parrot","Seagull","Pelican","Albatross"]],
+    ["How many arms does an octopus have?", ["8","6","10","12"]],
+    ["Which is the saltiest major body of water open to swimmers?", ["The Dead Sea","The Red Sea","The Caribbean","Lake Superior"]],
+    ["What do you call the front of a ship?", ["The bow","The stern","The mast","The rudder"]]
+  ]
+};
+const BLURB = {"Pirates":"Golden Age legends","Movies":"Swashbucklers & sea films","Tampa & Ybor":"Our home port","General":"Seafaring & beyond","Mixed Bag":"A bit of everything"};
+const RIGHT = ["Brains and good looks? Ye're dangerous, matey.","Aye! Pippy approves.","Smooth sailin', gorgeous.","Pops is purring for ye.","That's the treasure!","Ye've got a sharp eye and a sharper mind."];
+const WRONG = ["Ye walked the plank on that one.","Arr, close but no doubloons.","Pops knocked that one off the bar.","Shiver me timbers, not quite."];
+const TIMEUP = "The hourglass ran dry!";
+const QTIME = 20, ROUNDS = 10;
+
+const $ = id => document.getElementById(id);
+const shuffle = a => { a = a.slice(); for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem(k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+
+let cat, qs, i, pts, correct, timer, t0, log;
+
+function show(id){ ["menu","game","end"].forEach(s => $(s).hidden = s !== id); window.scrollTo(0,0); }
+
+function renderMenu(){
+  const best = store.get("poy-best") || {};
+  $("cats").innerHTML = "";
+  [...Object.keys(BANK), "Mixed Bag"].forEach(name => {
+    const b = document.createElement("button");
+    b.className = "cat";
+    b.innerHTML = `<b>${name}</b><small>${BLURB[name]}</small><span class="best">${best[name] ? "Best: " + best[name] + " doubloons" : "No score yet"}</span>`;
+    b.onclick = () => start(name);
+    $("cats").appendChild(b);
+  });
+  show("menu");
+}
+
+function start(name){
+  cat = name;
+  const pool = name === "Mixed Bag" ? Object.values(BANK).flat() : BANK[name];
+  qs = shuffle(pool).slice(0, ROUNDS).map(([q, opts]) => ({ q, answer: opts[0], opts: shuffle(opts) }));
+  i = 0; pts = 0; correct = 0; log = [];
+  $("catname").textContent = name;
+  show("game");
+  ask();
+}
+
+function ask(){
+  const cur = qs[i];
+  $("qnum").textContent = `Question ${i+1} of ${ROUNDS}`;
+  $("pts").textContent = pts;
+  $("qtext").textContent = cur.q;
+  $("fb").textContent = "";
+  $("next").hidden = true;
+  $("answers").innerHTML = "";
+  cur.opts.forEach((o, n) => {
+    const b = document.createElement("button");
+    b.className = "ans";
+    b.innerHTML = `<span class="k">${"ABCD"[n]}</span><span></span>`;
+    b.lastChild.textContent = o;
+    b.onclick = () => choose(b, o);
+    $("answers").appendChild(b);
+  });
+  t0 = performance.now();
+  clearInterval(timer);
+  timer = setInterval(tick, 100);
+  tick();
+  $("answers").firstChild.focus({preventScroll:true});
+}
+
+function tick(){
+  const left = Math.max(0, QTIME - (performance.now() - t0) / 1000);
+  const bar = $("bar");
+  bar.style.transform = `scaleX(${left / QTIME})`;
+  bar.style.background = left < 5 ? "var(--wrong)" : "var(--gold)";
+  if (left <= 0) choose(null, null);
+}
+
+function choose(btn, val){
+  clearInterval(timer);
+  const cur = qs[i];
+  const left = Math.max(0, QTIME - (performance.now() - t0) / 1000);
+  const ok = val === cur.answer;
+  [...$("answers").children].forEach(b => {
+    b.disabled = true;
+    if (b.lastChild.textContent === cur.answer) b.classList.add("right");
+  });
+  if (btn && !ok) btn.classList.add("wrong");
+  if (ok){ const gain = 100 + Math.round(left * 5); pts += gain; correct++; $("fb").textContent = `${pick(RIGHT)} +${gain}`; }
+  else $("fb").textContent = val === null ? `${TIMEUP} It was: ${cur.answer}` : `${pick(WRONG)} It was: ${cur.answer}`;
+  log.push({ q: cur.q, answer: cur.answer, ok });
+  $("pts").textContent = pts;
+  $("next").textContent = i === ROUNDS - 1 ? "See my score" : "Next question";
+  $("next").hidden = false;
+  $("next").focus({preventScroll:true});
+}
+
+function finish(){
+  const best = store.get("poy-best") || {};
+  const isBest = !best[cat] || pts > best[cat];
+  if (isBest){ best[cat] = pts; store.set("poy-best", best); }
+  $("final").textContent = pts;
+  $("correct").textContent = `${correct} of ${ROUNDS}`;
+  const s = correct >= 9 ? 3 : correct >= 6 ? 2 : correct >= 3 ? 1 : 0;
+  $("stars").textContent = "★".repeat(s) + "☆".repeat(3 - s);
+  $("endtitle").textContent = s === 3 ? "Captain material!" : s === 2 ? "Fine first mate!" : s === 1 ? "Deckhand in training" : "Swab the deck and try again";
+  $("endmsg").textContent = isBest ? "New best score for " + cat + "!" : "Your best in " + cat + ": " + best[cat];
+  $("review").innerHTML = "";
+  log.forEach((r, n) => {
+    const d = document.createElement("div");
+    d.className = r.ok ? "ok" : "no";
+    d.innerHTML = `<strong>${n+1}.</strong> <span></span><br><strong></strong>`;
+    d.children[1].textContent = r.q;
+    d.children[3].textContent = (r.ok ? "✓ " : "✗ ") + r.answer;
+    $("review").appendChild(d);
+  });
+  show("end");
+  $("again").focus({preventScroll:true});
+}
+
+$("next").onclick = () => { i++; i < ROUNDS ? ask() : finish(); };
+$("again").onclick = () => start(cat);
+$("tomenu").onclick = renderMenu;
+document.addEventListener("keydown", e => {
+  if ($("game").hidden) return;
+  const k = "abcd".indexOf(e.key.toLowerCase());
+  const btns = [...$("answers").children];
+  if (k >= 0 && btns[k] && !btns[k].disabled) btns[k].click();
+});
+renderMenu();
+</script>
+
+</body></html>

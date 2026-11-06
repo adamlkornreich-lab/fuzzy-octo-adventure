@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pirates of Ybor</title>
+<style>
+:root{--bg:#0b1a24;--card:#12303f;--ink:#f4ead2;--mut:#a9b8bd;--gold:#e8b647;--red:#c8442f;--ln:#24566b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6efdc;--card:#fffaf0;--ink:#1d2b33;--mut:#5b6b72;--gold:#a9720b;--red:#b0361f;--ln:#d9c9a0}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Georgia,serif}
+header{padding:2.5rem 1rem 1.5rem;text-align:center}h1{margin:0;font-size:clamp(2rem,7vw,3.5rem);color:var(--gold)}
+.sub{color:var(--mut);max-width:34rem;margin:.5rem auto}
+nav{display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;padding:0 1rem}
+button,.btn{background:var(--gold);color:#1d1405;border:0;border-radius:8px;padding:.6rem 1rem;font:inherit;font-weight:bold;cursor:pointer}
+button.alt{background:transparent;color:var(--ink);border:1px solid var(--ln)}
+main{max-width:56rem;margin:0 auto;padding:1rem}
+section{background:var(--card);border:1px solid var(--ln);border-radius:12px;padding:1.2rem;margin:1rem 0}
+h2{margin:.2rem 0 .8rem;color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(10rem,1fr));gap:.7rem}
+.tile{border:1px solid var(--ln);border-radius:10px;padding:.8rem;text-align:center}.tile b{display:block}.tile small{color:var(--mut)}
+.tile.live{border-color:var(--gold)}
+#opts button{display:block;width:100%;margin:.4rem 0;text-align:left;background:transparent;color:var(--ink);border:1px solid var(--ln)}
+#opts button.ok{background:#2d7a4b;color:#fff}#opts button.bad{background:var(--red);color:#fff}
+#tg{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;max-width:22rem}
+#tg button{aspect-ratio:1;padding:0;background:var(--ln);color:var(--ink);font-size:1.3rem}
+.bar{height:1.4rem;background:var(--ln);border-radius:8px;position:relative;margin:.8rem 0;overflow:hidden}
+#pin{position:absolute;top:0;width:6px;height:100%;background:var(--gold)}#zone{position:absolute;top:0;left:42%;width:16%;height:100%;background:#2d7a4b99}
+.row{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+footer{text-align:center;color:var(--mut);padding:2rem 1rem;font-size:.9rem}
+a{color:var(--gold)}
+</style></head><body>
+<header>
+<h1>☠ Pirates of Ybor</h1>
+<p class="sub">One crew, every game. Trivia, treasure hunts, darts and tavern games, themed on Gaspar’s Grotto with Pops &amp; Pippy at the helm.</p>
+<nav><button onclick="go('games')">Play free demo</button><button class="alt" onclick="go('platforms')">Get the app</button><button class="alt" onclick="go('support')">Support</button></nav>
+</header>
+<main>
+<section id="games"><h2>Tavern Games</h2>
+<div class="grid">
+<div class="tile live"><b>Pirate Trivia</b><small>Playable below</small></div>
+<div class="tile live"><b>Treasure Hunt</b><small>Playable below</small></div>
+<div class="tile live"><b>Cannon Darts</b><small>Playable below</small></div>
+<div class="tile"><b>Pirate Chess</b><small>vs AI &amp; 2 player · soon</small></div>
+<div class="tile"><b>Checkers</b><small>soon</small></div>
+<div class="tile"><b>Beer Pong</b><small>soon</small></div>
+<div class="tile"><b>Ping Pong</b><small>soon</small></div>
+<div class="tile"><b>Bowling</b><small>soon</small></div>
+<div class="tile"><b>Shuffleboard</b><small>soon</small></div>
+<div class="tile"><b>Find-It Hunt</b><small>soon</small></div>
+<div class="tile"><b>Swashbuckling</b><small>soon</small></div>
+<div class="tile"><b>Bar Tournament</b><small>soon</small></div>
+</div></section>
+
+<section id="trivia"><h2>Pirate Trivia</h2>
+<div class="row"><select id="cat" aria-label="Category" onchange="startQ()"><option value="all">All categories</option><option>Movies</option><option>Florida Pirate Trail</option><option>Pirate Lore</option></select><span id="score"></span></div>
+<h3 id="q"></h3><div id="opts"></div><div class="row"><button id="nx" class="alt" onclick="nextQ()">Next</button></div></section>
+
+<section id="treasure"><h2>Treasure Hunt</h2>
+<p id="th" class="sub" style="margin:0 0 .6rem">Find the hidden chest. Fewer digs, bigger glory.</p>
+<div id="tg"></div><p><button class="alt" onclick="newMap()">New map</button></p></section>
+
+<section id="darts"><h2>Cannon Darts</h2>
+<p class="sub" style="margin:0">Tap Fire when the marker is in the green zone. Five shots.</p>
+<div class="bar"><div id="zone"></div><div id="pin"></div></div>
+<div class="row"><button onclick="fire()">Fire!</button><span id="ds">Score 0 · Shots left 5</span></div></section>
+
+<section id="platforms"><h2>All Platforms</h2>
+<p>This site runs in any browser on phone, tablet and desktop. Native versions are on the way.</p>
+<div class="row"><button class="alt" disabled>Apple App Store · soon</button><button class="alt" disabled>Google Play · soon</button><button class="alt" disabled>Samsung Galaxy Store · soon</button></div>
+<p class="sub" style="margin:.8rem 0 0">Sign in with Google, Apple, Samsung, Facebook or TikTok, and pay with tap-to-pay (Apple Pay or Google Pay) through the app stores. These connect once the apps ship. Try-first demo is always free.</p></section>
+
+<section id="credits"><h2>Credits</h2>
+<p>With thanks to Captain Shiller and Co-Navigator Shere and their family; Mark Brenner; Ed Lafferty; Ruben and Rene Alvarez and their whole family; Amber Kornreich; and Atara 👑. Inspired by Pops the world-famous bar cat and Tanker Ray.</p></section>
+
+<section id="support"><h2>Support &amp; Copyright</h2>
+<p>Questions, permissions or copyright concerns: <a href="mailto:adamlkornreich@gmail.com">adamlkornreich@gmail.com</a>.</p>
+<p>Movie, brand and celebrity names are used for trivia and commentary only. They belong to their owners and imply no endorsement.</p></section>
+</main>
+<footer>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.</footer>
+<script>
+function go(id){document.getElementById(id).scrollIntoView({behavior:'smooth'})}
+var Q=[
+["Movies","Which film features Captain Jack Sparrow?",["Pirates of the Caribbean","Hook","Cutthroat Island"],0],
+["Movies","Which classic novel gave us Long John Silver?",["Treasure Island","Moby-Dick","Peter Pan"],0],
+["Movies","What is Jack Sparrow’s ship called?",["The Black Pearl","The Hispaniola","The Jolly Roger"],0],
+["Florida Pirate Trail","Which Tampa festival celebrates legendary pirate José Gaspar?",["Gasparilla","Mardi Gras","Fiesta Day"],0],
+["Florida Pirate Trail","Ybor City, Tampa is historically famous for which industry?",["Cigars","Citrus","Shipbuilding"],0],
+["Florida Pirate Trail","Apollo Beach is well known for which winter wildlife viewing?",["Manatees","Flamingos","Sea turtles hatching"],0],
+["Florida Pirate Trail","Which Orlando-area park has a famous pirate ride?",["Magic Kingdom","Busch Gardens","Legoland"],0],
+["Pirate Lore","What flag do pirates traditionally fly?",["Jolly Roger","Union Jack","Blue Ensign"],0],
+["Pirate Lore","What do pirates traditionally bury?",["Treasure","Cannons","Maps"],0],
+["Pirate Lore","Which famous pirate was nicknamed Blackbeard?",["Edward Teach","Henry Morgan","Calico Jack"],0]];
+var pool,qi,sc,done;
+function sh(a){return a.slice().sort(function(){return Math.random()-.5})}
+function startQ(){var c=document.getElementById('cat').value;pool=sh(Q.filter(function(x){return c=='all'||x[0]==c}));qi=-1;sc=0;nextQ()}
+function nextQ(){qi++;var o=document.getElementById('opts');if(qi>=pool.length){document.getElementById('q').textContent='Round over! '+sc+' of '+pool.length+' right.';o.innerHTML='';document.getElementById('nx').textContent='Play again';qi=-2;pool=sh(pool);if(qi==-2)qi=-1;sc=0;return}
+document.getElementById('nx').textContent='Next';var x=pool[qi];document.getElementById('q').textContent=x[1];o.innerHTML='';
+sh(x[2].map(function(t,i){return[t,i]})).forEach(function(p){var b=document.createElement('button');b.textContent=p[0];b.onclick=function(){if(o.dataset.d==qi)return;o.dataset.d=qi;if(p[1]==x[3]){sc++;b.className='ok'}else{b.className='bad';[].forEach.call(o.children,function(e){if(e.textContent==x[2][x[3]])e.className='ok'})}document.getElementById('score').textContent='Score '+sc};o.appendChild(b)})}
+var chest,digs;
+function newMap(){var g=document.getElementById('tg');g.innerHTML='';chest=Math.floor(Math.random()*36);digs=0;document.getElementById('th').textContent='Find the hidden chest. Fewer digs, bigger glory.';
+for(var i=0;i<36;i++){(function(i){var b=document.createElement('button');b.textContent='🌴';b.setAttribute('aria-label','Dig spot '+(i+1));b.onclick=function(){if(b.disabled||digs<0)return;digs++;var r=Math.abs(i%6-chest%6)+Math.abs(Math.floor(i/6)-Math.floor(chest/6));if(i==chest){b.textContent='💰';document.getElementById('th').textContent='Chest found in '+digs+' digs! Arr!';digs=-1}else{b.textContent=r<2?'🔥':r<4?'🌤':'❄';b.disabled=true;document.getElementById('th').textContent='Dig '+digs+': 🔥 hot, 🌤 warm, ❄ cold'}};g.appendChild(b)})(i)}}
+var pos=0,dir=1,shots,ds;
+function resetD(){shots=5;ds=0;upd()}function upd(){document.getElementById('ds').textContent='Score '+ds+' · Shots left '+shots}
+setInterval(function(){pos+=dir*2.2;if(pos>=100||pos<=0)dir=-dir;document.getElementById('pin').style.left=pos+'%'},16);
+function fire(){if(shots<=0){resetD();return}var d=Math.abs(pos-50);ds+=d<8?100:d<20?50:d<35?20:0;shots--;upd();if(shots==0)document.getElementById('ds').textContent+=' · Final! Tap Fire to replay'}
+startQ();newMap();resetD();
+</script></body></html>

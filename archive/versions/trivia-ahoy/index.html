@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pirates of Ybor – Trivia Ahoy!</title>
+<style>
+:root{--bg:#1a0f08;--panel:#2b1a0e;--ink:#f6e7c1;--gold:#e0a82e;--red:#b3261e;--sea:#0f5c73;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f3e2b8;--panel:#fff4d6;--ink:#2b1a0e}}
+:root[data-theme="dark"]{--bg:#1a0f08;--panel:#2b1a0e;--ink:#f6e7c1}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif;line-height:1.5}
+header{background:linear-gradient(var(--sea),var(--bg));text-align:center;padding:28px 16px 8px}
+h1{font-size:clamp(2rem,7vw,3.4rem);margin:8px 0;color:var(--gold);text-shadow:2px 2px 0 #000}
+.tag{opacity:.9;font-style:italic}
+main{max-width:760px;margin:auto;padding:16px}
+.card{background:var(--panel);border:2px solid var(--gold);border-radius:14px;padding:18px;margin:16px 0}
+button{font:inherit;cursor:pointer;border:2px solid var(--gold);background:var(--red);color:#fff;padding:12px 18px;border-radius:10px;margin:5px 5px 5px 0;font-weight:bold}
+button:hover{filter:brightness(1.15)}
+button.alt{background:var(--sea)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.opts button{display:block;width:100%;text-align:left;background:var(--panel);color:var(--ink)}
+.opts button.ok{background:#1f7a3a;color:#fff}.opts button.bad{background:#7a1f1f;color:#fff}
+.cats{display:flex;flex-wrap:wrap}
+.hide{display:none}
+footer{text-align:center;font-size:.85rem;padding:20px 16px;opacity:.9}
+.tryban{color:var(--gold);font-weight:bold}
+</style></head>
+<body>
+<header>
+<svg viewBox="0 0 200 120" width="190" role="img" aria-label="Pirate ship"><path d="M20 80h160l-20 28H40z" fill="#6b3d1a" stroke="#e0a82e" stroke-width="3"/><rect x="98" y="14" width="5" height="68" fill="#e0a82e"/><path d="M103 18l50 22-50 24z" fill="#f6e7c1" stroke="#000"/><path d="M98 18L56 38l42 22z" fill="#f6e7c1" stroke="#000"/><circle cx="125" cy="40" r="6" fill="#000"/><path d="M0 112q25-12 50 0t50 0 50 0 50 0v8H0z" fill="#0f5c73"/></svg>
+<h1>☠ Pirates of Ybor ☠</h1>
+<div class="tag">Trivia, treasure &amp; mischief with Pops &amp; Pippy</div>
+</header>
+<main>
+<section class="card" id="home">
+<p class="tryban">⚓ Try first – no sign-up, no card. Answer 5 free questions!</p>
+<div class="cats" id="cats"></div>
+<p style="font-size:.9rem">Love Ahoy is cheeky, PG-13 fun – flirty, never explicit. Players must be 17+ for that deck.</p>
+</section>
+<section class="card hide" id="quiz">
+<div id="meta"></div><h2 id="q"></h2><div class="opts" id="opts"></div>
+<p id="fb"></p><button id="next" class="alt hide">Next, matey ➜</button>
+</section>
+<section class="card hide" id="end">
+<h2 id="score"></h2>
+<p>Liked the free taste? Full game with Treasure Hunt, Pirate Chess and fresh AI-made questions is coming to the Apple App Store and Google Play.</p>
+<button id="again">Sail again</button>
+<button class="alt" disabled title="Coming soon">Sign in (Google, Apple, Samsung, Facebook, TikTok) – soon</button>
+</section>
+<section class="card">
+<h2>Credits</h2>
+<p>With heartfelt thanks to <b>Captain Shiller</b> and <b>Co-Navigator Shere</b> and their whole family – the crew behind this voyage. Mascots: Pops &amp; Pippy the cats. Created by Adam Kornreich, R.A. Consulting.</p>
+<p>Copyright or permissions questions: <a style="color:var(--gold)" href="mailto:adamlkornreich@gmail.com">adamlkornreich@gmail.com</a></p>
+</section>
+</main>
+<footer>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.<br>All third-party names, films and brands are the property of their owners and are used for trivia only.</footer>
+<script>
+const D={
+"Pirates":[["Which pirate was known as Blackbeard?","Edward Teach",["Edward Teach","Henry Morgan","Jack Rackham","Bartholomew Roberts"]],["What flag symbol means pirates?","Jolly Roger",["Jolly Roger","Union Jack","Black Pearl","Red Ensign"]],["Which female pirate sailed with Calico Jack?","Anne Bonny",["Anne Bonny","Grace O’Malley","Ching Shih","Mary Read"]],["Pirates often sought what to cure scurvy?","Citrus fruit",["Citrus fruit","Rum","Salt","Tobacco"]],["Which Tampa festival features a pirate invasion?","Gasparilla",["Gasparilla","Mardi Gras","Fiesta","Carnival"]]],
+"Movies":[["Who played Captain Jack Sparrow?","Johnny Depp",["Johnny Depp","Brad Pitt","Orlando Bloom","Tom Cruise"]],["Which film features the ship the Black Pearl?","Pirates of the Caribbean",["Pirates of the Caribbean","Hook","Titanic","Waterworld"]],["In Titanic, which jewel is Rose’s?","Heart of the Ocean",["Heart of the Ocean","Hope Diamond","Star of India","Black Orlov"]],["Who directed Jaws?","Steven Spielberg",["Steven Spielberg","James Cameron","Ridley Scott","George Lucas"]],["Which film has the line “I’ll be back”?","The Terminator",["The Terminator","Rocky","Alien","Die Hard"]]],
+"Ybor & Tampa":[["Ybor City is famous for making what?","Cigars",["Cigars","Rum","Sugar","Furniture"]],["What is Tampa’s NFL team?","Buccaneers",["Buccaneers","Dolphins","Jaguars","Saints"]],["Which bay is Tampa on?","Tampa Bay",["Tampa Bay","Biscayne Bay","Mobile Bay","Chesapeake Bay"]],["What animal roam Ybor’s streets freely?","Chickens",["Chickens","Goats","Peacocks","Geese"]],["Which sandwich is a Tampa classic?","Cuban sandwich",["Cuban sandwich","Reuben","Po’ boy","Philly cheesesteak"]]],
+"Science & Sea":[["What is the largest ocean?","Pacific",["Pacific","Atlantic","Indian","Arctic"]],["How many hearts does an octopus have?","Three",["Three","One","Two","Eight"]],["What force pulls the tides?","The Moon’s gravity",["The Moon’s gravity","Wind","Sun’s heat","Whales"]],["Which planet is the Red Planet?","Mars",["Mars","Venus","Jupiter","Mercury"]],["What do sailors use to find north?","Compass",["Compass","Sextant only","Barometer","Anchor"]]],
+"Love Ahoy (17+)":[["Which famous couple sailed the movie ship in Titanic’s ‘I’m flying’ scene?","Jack and Rose",["Jack and Rose","Romeo and Juliet","Anthony and Cleopatra","Tristan and Isolde"]],["What flower says ‘I love you’ on Valentine’s Day?","Red rose",["Red rose","Daisy","Tulip","Sunflower"]],["Which mythological goddess of love was born from sea foam?","Aphrodite",["Aphrodite","Athena","Hera","Artemis"]],["Which pirate captain flirts with Elizabeth Swann’s fiancé’s heart in the films?","Jack Sparrow",["Jack Sparrow","Barbossa","Davy Jones","Will Turner"]],["What do you call a kiss on the hand to a lady, pirate style?","A gallant bow and a kiss on the hand",["A gallant bow and a kiss on the hand","A cannon blast","A plank walk","A mutiny"]]]
+};
+const $=i=>document.getElementById(i);let set=[],i=0,s=0,cat="";
+const sh=a=>a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1]);
+function home(){$("home").classList.remove("hide");$("quiz").classList.add("hide");$("end").classList.add("hide")}
+Object.keys(D).forEach(c=>{const b=document.createElement("button");b.textContent=c;b.onclick=()=>start(c);$("cats").appendChild(b)});
+function start(c){cat=c;set=sh(D[c]);i=0;s=0;$("home").classList.add("hide");$("quiz").classList.remove("hide");show()}
+function show(){const q=set[i];$("meta").textContent=cat+" · Free question "+(i+1)+" of "+set.length;$("q").textContent=q[0];$("fb").textContent="";$("next").classList.add("hide");const o=$("opts");o.innerHTML="";
+sh(q[2]).forEach(t=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>pick(b,t,q[1]);o.appendChild(b)})}
+function pick(b,t,a){document.querySelectorAll("#opts button").forEach(x=>{x.disabled=true;if(x.textContent===a)x.classList.add("ok")});
+if(t===a){s++;$("fb").textContent="Aye, ye got it! 🏴‍☠️"}else{b.classList.add("bad");$("fb").textContent="Arr, the answer be: "+a}
+$("next").classList.remove("hide")}
+$("next").onclick=()=>{i++;if(i<set.length)show();else{$("quiz").classList.add("hide");$("end").classList.remove("hide");$("score").textContent="Ye scored "+s+" of "+set.length+"!"}};
+$("again").onclick=home;
+</script></body></html>

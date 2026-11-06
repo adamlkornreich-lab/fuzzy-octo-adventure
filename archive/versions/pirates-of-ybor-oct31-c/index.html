@@ -1,0 +1,530 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Pirates of Ybor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Alegreya+Sans:wght@400;500;700;800&family=Alegreya+Sans+SC:wght@700&display=swap">
+<style>
+/* Layout: a ship's deck — brass-rimmed home port of game "berths", each opening into a full deck view; one shared doubloon chest ties every game together. Single deliberate night-at-sea look. */
+:root{
+  --sea:#0b1626; --hull:#132338; --plank:#1b3150; --rope:#2a4466;
+  --brass:#e2b453; --brass-d:#a9822f; --parch:#f2e6c9; --ink:#e9eef6; --mute:#95a7c1;
+  --rum:#c2463a; --kelp:#4fb08a;
+  --display:"Pirata One","Luminari",Georgia,serif;
+  --body:"Alegreya Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --sc:"Alegreya Sans SC","Alegreya Sans",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{background:var(--sea);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,#1d3a63 0,transparent 70%),
+  repeating-linear-gradient(90deg,transparent 0 119px,rgba(255,255,255,.018) 119px 120px);}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 120px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px}
+.brand h1{font-family:var(--display);font-weight:400;font-size:clamp(2rem,6vw,3.2rem);line-height:1;margin:0;color:var(--brass);letter-spacing:.01em;text-shadow:0 2px 0 #00000080}
+.brand small{display:block;font-family:var(--sc);color:var(--mute);letter-spacing:.14em;font-size:.72rem;text-transform:uppercase}
+.chest{display:flex;align-items:center;gap:8px;background:var(--hull);border:1px solid var(--brass-d);border-radius:999px;padding:6px 14px 6px 8px;font-variant-numeric:tabular-nums;font-weight:800}
+.coin{width:24px;height:24px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3c4,var(--brass) 45%,var(--brass-d));box-shadow:inset 0 0 0 2px #7a5a1c55;display:inline-block}
+.hero{margin:28px 0 18px;display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:center}
+.hero p.lede{font-size:1.15rem;max-width:58ch;color:var(--parch);margin:0 0 10px}
+.hero .meta{color:var(--mute);font-size:.92rem}
+.hero .badge{justify-self:center}
+.berths{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:10px}
+.berth{appearance:none;text-align:left;cursor:pointer;color:inherit;font:inherit;background:linear-gradient(180deg,var(--plank),var(--hull));border:1px solid var(--rope);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:6px;min-height:150px;position:relative;transition:transform .15s,border-color .15s}
+.berth:hover,.berth:focus-visible{transform:translateY(-3px);border-color:var(--brass);outline:none}
+.berth .ico{font-family:var(--display);font-size:2.2rem;color:var(--brass);line-height:1}
+.berth h3{margin:0;font-family:var(--display);font-weight:400;font-size:1.6rem;color:var(--parch);line-height:1.1}
+.berth p{margin:0;color:var(--mute);font-size:.95rem}
+.berth .modes{margin-top:auto;font-family:var(--sc);font-size:.72rem;letter-spacing:.12em;color:var(--brass);text-transform:uppercase}
+h2.sec{font-family:var(--display);font-weight:400;color:var(--brass);font-size:2rem;margin:36px 0 8px}
+.log{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.port{border-top:2px solid var(--rope);padding-top:10px}
+.port b{display:block;font-family:var(--sc);letter-spacing:.1em;font-size:.78rem;color:var(--parch);text-transform:uppercase}
+.port span{color:var(--mute);font-size:.9rem}
+.pill{display:inline-block;font-size:.72rem;font-weight:800;padding:2px 8px;border-radius:999px;margin-top:4px}
+.pill.go{background:#4fb08a26;color:var(--kelp)}.pill.wait{background:#e2b45326;color:var(--brass)}
+/* deck (game view) */
+.deck{display:none}
+.deck.on{display:block}
+.deckbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:18px 0;flex-wrap:wrap}
+.deckbar h2{margin:0;font-family:var(--display);font-weight:400;font-size:2.2rem;color:var(--brass)}
+.btn{appearance:none;font:inherit;font-weight:800;cursor:pointer;border-radius:6px;padding:10px 16px;border:1px solid var(--brass-d);background:var(--hull);color:var(--parch)}
+.btn:hover,.btn:focus-visible{border-color:var(--brass);outline:none;color:#fff}
+.btn.gold{background:var(--brass);color:#2a1d05;border-color:var(--brass)}
+.btn.gold:hover{background:#f0c766;color:#2a1d05}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.panel{background:var(--hull);border:1px solid var(--rope);border-radius:8px;padding:16px}
+.status{font-weight:700;color:var(--parch);min-height:1.5em}
+canvas{display:block;max-width:100%;border-radius:8px;border:1px solid var(--rope);touch-action:manipulation}
+/* trivia */
+.q{font-size:1.25rem;font-weight:700;color:var(--parch);margin:8px 0 14px;text-wrap:balance}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{text-align:left}
+.opt.right{background:#4fb08a33;border-color:var(--kelp)}.opt.wrong{background:#c2463a33;border-color:var(--rum)}
+.cat{font-family:var(--sc);letter-spacing:.12em;color:var(--brass);font-size:.75rem;text-transform:uppercase}
+/* chess */
+.board{display:grid;grid-template-columns:repeat(8,1fr);width:min(100%,480px);aspect-ratio:1;border:3px solid var(--brass-d);border-radius:4px;overflow:hidden;max-width:100%}
+.sq{display:flex;align-items:center;justify-content:center;font-size:clamp(1.4rem,6.5vw,2.6rem);cursor:pointer;user-select:none;line-height:1;border:0;padding:0;font-family:"Segoe UI Symbol","Noto Sans Symbols 2",serif}
+.sq.l{background:#e7d3a8}.sq.d{background:#8a6a3f}
+.sq.sel{box-shadow:inset 0 0 0 4px var(--rum)}.sq.mv{box-shadow:inset 0 0 0 4px var(--kelp)}
+.pw{color:#fffaf0;text-shadow:0 0 2px #000,0 0 2px #000}.pb{color:#1a1a1a;text-shadow:0 0 1px #fff8}
+/* treasure */
+.grid6{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;width:min(100%,420px)}
+.cell{aspect-ratio:1;border-radius:4px;border:1px solid #c9a96e;background:#e9d7ad;color:#3b2a10;font-weight:800;font-size:1rem;cursor:pointer}
+.cell.dug{background:#7a5f38;color:var(--parch);cursor:default}
+.cell.gold{background:var(--brass);color:#2a1d05}
+/* duel */
+.bars{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.hp{height:14px;background:#00000055;border-radius:7px;overflow:hidden;border:1px solid var(--rope)}
+.hp i{display:block;height:100%;background:var(--kelp);transition:width .25s}
+.hp.foe i{background:var(--rum)}
+.tele{font-family:var(--display);font-size:2rem;color:var(--parch);text-align:center;min-height:2.6rem}
+/* watermark */
+.wm{position:fixed;right:calc(10px + env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:20;pointer-events:none;opacity:.88}
+.wm svg{width:92px;height:92px;filter:drop-shadow(0 4px 10px #0009)}
+.spark{animation:tw 2.4s infinite ease-in-out;transform-origin:center;transform-box:fill-box}
+.spark:nth-of-type(2){animation-delay:.8s}.spark:nth-of-type(3){animation-delay:1.6s}
+@keyframes tw{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1.15)}}
+footer.copy{margin-top:40px;padding-top:14px;border-top:1px solid var(--rope);color:var(--mute);font-size:.88rem;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+footer.copy b{color:var(--parch)}
+@media (max-width:760px){.hero{grid-template-columns:1fr}.hero .badge{display:none}.berths{grid-template-columns:repeat(2,minmax(0,1fr))}.log{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:440px){.berths{grid-template-columns:1fr}.opts{grid-template-columns:1fr}.berth{min-height:0}}
+@media (prefers-reduced-motion:reduce){.spark{animation:none}.berth{transition:none}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="popsPippy" viewBox="0 0 120 120">
+      <circle cx="60" cy="60" r="57" fill="#132338" stroke="#e2b453" stroke-width="3"/>
+      <circle cx="60" cy="60" r="50" fill="none" stroke="#a9822f" stroke-width="1" stroke-dasharray="3 3"/>
+      <!-- Pops: bar cat in tricorn with eyepatch -->
+      <path d="M22 70 L26 44 L36 54 L46 44 L50 70 Z" fill="#6b6f78"/>
+      <ellipse cx="36" cy="70" rx="17" ry="15" fill="#6b6f78"/>
+      <path d="M17 50 Q36 30 55 50 Q36 44 17 50Z" fill="#1a1a1a"/>
+      <circle cx="36" cy="42" r="3" fill="#e2b453"/>
+      <rect x="25" y="64" width="9" height="6" rx="2" fill="#1a1a1a"/><path d="M22 63 L50 60" stroke="#1a1a1a" stroke-width="1.4"/>
+      <circle cx="43" cy="67" r="2.6" fill="#f3d36b"/><circle cx="43" cy="67" r="1.2" fill="#111"/>
+      <path d="M33 75 l3 2 l3 -2" stroke="#2b2b2b" stroke-width="1.4" fill="none"/>
+      <!-- Pippy: chihuahua in red bandana -->
+      <path d="M64 52 L70 72 L78 64 Z" fill="#d9a46b"/><path d="M98 52 L92 72 L84 64 Z" fill="#d9a46b"/>
+      <ellipse cx="81" cy="76" rx="14" ry="13" fill="#e6b47a"/>
+      <path d="M66 68 Q81 56 96 68 Q81 64 66 68Z" fill="#c2463a"/>
+      <circle cx="76" cy="76" r="2.4" fill="#111"/><circle cx="86" cy="76" r="2.4" fill="#111"/>
+      <ellipse cx="81" cy="83" rx="3" ry="2" fill="#3a2414"/>
+      <!-- banner -->
+      <path d="M18 92 H102 L96 100 L102 108 H18 L24 100 Z" fill="#e2b453"/>
+      <text x="60" y="104" text-anchor="middle" font-family="Pirata One, Georgia, serif" font-size="11" fill="#2a1d05">Pops &amp; Pippy</text>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div>
+        <h1>Pirates of Ybor</h1>
+        <small>Gaspar's Grotto Arcade · Welcome aboard</small>
+      </div>
+    </div>
+    <div class="chest" title="Your doubloons, shared across every game">
+      <span class="coin"></span><span id="doubloons">0</span><span style="font-weight:500;color:var(--mute)">doubloons</span>
+    </div>
+  </header>
+
+  <main id="home" class="deck on">
+    <section class="hero">
+      <div>
+        <p class="lede">One ship, every game. Earn doubloons in trivia, chess, golf, swordplay, darts and the treasure hunt. Your chest follows you from deck to deck.</p>
+        <p class="meta">Play solo against the crew's AI or pass the phone for two-player. Free to try. No sign-up needed for the demo.</p>
+      </div>
+      <svg class="badge" width="180" height="180" aria-label="Pops and Pippy"><use href="#popsPippy"/></svg>
+    </section>
+
+    <div class="berths" id="berths"></div>
+
+    <h2 class="sec">Ship's log: where we sail next</h2>
+    <div class="log">
+      <div class="port"><b>Web</b><span>thepiratesofybor.com</span><br><span class="pill go">This build</span></div>
+      <div class="port"><b>Apple App Store</b><span>iPhone &amp; iPad via Codemagic</span><br><span class="pill wait">Needs dev account</span></div>
+      <div class="port"><b>Google Play</b><span>Android build included</span><br><span class="pill wait">Needs dev account</span></div>
+      <div class="port"><b>Samsung · Amazon</b><span>Same Android build</span><br><span class="pill wait">Needs seller account</span></div>
+    </div>
+
+    <footer class="copy">
+      <span><b>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy.</b> All rights reserved.</span>
+      <span>Crowned by Atara, blessed by Pippy · Captain Shiller &amp; Co-Navigator Shere · Pops, inspired by Tanker Ray</span>
+    </footer>
+  </main>
+
+  <section id="deck" class="deck">
+    <div class="deckbar">
+      <h2 id="deckTitle">Deck</h2>
+      <button class="btn" id="backBtn" type="button">← Back to port</button>
+    </div>
+    <div id="deckBody"></div>
+  </section>
+</div>
+
+<div class="wm" aria-hidden="true">
+  <svg viewBox="0 0 120 120"><use href="#popsPippy"/>
+    <path class="spark" d="M106 14 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#fff3c4"/>
+    <path class="spark" d="M12 22 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#fff3c4"/>
+    <path class="spark" d="M104 96 l2 4 4 2 -4 2 -2 4 -2 -4 -4 -2 4 -2z" fill="#fff3c4"/>
+  </svg>
+</div>
+
+<script>
+(function(){
+"use strict";
+/* ---------- shared doubloon chest ---------- */
+let coins=0;
+try{coins=parseInt(localStorage.getItem("poy_doubloons")||"0",10)||0}catch(e){}
+const coinEl=document.getElementById("doubloons");
+function addCoins(n){coins=Math.max(0,coins+n);coinEl.textContent=coins;try{localStorage.setItem("poy_doubloons",String(coins))}catch(e){}}
+addCoins(0);
+
+const $=s=>document.querySelector(s);
+const el=(tag,attrs={},html="")=>{const e=document.createElement(tag);for(const k in attrs){if(k==="class")e.className=attrs[k];else if(k.startsWith("on"))e.addEventListener(k.slice(2),attrs[k]);else e.setAttribute(k,attrs[k])}if(html)e.innerHTML=html;return e};
+const rnd=n=>Math.floor(Math.random()*n);
+let cleanup=null;
+
+const GAMES=[
+ {id:"trivia",ico:"?",name:"Grotto Trivia",desc:"Ybor, Tampa, Florida, pirate lore and the movies.",modes:"1P · Pass & play",run:trivia},
+ {id:"chess",ico:"♛",name:"Pirate Chess",desc:"Outwit the quartermaster or a mate across the table.",modes:"1P vs AI · 2P",run:chess},
+ {id:"treasure",ico:"✕",name:"Treasure Hunt",desc:"Dig for Gaspar's chest. Warmer, colder, gold.",modes:"1P",run:treasure},
+ {id:"golf",ico:"⛳",name:"Andy Golf Club",desc:"Three holes of sand traps, water and wind.",modes:"1P · 2P",run:golf},
+ {id:"duel",ico:"⚔",name:"Shere's Revenge",desc:"Read the blade. Parry high, parry low, strike.",modes:"1P vs AI",run:duel},
+ {id:"darts",ico:"◎",name:"Pirate Darts",desc:"Five throws at the tavern board. Steady hand.",modes:"1P · 2P",run:darts}
+];
+const berths=$("#berths");
+GAMES.forEach(g=>{
+  const b=el("button",{class:"berth",type:"button",onclick:()=>openGame(g.id)},
+   `<span class="ico" aria-hidden="true">${g.ico}</span><h3>${g.name}</h3><p>${g.desc}</p><span class="modes">${g.modes}</span>`);
+  berths.appendChild(b);
+});
+
+function openGame(id){
+  const g=GAMES.find(x=>x.id===id); if(!g)return;
+  if(cleanup){cleanup();cleanup=null}
+  $("#home").classList.remove("on");$("#deck").classList.add("on");
+  $("#deckTitle").textContent=g.name;
+  const body=$("#deckBody");body.innerHTML="";
+  cleanup=g.run(body)||null;
+  if(location.hash!=="#"+id)location.hash=id;
+  window.scrollTo(0,0);
+}
+function goHome(){
+  if(cleanup){cleanup();cleanup=null}
+  $("#deck").classList.remove("on");$("#home").classList.add("on");
+  if(location.hash)history.replaceState(null,"",location.pathname+location.search);
+}
+$("#backBtn").addEventListener("click",goHome);
+function route(){const h=location.hash.slice(1);if(GAMES.some(g=>g.id===h))openGame(h);else if(!h)goHome()}
+window.addEventListener("hashchange",route);
+
+/* ---------- TRIVIA ---------- */
+const QS=[
+ ["Ybor & Tampa","Which Tampa festival celebrates the legend of a pirate invasion each January?",["Gasparilla","Fiesta Day","Guavaween","Strawberry Festival"],0],
+ ["Ybor & Tampa","Ybor City first became famous for making what?",["Cigars","Rum","Sailcloth","Citrus crates"],0],
+ ["Ybor & Tampa","Who founded Ybor City?",["Vicente Martinez-Ybor","Henry Plant","Juan Ponce de León","José Martí"],0],
+ ["Ybor & Tampa","Ybor's main nightlife street, La Séptima, is better known as?",["7th Avenue","Bayshore Boulevard","Channelside Drive","Dale Mabry"],0],
+ ["Ybor & Tampa","Ye Mystic Krewe of Gasparilla was founded in which year?",["1904","1885","1921","1950"],0],
+ ["Ybor & Tampa","Tampa Bay's NFL team takes its name from which seafarers?",["Buccaneers","Corsairs","Privateers","Raiders"],0],
+ ["Ybor & Tampa","The legendary pirate Gasparilla is said to be named what?",["José Gaspar","Juan Garrido","Diego Grillo","Pedro Gilbert"],0],
+ ["Florida","What is the capital of Florida?",["Tallahassee","Tampa","Orlando","Miami"],0],
+ ["Florida","Which Florida city is the oldest continuously inhabited European-founded city in the US?",["St. Augustine","Pensacola","Key West","Fernandina Beach"],0],
+ ["Florida","Florida became a US state in which year?",["1845","1821","1861","1912"],0],
+ ["Pirate Lore","Blackbeard's real name is usually given as?",["Edward Teach","William Kidd","Henry Morgan","Bartholomew Roberts"],0],
+ ["Pirate Lore","What was Blackbeard's flagship called?",["Queen Anne's Revenge","Golden Hind","Adventure Galley","Royal Fortune"],0],
+ ["Pirate Lore","'Pieces of eight' were what?",["Spanish silver coins","Gold rings","Cannonballs","Map fragments"],0],
+ ["Pirate Lore","Anne Bonny sailed alongside which other famous female pirate?",["Mary Read","Grace O'Malley","Ching Shih","Jeanne de Clisson"],0],
+ ["Pirate Lore","Which Jamaican port was once called the 'wickedest city on Earth'?",["Port Royal","Kingston","Montego Bay","Nassau"],0],
+ ["Pirate Lore","The traditional skull-and-crossbones pirate flag is called?",["Jolly Roger","Black Spot","Blue Peter","Union Jack"],0],
+ ["Movies & Books","Who wrote the novel Treasure Island?",["Robert Louis Stevenson","Charles Dickens","Jules Verne","Mark Twain"],0],
+ ["Movies & Books","In The Goonies, the kids hunt for the treasure of which pirate?",["One-Eyed Willy","Long John Silver","Captain Flint","Black Bart"],0],
+ ["Movies & Books","Captain Hook's sworn enemy is?",["Peter Pan","Sinbad","Popeye","Robin Hood"],0],
+ ["Movies & Books","The Pirates of the Caribbean films were inspired by what?",["A theme-park ride","A comic book","A board game","A Broadway show"],0]
+];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+function trivia(root){
+  let players=1,turn=0,score=[0,0],deck=[],i=0,lock=false;const ROUNDS=10;
+  const p=el("div",{class:"panel"});root.appendChild(p);
+  function setup(){
+    p.innerHTML=`<p class="status">Ten questions from the Grotto. Each right answer earns 10 doubloons.</p>
+      <div class="row"><button class="btn gold" id="t1" type="button">Play solo</button><button class="btn" id="t2" type="button">Two players, pass &amp; play</button></div>`;
+    p.querySelector("#t1").onclick=()=>start(1);p.querySelector("#t2").onclick=()=>start(2);
+  }
+  function start(n){players=n;turn=0;score=[0,0];i=0;deck=shuffle(QS).slice(0,ROUNDS*(n===2?2:1)>QS.length?QS.length:ROUNDS*(n===2?2:1));show()}
+  function show(){
+    if(i>=deck.length)return end();
+    lock=false;const [cat,q,opts,ans]=deck[i];
+    const order=shuffle(opts.map((o,k)=>({o,k})));
+    p.innerHTML=`<div class="row" style="justify-content:space-between"><span class="cat">${cat}</span><span class="cat">Q ${i+1} / ${deck.length}${players===2?` · Player ${turn+1}`:""}</span></div>
+      <p class="q">${q}</p><div class="opts"></div>
+      <p class="status" id="tmsg">${players===2?`Score: P1 ${score[0]} · P2 ${score[1]}`:`Score: ${score[0]}`}</p>`;
+    const box=p.querySelector(".opts");
+    order.forEach(({o,k})=>{const b=el("button",{class:"btn opt",type:"button"},o);b.onclick=()=>{
+      if(lock)return;lock=true;
+      if(k===ans){b.classList.add("right");score[turn]++;addCoins(10);p.querySelector("#tmsg").textContent="Right you are! +10 doubloons"}
+      else{b.classList.add("wrong");[...box.children].forEach((c,ix)=>{if(order[ix].k===ans)c.classList.add("right")});p.querySelector("#tmsg").textContent="Walk the plank. The right answer is marked in green."}
+      setTimeout(()=>{i++;if(players===2)turn=1-turn;show()},1300);
+    };box.appendChild(b)});
+  }
+  function end(){
+    const msg=players===2?(score[0]===score[1]?`A draw at ${score[0]} apiece.`:`Player ${score[0]>score[1]?1:2} takes the round, ${Math.max(...score)} to ${Math.min(...score)}.`):`You scored ${score[0]} of ${deck.length}.`;
+    p.innerHTML=`<p class="q">${msg}</p><div class="row"><button class="btn gold" type="button" id="again">Play again</button></div>`;
+    p.querySelector("#again").onclick=setup;
+  }
+  setup();
+}
+
+/* ---------- CHESS ---------- */
+function chess(root){
+  const G={K:"♔",Q:"♕",R:"♖",B:"♗",N:"♘",P:"♙",k:"♚",q:"♛",r:"♜",b:"♝",n:"♞",p:"♟"};
+  const V={p:1,n:3,b:3,r:5,q:9,k:100};
+  let B,turn,sel,moves,vsAI=true,over=false;
+  const wrap=el("div",{class:"row",style:"align-items:flex-start;gap:16px"});
+  const boardEl=el("div",{class:"board"});
+  const side=el("div",{class:"panel",style:"flex:1;min-width:0"});
+  side.innerHTML=`<p class="status" id="cmsg"></p><div class="row"><button class="btn gold" id="cai" type="button">New game vs AI</button><button class="btn" id="c2p" type="button">New 2-player game</button></div><p style="color:var(--mute);margin:10px 0 0;font-size:.9rem">Capture the enemy king to win. Pawns crown to queens. Win vs AI: +50 doubloons.</p>`;
+  wrap.append(boardEl,side);root.appendChild(wrap);
+  const msg=t=>side.querySelector("#cmsg").textContent=t;
+  side.querySelector("#cai").onclick=()=>reset(true);side.querySelector("#c2p").onclick=()=>reset(false);
+  const isW=c=>c&&c===c.toUpperCase();
+  function reset(ai){vsAI=ai;over=false;sel=null;moves=[];turn="w";
+    B=["rnbqkbnr","pppppppp","........","........","........","........","PPPPPPPP","RNBQKBNR"].map(r=>r.split("").map(c=>c==="."?null:c));
+    msg("White to move. You sail under the white flag.");draw()}
+  function gen(b,color){
+    const out=[];
+    for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+      const pc=b[r][c];if(!pc||(color==="w")!==isW(pc))continue;
+      const t=pc.toLowerCase(),own=x=>x&&isW(x)===isW(pc);
+      const add=(rr,cc)=>{if(rr<0||rr>7||cc<0||cc>7)return false;const tg=b[rr][cc];if(own(tg))return false;out.push([r,c,rr,cc]);return !tg};
+      if(t==="p"){const d=isW(pc)?-1:1,st=isW(pc)?6:1;
+        if(!b[r+d]?.[c]){out.push([r,c,r+d,c]);if(r===st&&!b[r+2*d][c])out.push([r,c,r+2*d,c])}
+        for(const dc of[-1,1]){const tg=b[r+d]?.[c+dc];if(tg&&!own(tg))out.push([r,c,r+d,c+dc])}}
+      else if(t==="n")[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]].forEach(([a,z])=>add(r+a,c+z));
+      else if(t==="k")[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]].forEach(([a,z])=>add(r+a,c+z));
+      else{const dirs=t==="r"?[[1,0],[-1,0],[0,1],[0,-1]]:t==="b"?[[1,1],[1,-1],[-1,1],[-1,-1]]:[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+        dirs.forEach(([a,z])=>{let rr=r+a,cc=c+z;while(add(rr,cc)){rr+=a;cc+=z}})}
+    }return out;
+  }
+  function apply(b,m){const n=b.map(r=>r.slice());const[r,c,rr,cc]=m;let pc=n[r][c];if(pc==="P"&&rr===0)pc="Q";if(pc==="p"&&rr===7)pc="q";n[rr][cc]=pc;n[r][c]=null;return n}
+  function evalB(b){let s=0;for(const row of b)for(const p of row)if(p)s+=(isW(p)?-1:1)*V[p.toLowerCase()];return s}
+  function aiMove(){
+    const ms=gen(B,"b");if(!ms.length)return;
+    let best=-1e9,pick=[];
+    for(const m of ms){const n=apply(B,m);
+      if(B[m[2]][m[3]]==="K"){pick=[m];break}
+      let worst=1e9;for(const r of gen(n,"w")){const s=n[r[2]][r[3]]==="k"?-1000:evalB(apply(n,r));if(s<worst)worst=s}
+      if(worst===1e9)worst=evalB(n);worst+=Math.random()*.3;
+      if(worst>best){best=worst;pick=[m]}}
+    move(pick[0]);
+  }
+  function move(m){
+    const cap=B[m[2]][m[3]];B=apply(B,m);sel=null;moves=[];
+    if(cap&&cap.toLowerCase()==="k"){over=true;const w=isW(cap)?"Black":"White";msg(`${w} captures the king! ${w} wins.`);if(vsAI&&w==="White")addCoins(50);draw();return}
+    turn=turn==="w"?"b":"w";
+    if(!gen(B,turn).length){over=true;msg("No moves left. A stalemate on the high seas.");draw();return}
+    msg(turn==="w"?"White to move.":vsAI?"The quartermaster is thinking…":"Black to move.");draw();
+    if(vsAI&&turn==="b"&&!over)setTimeout(aiMove,350);
+  }
+  function draw(){
+    boardEl.innerHTML="";
+    for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+      const pc=B[r][c];const sq=el("button",{class:"sq "+((r+c)%2?"d":"l"),type:"button","aria-label":`square ${"abcdefgh"[c]}${8-r}`});
+      if(pc)sq.innerHTML=`<span class="${isW(pc)?"pw":"pb"}">${G[pc]}</span>`;
+      if(sel&&sel[0]===r&&sel[1]===c)sq.classList.add("sel");
+      if(moves.some(m=>m[2]===r&&m[3]===c))sq.classList.add("mv");
+      sq.onclick=()=>click(r,c);boardEl.appendChild(sq);
+    }
+  }
+  function click(r,c){
+    if(over||(vsAI&&turn==="b"))return;
+    const m=moves.find(m=>m[2]===r&&m[3]===c);if(m)return move(m);
+    const pc=B[r][c];
+    if(pc&&(turn==="w")===isW(pc)){sel=[r,c];moves=gen(B,turn).filter(m=>m[0]===r&&m[1]===c)}else{sel=null;moves=[]}
+    draw();
+  }
+  reset(true);
+}
+
+/* ---------- TREASURE HUNT ---------- */
+function treasure(root){
+  const p=el("div",{class:"panel"});root.appendChild(p);
+  let chest,shovels,done;
+  function start(){
+    chest=[rnd(6),rnd(6)];shovels=8;done=false;
+    p.innerHTML=`<p class="status" id="hmsg">Gaspar buried his chest somewhere on this beach. You have 8 shovels. Each dig tells you how many paces away it is.</p><div class="grid6" id="g6"></div><div class="row" style="margin-top:12px"><button class="btn" id="hnew" type="button">New map</button></div>`;
+    const g=p.querySelector("#g6");
+    for(let r=0;r<6;r++)for(let c=0;c<6;c++){const b=el("button",{class:"cell",type:"button","aria-label":`dig row ${r+1} column ${c+1}`});b.onclick=()=>dig(b,r,c);g.appendChild(b)}
+    p.querySelector("#hnew").onclick=start;
+  }
+  function dig(b,r,c){
+    if(done||b.classList.contains("dug"))return;
+    shovels--;const d=Math.abs(r-chest[0])+Math.abs(c-chest[1]);const m=p.querySelector("#hmsg");
+    if(d===0){b.className="cell gold";b.textContent="$";done=true;const prize=20+shovels*10;addCoins(prize);m.textContent=`Treasure! The chest is yours: +${prize} doubloons.`;return}
+    b.className="cell dug";b.textContent=d;
+    const heat=d<=1?"Scorching!":d<=2?"Hot.":d<=4?"Warm.":"Cold as the deep.";
+    if(shovels<=0){done=true;m.textContent=`Out of shovels. The chest was at row ${chest[0]+1}, column ${chest[1]+1}.`;
+      p.querySelectorAll(".cell")[chest[0]*6+chest[1]].className="cell gold";return}
+    m.textContent=`${d} paces away. ${heat} ${shovels} shovel${shovels===1?"":"s"} left.`;
+  }
+  start();
+}
+
+/* ---------- ANDY GOLF CLUB ---------- */
+function golf(root){
+  const W=640,H=400;
+  const cv=el("canvas",{width:W,height:H,"aria-label":"Golf course"});
+  const ui=el("div",{class:"panel",style:"margin-top:12px"});
+  ui.innerHTML=`<p class="status" id="gmsg"></p><div class="row"><button class="btn gold" id="g1" type="button">Solo round</button><button class="btn" id="g2" type="button">Two players</button></div><p style="color:var(--mute);margin:8px 0 0;font-size:.9rem">Tap the course to aim, then tap again to stop the power meter and swing. Sand slows you down. Water costs a stroke.</p>`;
+  root.append(cv,ui);
+  const ctx=cv.getContext("2d");const msg=t=>ui.querySelector("#gmsg").textContent=t;
+  const HOLES=[
+    {tee:[70,320],cup:[560,90],sand:[[300,180,70,40]],water:[[380,260,110,60]],wind:0.0},
+    {tee:[80,80],cup:[560,320],sand:[[250,250,60,45],[460,200,50,35]],water:[[300,60,90,170]],wind:0.015},
+    {tee:[320,360],cup:[320,60],sand:[[260,140,120,30]],water:[[120,180,120,90],[420,180,120,90]],wind:-0.02}
+  ];
+  let hole,ball,vel,state,aim,power,pdir,strokes,players,turn,cards,raf;
+  function newRound(n){players=n;turn=0;cards=[[],[]];hole=0;startHole()}
+  function startHole(){const h=HOLES[hole];ball={x:h.tee[0],y:h.tee[1]};vel={x:0,y:0};strokes=0;state="aim";aim=null;power=0;pdir=1;
+    msg(`Hole ${hole+1} of 3${players===2?` · Player ${turn+1}`:""} · Wind ${HOLES[hole].wind>0?"→":HOLES[hole].wind<0?"←":"calm"}`)}
+  function inRect(x,y,r){return x>r[0]&&x<r[0]+r[2]&&y>r[1]&&y<r[1]+r[3]}
+  function pos(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+  cv.addEventListener("pointerdown",onTap);
+  function onTap(e){
+    if(state==="aim"){const p=pos(e);aim=p;state="power";power=0;pdir=1}
+    else if(state==="power"){
+      const dx=aim.x-ball.x,dy=aim.y-ball.y,d=Math.hypot(dx,dy)||1;const sp=2+power*11;
+      vel={x:dx/d*sp,y:dy/d*sp};strokes++;state="roll";
+    }
+  }
+  function step(){
+    const h=HOLES[hole];
+    if(state==="power"){power+=0.018*pdir;if(power>=1){power=1;pdir=-1}if(power<=0){power=0;pdir=1}}
+    if(state==="roll"){
+      const last={x:ball.x,y:ball.y};
+      ball.x+=vel.x;ball.y+=vel.y;vel.x+=h.wind;
+      const sand=h.sand.some(r=>inRect(ball.x,ball.y,r));const f=sand?0.9:0.975;vel.x*=f;vel.y*=f;
+      if(ball.x<6||ball.x>W-6){vel.x*=-0.6;ball.x=Math.min(W-6,Math.max(6,ball.x))}
+      if(ball.y<6||ball.y>H-6){vel.y*=-0.6;ball.y=Math.min(H-6,Math.max(6,ball.y))}
+      const dc=Math.hypot(ball.x-h.cup[0],ball.y-h.cup[1]),sp=Math.hypot(vel.x,vel.y);
+      if(dc<9&&sp<6){holed();}
+      else if(h.water.some(r=>inRect(ball.x,ball.y,r))){strokes++;ball={x:h.tee[0],y:h.tee[1]};vel={x:0,y:0};state="aim";msg(`Splash! Penalty stroke. Back to the tee. Strokes: ${strokes}`)}
+      else if(sp<0.08){vel={x:0,y:0};state="aim";msg(`Hole ${hole+1}${players===2?` · Player ${turn+1}`:""} · Strokes: ${strokes}${sand?" · In the sand":""}`)}
+    }
+    render();raf=requestAnimationFrame(step);
+  }
+  function holed(){
+    state="done";cards[turn][hole]=strokes;addCoins(Math.max(5,30-strokes*5));
+    msg(`In the cup in ${strokes}! +${Math.max(5,30-strokes*5)} doubloons`);
+    setTimeout(()=>{
+      if(players===2&&turn===0){turn=1;startHole();return}
+      turn=0;hole++;
+      if(hole>=HOLES.length){const t=c=>c.reduce((a,b)=>a+b,0);
+        msg(players===2?`Round over. P1: ${t(cards[0])} strokes · P2: ${t(cards[1])} strokes. ${t(cards[0])===t(cards[1])?"Tied!":"Player "+(t(cards[0])<t(cards[1])?1:2)+" wins the club!"}`:`Round over in ${t(cards[0])} strokes. Par is 9.`);state="over";return}
+      startHole();
+    },1100);
+  }
+  function render(){
+    const h=HOLES[hole];
+    ctx.fillStyle="#2f7a46";ctx.fillRect(0,0,W,H);
+    for(let i=0;i<W;i+=40){ctx.fillStyle=i%80?"#2c7342":"#317f49";ctx.fillRect(i,0,40,H)}
+    ctx.fillStyle="#46a062";ctx.beginPath();ctx.arc(h.cup[0],h.cup[1],46,0,7);ctx.fill();
+    h.sand.forEach(r=>{ctx.fillStyle="#e7d29a";ctx.beginPath();ctx.ellipse(r[0]+r[2]/2,r[1]+r[3]/2,r[2]/2,r[3]/2,0,0,7);ctx.fill()});
+    h.water.forEach(r=>{ctx.fillStyle="#2b6fb0";ctx.fillRect(r[0],r[1],r[2],r[3]);ctx.strokeStyle="#7fb6e6";ctx.strokeRect(r[0]+3,r[1]+3,r[2]-6,r[3]-6)});
+    ctx.fillStyle="#111";ctx.beginPath();ctx.arc(h.cup[0],h.cup[1],7,0,7);ctx.fill();
+    ctx.strokeStyle="#eee";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(h.cup[0],h.cup[1]);ctx.lineTo(h.cup[0],h.cup[1]-38);ctx.stroke();
+    ctx.fillStyle="#c2463a";ctx.beginPath();ctx.moveTo(h.cup[0],h.cup[1]-38);ctx.lineTo(h.cup[0]+20,h.cup[1]-31);ctx.lineTo(h.cup[0],h.cup[1]-24);ctx.fill();
+    ctx.fillStyle="#fff";ctx.font="bold 9px sans-serif";ctx.fillText("☠",h.cup[0]+5,h.cup[1]-28);
+    if(aim&&(state==="power")){ctx.setLineDash([6,6]);ctx.strokeStyle="#fff8";ctx.beginPath();ctx.moveTo(ball.x,ball.y);ctx.lineTo(aim.x,aim.y);ctx.stroke();ctx.setLineDash([])}
+    ctx.fillStyle="#00000044";ctx.beginPath();ctx.arc(ball.x+2,ball.y+3,6,0,7);ctx.fill();
+    ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(ball.x,ball.y,6,0,7);ctx.fill();
+    if(state==="power"){ctx.fillStyle="#0009";ctx.fillRect(14,H-34,200,18);ctx.fillStyle=power>.8?"#c2463a":"#e2b453";ctx.fillRect(16,H-32,196*power,14);ctx.fillStyle="#fff";ctx.font="bold 11px sans-serif";ctx.fillText("POWER",222,H-20)}
+    ctx.fillStyle="#0008";ctx.fillRect(W-120,8,112,26);ctx.fillStyle="#f2e6c9";ctx.font="bold 13px sans-serif";ctx.fillText(`Hole ${hole+1} · ${strokes} str`,W-112,26);
+  }
+  ui.querySelector("#g1").onclick=()=>newRound(1);ui.querySelector("#g2").onclick=()=>newRound(2);
+  newRound(1);raf=requestAnimationFrame(step);
+  return()=>{cancelAnimationFrame(raf);cv.removeEventListener("pointerdown",onTap)};
+}
+
+/* ---------- SHERE'S REVENGE ---------- */
+function duel(root){
+  const p=el("div",{class:"panel"});root.appendChild(p);
+  p.innerHTML=`<div class="bars"><div><b>You</b><div class="hp"><i id="hpMe" style="width:100%"></i></div></div><div style="text-align:right"><b>Captain Bones</b><div class="hp foe"><i id="hpFoe" style="width:100%"></i></div></div></div>
+   <p class="tele" id="tele">En garde!</p><p class="status" id="dmsg" style="text-align:center">Watch the captain's blade. Parry the side he swings at, or strike while he's open.</p>
+   <div class="row" style="justify-content:center"><button class="btn" id="ph" type="button">Parry high</button><button class="btn gold" id="st" type="button">Strike</button><button class="btn" id="pl" type="button">Parry low</button></div>
+   <div class="row" style="justify-content:center;margin-top:10px"><button class="btn" id="dnew" type="button">New duel</button></div>`;
+  let me,foe,phase,timer,lvl=1;
+  const tele=p.querySelector("#tele"),dm=p.querySelector("#dmsg");
+  const upd=()=>{p.querySelector("#hpMe").style.width=me+"%";p.querySelector("#hpFoe").style.width=foe+"%"};
+  function start(){clearTimeout(timer);me=100;foe=100;upd();tele.textContent="En garde!";dm.textContent="Watch the captain's blade.";setTimeout(next,900)}
+  function next(){
+    if(me<=0||foe<=0)return;
+    const r=Math.random();
+    if(r<0.35){phase="open";tele.textContent="He lowers his guard…";timer=setTimeout(()=>{if(phase==="open"){phase=null;tele.textContent="Too slow.";timer=setTimeout(next,600)}},Math.max(500,1100-lvl*80))}
+    else{phase=r<0.68?"high":"low";tele.textContent=phase==="high"?"⚔ Swing from HIGH!":"⚔ Slash from LOW!";
+      timer=setTimeout(()=>{if(phase==="high"||phase==="low"){phase=null;hit("me",14);tele.textContent="You're cut!";timer=setTimeout(next,700)}},Math.max(550,1250-lvl*80))}
+  }
+  function hit(who,n){if(who==="me")me=Math.max(0,me-n);else foe=Math.max(0,foe-n);upd();
+    if(foe<=0){clearTimeout(timer);tele.textContent="Victory! Shere's revenge is served.";addCoins(40+lvl*10);dm.textContent=`+${40+lvl*10} doubloons. The next captain will be faster.`;lvl++}
+    else if(me<=0){clearTimeout(timer);tele.textContent="You've been sent to Davy Jones.";dm.textContent="Try another duel.";lvl=1}}
+  function act(a){
+    if(!phase||me<=0||foe<=0)return;clearTimeout(timer);
+    if(a==="strike"){if(phase==="open"){hit("foe",20);tele.textContent="A clean strike!"}else{hit("me",18);tele.textContent="You struck into his swing!"}}
+    else if(a===phase){hit("foe",6);tele.textContent="Parried! Riposte!"}
+    else if(phase==="open"){tele.textContent="Wasted parry."}
+    else{hit("me",14);tele.textContent="Wrong side!"}
+    phase=null;if(me>0&&foe>0)timer=setTimeout(next,650);
+  }
+  p.querySelector("#ph").onclick=()=>act("high");p.querySelector("#pl").onclick=()=>act("low");p.querySelector("#st").onclick=()=>act("strike");
+  p.querySelector("#dnew").onclick=start;
+  const key=e=>{if(e.key==="ArrowUp")act("high");else if(e.key==="ArrowDown")act("low");else if(e.key===" "){e.preventDefault();act("strike")}};
+  document.addEventListener("keydown",key);
+  start();
+  return()=>{clearTimeout(timer);document.removeEventListener("keydown",key)};
+}
+
+/* ---------- PIRATE DARTS ---------- */
+function darts(root){
+  const S=400;const cv=el("canvas",{width:S,height:S,style:"width:min(100%,400px)","aria-label":"Dart board"});
+  const ui=el("div",{class:"panel",style:"margin-top:12px"});
+  ui.innerHTML=`<p class="status" id="dmsg2"></p><div class="row"><button class="btn gold" id="d1" type="button">Solo</button><button class="btn" id="d2" type="button">Two players</button></div><p style="color:var(--mute);margin:8px 0 0;font-size:.9rem">The sight drifts like a rolling deck. Tap the board to throw. Bullseye is 50.</p>`;
+  root.append(cv,ui);const ctx=cv.getContext("2d");const msg=t=>ui.querySelector("#dmsg2").textContent=t;
+  let t=0,throws,score,players,turn,hits,raf,pause=false;
+  const RINGS=[[18,50],[40,25],[80,15],[120,10],[160,5],[185,1]];
+  function start(n){players=n;turn=0;score=[0,0];throws=[0,0];hits=[];say()}
+  function say(){msg(players===2?`Player ${turn+1} · throw ${throws[turn]+1} of 5 · P1 ${score[0]} · P2 ${score[1]}`:`Throw ${throws[0]+1} of 5 · Score ${score[0]}`)}
+  function aimPt(){return{x:S/2+Math.sin(t*1.7)*120+Math.sin(t*4.3)*25,y:S/2+Math.cos(t*1.3)*110+Math.sin(t*3.1)*25}}
+  function onTap(){
+    if(pause||throws[turn]>=5)return;const a=aimPt();const d=Math.hypot(a.x-S/2,a.y-S/2);
+    const pts=(RINGS.find(r=>d<=r[0])||[0,0])[1];score[turn]+=pts;throws[turn]++;hits.push({...a,p:turn});
+    msg(pts?`${pts} points!`:"Missed the board!");pause=true;
+    setTimeout(()=>{pause=false;
+      if(players===2){if(throws[0]>=5&&throws[1]>=5){msg(`Final: P1 ${score[0]} · P2 ${score[1]}. ${score[0]===score[1]?"A tie!":"Player "+(score[0]>score[1]?1:2)+" wins the round of grog."}`);return}turn=1-turn}
+      else if(throws[0]>=5){const c=Math.floor(score[0]/5);addCoins(c);msg(`Final score ${score[0]}. +${c} doubloons.`);return}
+      say()},800);
+  }
+  cv.addEventListener("pointerdown",onTap);
+  function render(){
+    t+=0.016;ctx.fillStyle="#132338";ctx.fillRect(0,0,S,S);
+    const cols=["#c2463a","#1a1a1a","#f2e6c9","#1a1a1a","#2a7a4a","#a9822f"];
+    for(let i=RINGS.length-1;i>=0;i--){ctx.fillStyle=cols[i];ctx.beginPath();ctx.arc(S/2,S/2,RINGS[i][0],0,7);ctx.fill()}
+    ctx.strokeStyle="#e2b45366";for(let i=0;i<20;i++){const a=i*Math.PI/10;ctx.beginPath();ctx.moveTo(S/2+Math.cos(a)*18,S/2+Math.sin(a)*18);ctx.lineTo(S/2+Math.cos(a)*185,S/2+Math.sin(a)*185);ctx.stroke()}
+    hits.forEach(h=>{ctx.fillStyle=h.p?"#4fb08a":"#e2b453";ctx.beginPath();ctx.arc(h.x,h.y,5,0,7);ctx.fill();ctx.strokeStyle="#000";ctx.stroke()});
+    const a=aimPt();ctx.strokeStyle="#fff";ctx.lineWidth=2;ctx.beginPath();ctx.arc(a.x,a.y,12,0,7);ctx.moveTo(a.x-18,a.y);ctx.lineTo(a.x+18,a.y);ctx.moveTo(a.x,a.y-18);ctx.lineTo(a.x,a.y+18);ctx.stroke();ctx.lineWidth=1;
+    raf=requestAnimationFrame(render);
+  }
+  ui.querySelector("#d1").onclick=()=>start(1);ui.querySelector("#d2").onclick=()=>start(2);
+  start(1);raf=requestAnimationFrame(render);
+  return()=>{cancelAnimationFrame(raf);cv.removeEventListener("pointerdown",onTap)};
+}
+
+route();
+})();
+</script>
+
+</body></html>

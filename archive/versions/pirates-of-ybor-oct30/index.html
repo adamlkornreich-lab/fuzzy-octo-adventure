@@ -1,0 +1,684 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Pirates of Ybor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Alegreya+Sans:wght@400;500;700;800&display=swap">
+<style>
+/* Layout: candlelit captain's cabin — velvet ground, candle-gold accents, one view at a time under a sticky brass nav */
+:root{
+  --night:#140b0e; --velvet:#22121a; --plush:#2e1822; --candle:#f0b45c; --rose:#d9786a;
+  --cream:#f6e9d6; --smoke:#c4ada6; --kelp:#86c9a0; --rum:#e3593f;
+  --line:rgba(240,180,92,.22);
+  --logo:"Pirata One","Cormorant Garamond",Georgia,serif;
+  --display:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --body:"Alegreya Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--night);color:var(--cream)}
+body{font-family:var(--body);font-size:16px;line-height:1.55;min-height:100%;
+  background:radial-gradient(ellipse 80% 50% at 85% 0%,rgba(217,120,106,.16),transparent 70%),radial-gradient(ellipse 70% 45% at 10% 8%,rgba(240,180,92,.12),transparent 70%),var(--night)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--velvet)}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:rgba(34,18,26,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:14px;padding-block:10px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo svg{width:46px;height:auto}
+.logo b{font-family:var(--logo);font-weight:400;font-size:1.6rem;color:var(--candle);line-height:1;display:block}
+.logo small{display:block;font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--smoke)}
+nav.tabs{display:flex;gap:2px;margin-left:auto;overflow-x:auto;max-width:100%;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs a{color:var(--smoke);text-decoration:none;padding:7px 11px;border-radius:999px;font-weight:700;font-size:.88rem;white-space:nowrap}
+nav.tabs a:hover{color:var(--cream)}
+nav.tabs a[aria-current="page"]{background:var(--candle);color:var(--night)}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--candle);outline-offset:2px}
+main{padding-block:26px 40px}
+section.view{display:grid;gap:22px}
+h1,h2,h3{font-family:var(--display);font-weight:600;text-wrap:balance;margin:0;color:var(--cream);letter-spacing:.005em}
+h1{font-size:clamp(2.8rem,9vw,5.4rem);line-height:.95;font-style:italic}
+h2{font-size:clamp(1.9rem,5vw,2.6rem);line-height:1.05;font-style:italic}
+h3{font-size:1.45rem;line-height:1.15}
+p{margin:0;max-width:65ch}
+.eyebrow{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--rose);font-weight:800}
+.muted{color:var(--smoke)}
+.vhead{display:flex;gap:16px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap}
+.vhead>div{display:grid;gap:6px;min-width:0}
+.duo{width:84px;height:auto;flex:none;filter:drop-shadow(0 6px 16px rgba(240,180,92,.25))}
+/* hero */
+.hero{display:grid;grid-template-columns:1.25fr 1fr;gap:28px;align-items:center;padding-block:10px}
+.hero .lead{display:grid;gap:16px}
+.hero p.sub{font-size:1.15rem;color:var(--smoke)}
+.hero .stage-mark{position:relative}
+.hero .stage-mark::before{content:"";position:absolute;inset:8% 6%;border-radius:50%;background:radial-gradient(circle,rgba(240,180,92,.32),rgba(217,120,106,.12) 45%,transparent 70%);animation:glow 3.6s ease-in-out infinite}
+.hero .stage-mark svg{position:relative;width:100%;max-width:380px;height:auto;display:block;margin-inline:auto;filter:drop-shadow(0 18px 40px rgba(0,0,0,.55))}
+@keyframes glow{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.04)}}
+.cta{display:flex;gap:10px;flex-wrap:wrap}
+button,.btn{font:inherit;font-weight:800;border:0;border-radius:999px;padding:11px 20px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;line-height:1.2}
+.btn-gold{background:linear-gradient(180deg,#f6c475,var(--candle));color:var(--night);box-shadow:0 6px 20px rgba(240,180,92,.25)}
+.btn-gold:hover{filter:brightness(1.07)}
+.btn-ghost{background:transparent;color:var(--cream);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--candle)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.card{background:linear-gradient(180deg,var(--plush),var(--velvet));border:1px solid var(--line);border-radius:18px;padding:18px;display:grid;gap:8px;align-content:start;min-width:0}
+.card .btn{justify-self:start;margin-top:4px}
+.tag{justify-self:start;font-size:.68rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:3px 9px;border-radius:999px}
+.tag.live{background:rgba(134,201,160,.16);color:var(--kelp)}
+.tag.build{background:rgba(240,180,92,.15);color:var(--candle)}
+.tag.plan{background:rgba(196,173,166,.13);color:var(--smoke)}
+.glyph{font-family:var(--logo);font-size:2rem;color:var(--candle);line-height:1}
+.panel{background:var(--velvet);border:1px solid var(--line);border-radius:20px;padding:20px;display:grid;gap:14px;min-width:0}
+.grotto{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;background:linear-gradient(120deg,rgba(217,120,106,.16),rgba(240,180,92,.08));border:1px solid var(--line);border-radius:20px;padding:20px}
+.grotto .glyph{font-size:3rem}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+select,input[type=text],textarea{font:inherit;background:var(--night);color:var(--cream);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+label{font-weight:700;font-size:.88rem;display:grid;gap:5px}
+.note{font-size:.85rem;color:var(--smoke)}
+/* trivia */
+.q{font-family:var(--display);font-size:clamp(1.5rem,4vw,2rem);line-height:1.2;color:var(--cream);font-weight:600}
+.answers{display:grid;gap:10px;grid-template-columns:1fr 1fr}
+.answers button{background:var(--night);color:var(--cream);border:1px solid var(--line);border-radius:14px;text-align:left;justify-content:flex-start;padding:14px;font-weight:600}
+.answers button:hover:not(:disabled){border-color:var(--candle)}
+.answers button.right{background:rgba(134,201,160,.2);border-color:var(--kelp);opacity:1}
+.answers button.wrong{background:rgba(227,89,63,.2);border-color:var(--rum);opacity:1}
+.meter{height:5px;background:var(--night);border-radius:999px;overflow:hidden}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--rose),var(--candle));transition:width .3s}
+.stat{font-variant-numeric:tabular-nums;font-weight:800}
+.ai-badge{font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--rose)}
+/* treasure */
+.sea-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-width:420px;width:100%}
+.sea-grid button{aspect-ratio:1;max-width:100%;padding:0;border-radius:10px;background:#3a2030;border:1px solid var(--line);color:var(--cream);font-size:1.05rem}
+.sea-grid button:hover:not(:disabled){background:#4a2a3c}
+.sea-grid button.dug{background:#2a1c14;color:var(--smoke);opacity:1}
+.sea-grid button.gold{background:var(--candle);color:var(--night);opacity:1}
+/* reels */
+.reel{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+.stage{position:relative;width:100%;margin-inline:auto}
+.stage[data-fmt="story"]{max-width:340px}
+.stage canvas{display:block;width:100%;height:auto;border-radius:16px;background:#000;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap}
+.thumbs img{width:54px;height:54px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+.file{position:relative;overflow:hidden}
+.file input{position:absolute;inset:0;opacity:0;cursor:pointer}
+/* chat */
+.chat{display:grid;gap:10px;max-height:58vh;overflow-y:auto;padding-right:4px;align-content:start}
+.msg{max-width:88%;padding:10px 14px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.me{justify-self:end;background:var(--candle);color:var(--night);border-bottom-right-radius:4px;font-weight:600}
+.msg.qm{justify-self:start;background:var(--plush);border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg.qm b{display:block;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rose);margin-bottom:2px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chips button{background:transparent;border:1px solid var(--line);color:var(--cream);font-weight:600;padding:7px 13px;font-size:.88rem}
+.chips button:hover{border-color:var(--candle)}
+.composer{display:flex;gap:8px;align-items:flex-end}
+.composer textarea{flex:1;resize:none;min-height:46px;max-height:140px}
+/* crews */
+.crew-types{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.crew-types button{background:var(--plush);color:var(--cream);border:1px solid var(--line);border-radius:14px;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;padding:14px}
+.crew-types button[aria-pressed="true"]{border-color:var(--candle);background:#3d2030}
+.crew-types b{font-family:var(--display);font-weight:600;font-size:1.2rem;color:var(--cream)}
+.crew-types span{font-size:.8rem;color:var(--smoke);font-weight:500}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line)}
+th{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rose)}
+.tbl{overflow-x:auto}
+.code{font-family:ui-monospace,Menlo,monospace;background:var(--night);padding:3px 8px;border-radius:6px;color:var(--candle)}
+/* launch */
+.stores{display:grid;gap:12px}
+.store{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:start;background:var(--velvet);border:1px solid var(--line);border-radius:16px;padding:16px}
+.store .dot{width:12px;height:12px;border-radius:50%;margin-top:8px}
+.dot.ready{background:var(--kelp)}.dot.todo{background:var(--candle)}
+.store ul{margin:6px 0 0;padding-left:18px;color:var(--smoke);font-size:.95rem}
+.store .fee{font-weight:800;color:var(--cream);white-space:nowrap;font-size:.9rem}
+.check{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line);font-weight:500;font-size:1rem}
+.check input{margin-top:4px;accent-color:var(--candle);width:18px;height:18px;flex:none}
+/* credits */
+.credit-list{display:grid;gap:8px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.credit-list div{background:var(--velvet);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.credit-list b{font-family:var(--display);font-weight:600;font-size:1.2rem;color:var(--cream);display:block}
+/* watermark */
+.wm{position:fixed;right:calc(10px + env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));width:92px;height:auto;opacity:.24;pointer-events:none;z-index:5}
+.spark{animation:tw 2.4s ease-in-out infinite}
+.spark:nth-child(2n){animation-delay:.8s}.spark:nth-child(3n){animation-delay:1.6s}
+@keyframes tw{0%,100%{opacity:.25}50%{opacity:1}}
+footer{border-top:1px solid var(--line);padding-block:20px 100px;color:var(--smoke);font-size:.85rem}
+footer .wrap{display:grid;gap:6px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--candle);color:var(--night);font-weight:800;padding:10px 18px;border-radius:999px;z-index:20;max-width:calc(100% - 32px);text-align:center}
+@media (prefers-reduced-motion:reduce){.spark,.hero .stage-mark::before{animation:none}.meter i{transition:none}}
+@media (max-width:760px){
+  .hero,.reel{grid-template-columns:1fr}
+  .hero .stage-mark{order:-1}
+  .hero .stage-mark svg{max-width:250px}
+  .answers{grid-template-columns:1fr}
+  .store{grid-template-columns:auto 1fr}
+  .store .fee{grid-column:2}
+  .logo small{display:none}
+  .duo{width:64px}
+  .grotto{grid-template-columns:1fr}
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="popspippy" viewBox="0 0 320 300">
+      <ellipse cx="160" cy="284" rx="130" ry="10" fill="#000" opacity=".3"/>
+      <path d="M70 280 C60 220 70 170 110 155 L170 155 C205 170 212 225 200 280 Z" fill="#8a7a6a"/>
+      <path d="M100 200 C110 230 160 230 175 200" fill="none" stroke="#5c4f43" stroke-width="5" stroke-linecap="round"/>
+      <path d="M96 175 L170 175 L176 195 L90 195 Z" fill="#c2492f"/>
+      <circle cx="137" cy="110" r="52" fill="#9a8a78"/>
+      <path d="M92 88 L86 40 L118 68 Z" fill="#9a8a78"/><path d="M182 88 L188 40 L156 68 Z" fill="#9a8a78"/>
+      <path d="M95 78 L92 52 L110 70 Z" fill="#d8a7a0"/><path d="M179 78 L182 52 L164 70 Z" fill="#d8a7a0"/>
+      <path d="M100 98 L120 92 M154 92 L174 98" stroke="#5c4f43" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="117" cy="112" rx="9" ry="11" fill="#e0c24a"/><ellipse cx="117" cy="113" rx="3" ry="9" fill="#111"/>
+      <circle cx="158" cy="112" r="13" fill="#111"/>
+      <path d="M86 96 L190 126" stroke="#111" stroke-width="4"/>
+      <path d="M131 128 L143 128 L137 136 Z" fill="#d88c8c"/>
+      <path d="M137 136 Q130 146 122 142 M137 136 Q144 146 152 142" stroke="#5c4f43" stroke-width="3" fill="none"/>
+      <path d="M100 134 L70 128 M100 140 L70 142 M174 134 L204 128 M174 140 L204 142" stroke="#efe6d6" stroke-width="2"/>
+      <path d="M70 70 Q137 10 206 70 Q190 58 137 60 Q86 58 70 70 Z" fill="#1a1a1a"/>
+      <path d="M78 66 Q137 4 198 66 Q137 30 78 66 Z" fill="#222"/>
+      <path d="M78 66 Q137 52 198 66" stroke="#e0a645" stroke-width="4" fill="none"/>
+      <circle cx="137" cy="40" r="7" fill="#f3e6c8"/><path d="M131 48 L143 52 M143 48 L131 52" stroke="#f3e6c8" stroke-width="3"/>
+      <path d="M200 270 C230 260 236 230 222 214" stroke="#8a7a6a" stroke-width="14" fill="none" stroke-linecap="round"/>
+      <path d="M210 282 C204 240 212 214 240 208 C270 214 278 244 270 282 Z" fill="#d9b48a"/>
+      <path d="M218 222 L262 222 L258 236 L222 236 Z" fill="#1d3f6e"/>
+      <circle cx="240" cy="176" r="32" fill="#e2c09a"/>
+      <path d="M214 166 L190 118 L232 150 Z" fill="#e2c09a"/><path d="M266 166 L292 118 L250 150 Z" fill="#e2c09a"/>
+      <path d="M216 160 L200 130 L226 150 Z" fill="#f0b8a8"/><path d="M264 160 L282 130 L254 150 Z" fill="#f0b8a8"/>
+      <ellipse cx="228" cy="176" rx="7" ry="8" fill="#1a1208"/><ellipse cx="252" cy="176" rx="7" ry="8" fill="#1a1208"/>
+      <circle cx="230" cy="173" r="2.2" fill="#fff"/><circle cx="254" cy="173" r="2.2" fill="#fff"/>
+      <ellipse cx="240" cy="192" rx="6" ry="4.5" fill="#1a1208"/>
+      <path d="M240 196 Q234 202 230 199 M240 196 Q246 202 250 199" stroke="#7a5a3a" stroke-width="2" fill="none"/>
+      <path d="M210 158 Q240 132 270 158 Q240 150 210 158 Z" fill="#c2492f"/>
+      <circle cx="226" cy="150" r="2.5" fill="#f3e6c8"/><circle cx="244" cy="146" r="2.5" fill="#f3e6c8"/><circle cx="258" cy="152" r="2.5" fill="#f3e6c8"/>
+      <path d="M270 158 L286 150 L282 166 Z" fill="#c2492f"/>
+      <circle cx="268" cy="180" r="3.5" fill="none" stroke="#e0a645" stroke-width="2"/>
+      <g fill="#ffd77a">
+        <path class="spark" d="M40 60 l4 10 l10 4 l-10 4 l-4 10 l-4 -10 l-10 -4 l10 -4 z"/>
+        <path class="spark" d="M290 70 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 l8 -3 z"/>
+        <path class="spark" d="M300 220 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3 z"/>
+        <path class="spark" d="M30 200 l3 7 l7 3 l-7 3 l-3 7 l-3 -7 l-7 -3 l7 -3 z"/>
+        <path class="spark" d="M196 30 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2 z"/>
+      </g>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="logo" href="#home" aria-label="Pirates of Ybor home"><svg viewBox="0 0 320 300" aria-hidden="true"><use href="#popspippy"/></svg><span><b>Pirates of Ybor</b><small>Ybor City · Tampa Bay</small></span></a>
+    <nav class="tabs" aria-label="Main">
+      <a href="#home">Home</a>
+      <a href="#trivia">Trivia</a>
+      <a href="#arcade">Arcade</a>
+      <a href="#reels">Reel Maker</a>
+      <a href="#quartermaster">Quartermaster</a>
+      <a href="#crews">Crews</a>
+      <a href="#launch">Launch</a>
+      <a href="#credits">Credits</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- HOME -->
+<section class="view" id="v-home">
+  <div class="hero">
+    <div class="lead">
+      <span class="eyebrow">Pops &amp; Pippy welcome you</span>
+      <h1>Welcome aboard.</h1>
+      <p class="sub">Ybor City's pirate tavern in your pocket. Trivia by candlelight, an arcade of games of skill, a movie maker for your best nights, and a Quartermaster who knows every corner of the ship.</p>
+      <div class="cta">
+        <a class="btn btn-gold" href="#trivia">Play trivia</a>
+        <a class="btn btn-ghost" href="#reels">Make a movie</a>
+        <a class="btn btn-ghost" href="#quartermaster">Ask the Quartermaster</a>
+      </div>
+    </div>
+    <div class="stage-mark"><svg viewBox="0 0 320 300" role="img" aria-label="Pops the bar cat and Pippy the chihuahua dressed as pirates"><use href="#popspippy"/></svg></div>
+  </div>
+  <div class="grid">
+    <div class="card"><span class="glyph">✦</span><h3>Trivia</h3><p class="muted">Silver screen, pirate lore and the Florida Pirate Trail, plus fresh rounds written by Claude.</p><a class="btn btn-ghost" href="#trivia">Play</a></div>
+    <div class="card"><span class="glyph">⚓</span><h3>The Arcade</h3><p class="muted">Treasure Hunt now. Andy Golf Club, Shere's Revenge, pirate chess and tavern games on the way.</p><a class="btn btn-ghost" href="#arcade">Open arcade</a></div>
+    <div class="card"><span class="glyph">❂</span><h3>Reel Maker</h3><p class="muted">Turn your photos into a pirate movie with title cards, slow zooms and the Pops &amp; Pippy seal.</p><a class="btn btn-ghost" href="#reels">Make a reel</a></div>
+    <div class="card"><span class="glyph">⚑</span><h3>Crews</h3><p class="muted">Private leaderboards for family, friends, camp, schools, prep schools and colleges.</p><a class="btn btn-ghost" href="#crews">Start a crew</a></div>
+  </div>
+  <div class="grotto">
+    <span class="glyph">☠</span>
+    <div style="display:grid;gap:6px;min-width:0">
+      <span class="eyebrow">Our home port</span>
+      <h3>Inspired by Gaspar's Grotto, Ybor City</h3>
+      <p class="muted">Tampa's pirate bar at 1805 E 7th Ave, home of Pops the bar cat, Sunday brunch and live music on the patios. Hours, menu and reservations live on the Grotto's own site.</p>
+      <div class="row"><a class="btn btn-ghost" href="https://gasparsgrotto.com" target="_blank" rel="noopener">Visit gasparsgrotto.com</a></div>
+    </div>
+  </div>
+</section>
+
+<!-- TRIVIA -->
+<section class="view" id="v-trivia" hidden>
+  <div class="vhead"><div><span class="eyebrow">Trivia</span><h2>Name that reel, matey</h2></div><svg class="duo" viewBox="0 0 320 300" aria-hidden="true"><use href="#popspippy"/></svg></div>
+  <div class="panel" id="tv-setup">
+    <div class="row">
+      <label for="tv-cat">Category
+        <select id="tv-cat">
+          <option value="movies">Silver Screen</option>
+          <option value="pirates">Pirate Lore</option>
+          <option value="florida">Florida Pirate Trail</option>
+          <option value="mix">Grand Mix</option>
+        </select>
+      </label>
+      <label for="tv-crew">Score for crew
+        <select id="tv-crew"></select>
+      </label>
+    </div>
+    <div class="row">
+      <button class="btn-gold" id="tv-start" type="button">Start round</button>
+      <button class="btn-ghost" id="tv-ai" type="button" hidden>Fresh questions from Claude</button>
+    </div>
+    <p class="note" id="tv-status" aria-live="polite"></p>
+  </div>
+  <div class="panel" id="tv-play" hidden>
+    <div class="row" style="justify-content:space-between"><span class="stat" id="tv-prog">1 / 8</span><span class="ai-badge" id="tv-src"></span><span class="stat" id="tv-score">0 doubloons</span></div>
+    <div class="meter"><i id="tv-bar" style="width:0"></i></div>
+    <div class="q" id="tv-q"></div>
+    <div class="answers" id="tv-a"></div>
+    <p class="muted" id="tv-fact" aria-live="polite"></p>
+    <button class="btn-gold" id="tv-next" type="button" hidden style="justify-self:start">Next question</button>
+  </div>
+  <div class="panel" id="tv-done" hidden>
+    <h3 id="tv-result"></h3>
+    <p class="muted" id="tv-result-sub"></p>
+    <div class="row"><button class="btn-gold" id="tv-again" type="button">Play again</button><a class="btn btn-ghost" href="#crews">See crew board</a></div>
+  </div>
+</section>
+
+<!-- ARCADE -->
+<section class="view" id="v-arcade" hidden>
+  <div class="vhead"><div><span class="eyebrow">The Arcade</span><h2>Games of skill on the boardwalk</h2></div><svg class="duo" viewBox="0 0 320 300" aria-hidden="true"><use href="#popspippy"/></svg></div>
+  <div class="panel">
+    <div class="row" style="justify-content:space-between">
+      <div style="display:grid;gap:4px"><h3>Treasure Hunt</h3><p class="muted">Find Pippy's chest in 6 digs. The compass says warmer or colder.</p></div>
+      <span class="stat" id="th-left">Digs left: 6</span>
+    </div>
+    <div class="sea-grid" id="th-grid" aria-label="Treasure map"></div>
+    <div class="row"><span id="th-msg" aria-live="polite" class="muted">Tap a square to dig.</span><button class="btn-ghost" id="th-reset" type="button">New map</button></div>
+  </div>
+  <div class="grid" id="arcade-list"></div>
+</section>
+
+<!-- REELS -->
+<section class="view" id="v-reels" hidden>
+  <div class="vhead"><div><span class="eyebrow">Reel Maker</span><h2>Your night, on the big screen</h2><p class="muted">Add photos from the Grotto, game night or the whole crew. You get a title card, slow cinematic zooms, and the Pops &amp; Pippy seal on every frame.</p></div><svg class="duo" viewBox="0 0 320 300" aria-hidden="true"><use href="#popspippy"/></svg></div>
+  <div class="reel">
+    <div class="stage" id="stage" data-fmt="story"><canvas id="cv" width="720" height="1280" aria-label="Movie preview"></canvas></div>
+    <div class="panel">
+      <label for="rl-title">Movie title<input type="text" id="rl-title" value="A Night at the Grotto" maxlength="48"></label>
+      <div class="row">
+        <label for="rl-fmt">Format
+          <select id="rl-fmt"><option value="story">Story 9:16 (Reels, TikTok)</option><option value="wide">Wide 16:9 (YouTube, TV)</option></select>
+        </label>
+        <label for="rl-sec">Seconds per photo
+          <select id="rl-sec"><option>2</option><option selected>3</option><option>4</option><option>5</option></select>
+        </label>
+      </div>
+      <div class="row">
+        <span class="btn btn-ghost file">Add photos<input type="file" id="rl-files" accept="image/*" multiple aria-label="Add photos"></span>
+        <button class="btn-ghost" id="rl-clear" type="button" hidden>Clear photos</button>
+      </div>
+      <div class="thumbs" id="rl-thumbs"></div>
+      <p class="note" id="rl-note">Showing three sample scenes. Add up to 20 photos to make it yours.</p>
+      <div class="row">
+        <button class="btn-gold" id="rl-play" type="button">Play preview</button>
+        <button class="btn-ghost" id="rl-save" type="button" hidden>Save video</button>
+      </div>
+      <p class="note" id="rl-status" aria-live="polite"></p>
+    </div>
+  </div>
+</section>
+
+<!-- QUARTERMASTER -->
+<section class="view" id="v-quartermaster" hidden>
+  <div class="vhead"><div><span class="eyebrow">The Quartermaster · powered by Claude</span><h2>Ask anything aboard</h2><p class="muted">Rules for pirate chess, a crew name, game night plans, Gasparilla history. The Quartermaster keeps a straight course and a friendly tongue.</p></div><svg class="duo" viewBox="0 0 320 300" aria-hidden="true"><use href="#popspippy"/></svg></div>
+  <div class="panel">
+    <div class="chat" id="chat" aria-live="polite">
+      <div class="msg qm"><b>Quartermaster</b>Ahoy and welcome aboard! I'm the Quartermaster of Pirates of Ybor. Ask me about our games, Ybor City lore, or how to throw a proper game night for your crew.</div>
+    </div>
+    <div class="chips" id="chips">
+      <button type="button">How do I win at Treasure Hunt?</button>
+      <button type="button">Tell me a Gasparilla legend</button>
+      <button type="button">Name my camp cabin's crew</button>
+      <button type="button">Plan a game night for 8</button>
+    </div>
+    <div class="composer" id="composer">
+      <label for="qm-in" style="flex:1;display:flex"><span class="note" style="position:absolute;left:-9999px">Message the Quartermaster</span><textarea id="qm-in" rows="1" placeholder="Ask the Quartermaster…" maxlength="800"></textarea></label>
+      <button class="btn-gold" id="qm-send" type="button">Send</button>
+      <button class="btn-ghost" id="qm-stop" type="button" hidden>Stop</button>
+    </div>
+    <p class="note" id="qm-note">Answers use your own Claude account. In the store app, the Quartermaster runs through the Pirates of Ybor server.</p>
+  </div>
+</section>
+
+<!-- CREWS -->
+<section class="view" id="v-crews" hidden>
+  <div class="vhead"><div><span class="eyebrow">Crews</span><h2>Sail with your people</h2><p class="muted">Pick the kind of crew, name it, share the invite code. School, camp and prep-school crews are family-safe by default.</p></div><svg class="duo" viewBox="0 0 320 300" aria-hidden="true"><use href="#popspippy"/></svg></div>
+  <div class="panel">
+    <div class="crew-types" id="crew-types"></div>
+    <div class="row">
+      <label for="crew-name" style="flex:1 1 220px">Crew name<input type="text" id="crew-name" placeholder="e.g. Cabin 7 Buccaneers" maxlength="40"></label>
+      <button class="btn-gold" id="crew-add" type="button" style="align-self:end">Create crew</button>
+    </div>
+    <p class="note">Crews save on this device in the preview. The store app syncs crews across phones through each member's Apple or Google sign-in.</p>
+  </div>
+  <div class="panel">
+    <h3>Crew leaderboard</h3>
+    <div class="tbl"><table><thead><tr><th>Crew</th><th>Type</th><th>Invite</th><th>Rounds</th><th>Doubloons</th></tr></thead><tbody id="crew-body"></tbody></table></div>
+  </div>
+</section>
+
+<!-- LAUNCH -->
+<section class="view" id="v-launch" hidden>
+  <div class="vhead"><div><span class="eyebrow">Launch checklist</span><h2>Into every marketplace</h2><p class="muted">Where the app can be listed, what each store needs, and what's still open. Fees are the published rates; confirm them when you enroll.</p></div><svg class="duo" viewBox="0 0 320 300" aria-hidden="true"><use href="#popspippy"/></svg></div>
+  <div class="stores">
+    <div class="store"><span class="dot todo"></span><div><h3>Apple App Store</h3><ul><li>Apple Developer Program under R.A. Consulting (company accounts need a D-U-N-S number)</li><li>Capacitor wraps this app; build and upload from Xcode on a Mac</li><li>Sign in with Apple required when Google or Facebook sign-in is offered</li><li>Game unlocks use in-app purchase; physical merch can use Apple Pay checkout</li></ul></div><span class="fee">$99 / year</span></div>
+    <div class="store"><span class="dot todo"></span><div><h3>Google Play</h3><ul><li>Play Console; new personal accounts run a closed test with testers first</li><li>Same Capacitor project builds the Android bundle (.aab)</li><li>Data safety form and content rating questionnaire</li></ul></div><span class="fee">$25 once</span></div>
+    <div class="store"><span class="dot todo"></span><div><h3>Samsung Galaxy Store &amp; Amazon Appstore</h3><ul><li>Upload the same Android build to each</li></ul></div><span class="fee">Free</span></div>
+    <div class="store"><span class="dot todo"></span><div><h3>Facebook &amp; Instagram</h3><ul><li>Marketplace on both only lists physical items, so the app itself can't go there</li><li>Facebook Instant Games can host trivia and Treasure Hunt inside Facebook and Messenger</li><li>Reel Maker videos post straight to Instagram Reels and Stories, which advertises the app</li></ul></div><span class="fee">Free to list</span></div>
+    <div class="store"><span class="dot ready"></span><div><h3>Website (piratesofybor.com)</h3><ul><li>This page works as the web version now; point the domain at the hosted build</li></ul></div><span class="fee">Hosting only</span></div>
+  </div>
+  <div class="panel">
+    <h3>Before you hit submit</h3>
+    <div id="checks"></div>
+  </div>
+</section>
+
+<!-- CREDITS -->
+<section class="view" id="v-credits" hidden>
+  <div class="vhead"><div><span class="eyebrow">Acknowledgments</span><h2>Crowned by Atara, blessed by Pippy</h2><p class="muted">Inspired by Gaspar's Grotto and Ybor City. Everyone named has given permission. Photos of real people are not used.</p></div><svg class="duo" viewBox="0 0 320 300" aria-hidden="true"><use href="#popspippy"/></svg></div>
+  <div class="credit-list">
+    <div><b>Pops</b><span class="muted">The world famous bar cat, in the line of Tanker Ray</span></div>
+    <div><b>Pippy</b><span class="muted">Pirate chihuahua and first mate</span></div>
+    <div><b>♛ Atara</b><span class="muted">Crown of the crew</span></div>
+    <div><b>Amber Kornreich</b><span class="muted">The smartest person on Earth</span></div>
+    <div><b>Captain Shiller &amp; Co-Navigator Shere</b><span class="muted">and family</span></div>
+    <div><b>Mark Brenner</b><span class="muted">Crew</span></div>
+    <div><b>Ed Lafferty</b><span class="muted">Crew</span></div>
+    <div><b>Ruben &amp; Rene Alvarez</b><span class="muted">and the whole Alvarez family</span></div>
+    <div><b>Waldo Nuhel</b><span class="muted">Painter and musician</span></div>
+    <div><b>Kornreich &amp; Associates</b><span class="muted">and Dad</span></div>
+    <div><b>Gaspar's Grotto</b><span class="muted">Home port and inspiration</span></div>
+  </div>
+  <div class="panel">
+    <h3>Support &amp; permissions</h3>
+    <p class="muted">Questions, permissions or takedown requests:</p>
+    <div class="row"><span class="code" id="mail">adamlkornreich@gmail.com</span><button class="btn-ghost" id="copy-mail" type="button">Copy email</button></div>
+    <p class="note">Pirates of Ybor does not endorse any political candidate or party. Movie questions reference films for trivia only; no studio affiliation is implied. Torrent and magnet links are blocked.</p>
+  </div>
+</section>
+
+</main>
+
+<footer><div class="wrap">
+  <span>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.</span>
+  <span>Games of skill · No real-money wagering · Family-safe mode on for school crews</span>
+</div></footer>
+<svg class="wm" viewBox="0 0 320 300" aria-hidden="true"><use href="#popspippy"/></svg>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function toast(t){const el=$('#toast');el.textContent=t;el.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>el.hidden=true,2600)}
+const COPY='© 2026 Adam Kornreich / R.A. Consulting ❤ Pops & Pippy';
+
+/* ---------- routing ---------- */
+const views=['home','trivia','arcade','reels','quartermaster','crews','launch','credits'];
+function route(){
+  const v=views.includes(location.hash.slice(1))?location.hash.slice(1):'home';
+  views.forEach(n=>$('#v-'+n).hidden=n!==v);
+  document.querySelectorAll('nav.tabs a').forEach(a=>{if(a.getAttribute('href')==='#'+v)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current')});
+  if(v==='trivia')fillCrewSelect();
+  if(v==='crews')renderCrews();
+  if(v==='reels')drawAt(1.4);
+  window.scrollTo(0,0);
+}
+addEventListener('hashchange',route);
+
+/* ---------- Claude (sample) ---------- */
+let sample=null;
+const claudeReady=(window.claude&&window.claude.use)?window.claude.use('sample').then(s=>{sample=s;return s}).catch(()=>null):Promise.resolve(null);
+function qmCopy(code){return({not_granted:'Claude access was declined for this page.',sampling_disabled:'Claude isn\'t available on this account.',rate_limited:'The Quartermaster needs a breather. Try again in a minute.',refused:'The Quartermaster won\'t answer that one. Try asking another way.',session_expired:'Please sign in to Claude again.'})[code]||'Lost the signal for a moment. Try again.'}
+const HIDE=['not_granted','sampling_disabled','not_declared','capability_disabled','capability_removed'];
+
+/* ---------- trivia ---------- */
+const BANK={
+movies:[
+["The first feature film with synchronized spoken dialogue came out in which year?",["1927","1915","1939","1952"],0,"The Jazz Singer, 1927, ended the silent era."],
+["Which film won the very first Academy Award for Best Picture?",["Wings","Casablanca","Gone with the Wind","Ben-Hur"],0,"Wings, a WWI aviation film, won at the 1929 ceremony."],
+["Standard film is projected at how many frames per second?",["24","12","30","60"],0,"24 fps has been the standard since sound arrived."],
+["In The Princess Bride, the Dread Pirate goes by which surname?",["Roberts","Morgan","Kidd","Teach"],0,"The title is passed from pirate to pirate."],
+["Captain Hook's sworn enemy is…",["Peter Pan","Long John Silver","Sinbad","Robin Hood"],0,"And the crocodile, of course."],
+["Who wrote Treasure Island, the novel behind dozens of pirate films?",["Robert Louis Stevenson","Mark Twain","Jules Verne","Charles Dickens"],0,"Published as a book in 1883."],
+["Who traditionally calls 'Action!' on a film set?",["Director","Grip","Gaffer","Best boy"],0,"The gaffer runs lighting; grips handle rigging."],
+["A Foley artist creates what?",["Sound effects","Costumes","Storyboards","Stunts"],0,"Footsteps, creaking decks and sword clangs."]],
+pirates:[
+["Blackbeard's real name was…",["Edward Teach","William Kidd","Henry Morgan","Bartholomew Roberts"],0,"Records also spell it Thatch."],
+["The classic skull-and-crossbones flag is called the…",["Jolly Roger","Union Jack","Black Spot","Red Ensign"],0,"Many pirates designed their own versions."],
+["'Pieces of eight' were coins made from…",["Spanish silver","English gold","Dutch copper","French bronze"],0,"Worth eight reales each."],
+["Anne Bonny sailed alongside which other famous woman pirate?",["Mary Read","Grace O'Malley","Ching Shih","Jeanne de Clisson"],0,"Both served under Calico Jack Rackham."],
+["A ship's starboard side is on the…",["Right, facing forward","Left, facing forward","Back","Front"],0,"Port is the left."],
+["What is a doubloon?",["A gold coin","A cannonball","A sail","A sword"],0,"Spanish gold, worth about 32 reales."]],
+florida:[
+["The Gasparilla Pirate Festival is held in which city?",["Tampa","Miami","Key West","Pensacola"],0,"The yearly 'invasion' of Tampa."],
+["Gasparilla honors which legendary pirate?",["José Gaspar","Blackbeard","Jean Lafitte","Captain Kidd"],0,"Legend says he raided Florida's Gulf coast."],
+["Ybor City was famous worldwide for producing…",["Cigars","Oranges","Rum","Sugar"],0,"It was called the Cigar Capital of the World."],
+["Ybor City is named after its founder, Vicente Martinez…",["Ybor","Gaspar","Cuesta","Ferlita"],0,"He moved his cigar factory here in the 1880s."],
+["Which birds roam Ybor's streets freely and are protected?",["Chickens","Peacocks","Flamingos","Parrots"],0,"The Ybor chickens are local celebrities."],
+["Apollo Beach is a famous spot for viewing which animal in winter?",["Manatees","Dolphins","Alligators","Sea turtles"],0,"They gather in the warm water by the power station."],
+["Channelside sits on which waterway?",["Garrison Channel","St. Johns River","Indian River","Caloosahatchee"],0,"Next to the Port of Tampa."]]
+};
+BANK.mix=[...BANK.movies,...BANK.pirates,...BANK.florida];
+const CAT_DESC={movies:'film history and well-known movies (pirate films welcome)',pirates:'the Golden Age of Piracy and nautical terms',florida:'Tampa, Ybor City, the Gasparilla festival and Florida Gulf coast history',mix:'a mix of film history, pirate history, and Tampa/Ybor City history'};
+
+let round=null;
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+function prep(list){return list.map(q=>{const order=shuffle([0,1,2,3]);return{q:q[0],a:order.map(i=>q[1][i]),right:order.indexOf(q[2]),fact:q[3]}})}
+function begin(qs,src){round={qs,i:0,score:0,crew:$('#tv-crew').value,src};$('#tv-setup').hidden=true;$('#tv-done').hidden=true;$('#tv-play').hidden=false;$('#tv-src').textContent=src;showQ()}
+function startRound(){begin(prep(shuffle(BANK[$('#tv-cat').value]).slice(0,8)),'')}
+function crewSafe(){const c=getCrews().find(c=>c.id===$('#tv-crew').value);return c&&SAFE.includes(c.type)}
+async function aiRound(){
+  if(!sample)return;
+  const btn=$('#tv-ai'),st=$('#tv-status');btn.disabled=true;$('#tv-start').disabled=true;st.textContent='Claude is writing fresh questions… this can take up to a minute.';
+  const cat=$('#tv-cat').value;
+  const safety=crewSafe()?'Every question must suit middle-school students.':'Keep every question family-friendly.';
+  const prompt='Write 8 multiple-choice trivia questions about '+CAT_DESC[cat]+' for a pirate-themed game app from Ybor City, Tampa. '+safety+' Use only well-documented facts; skip anything disputed or likely to have changed recently. Vary difficulty from easy to hard. Each question has exactly 4 options with one correct. Reply with only a JSON array of objects shaped like {"q":"question","options":["a","b","c","d"],"answer":0,"fact":"one short sentence of context"}, where answer is the index of the correct option.';
+  try{
+    const data=await sample.json(prompt,{cache:false});
+    const qs=(Array.isArray(data)?data:[]).filter(x=>x&&typeof x.q==='string'&&Array.isArray(x.options)&&x.options.length===4&&Number.isInteger(x.answer)&&x.answer>=0&&x.answer<4).slice(0,8).map(x=>[String(x.q),x.options.map(String),x.answer,String(x.fact||'')]);
+    if(qs.length<4){st.textContent='Claude\'s questions came back incomplete. Try again, or play the built-in round.';return}
+    st.textContent='';begin(prep(qs),'Written by Claude');
+  }catch(e){
+    if(HIDE.includes(e&&e.code)){btn.hidden=true;st.textContent=qmCopy(e.code)+' The built-in rounds still work.'}
+    else st.textContent=e&&e.code==='invalid_json'?'Claude\'s questions came back garbled. Try again.':qmCopy(e&&e.code);
+  }finally{btn.disabled=false;$('#tv-start').disabled=false}
+}
+function showQ(){const q=round.qs[round.i];
+  $('#tv-prog').textContent=(round.i+1)+' / '+round.qs.length;$('#tv-score').textContent=round.score+' doubloons';
+  $('#tv-bar').style.width=(round.i/round.qs.length*100)+'%';$('#tv-q').textContent=q.q;$('#tv-fact').textContent='';$('#tv-next').hidden=true;
+  const box=$('#tv-a');box.innerHTML='';
+  q.a.forEach((t,i)=>{const b=document.createElement('button');b.type='button';b.textContent=t;b.onclick=()=>answer(i);box.appendChild(b)})}
+function answer(i){const q=round.qs[round.i];const btns=[...$('#tv-a').children];btns.forEach(b=>b.disabled=true);
+  btns[q.right].classList.add('right');
+  if(i===q.right){round.score+=10;$('#tv-fact').textContent='Aye! '+q.fact}else{btns[i].classList.add('wrong');$('#tv-fact').textContent='Not quite. '+q.fact}
+  $('#tv-score').textContent=round.score+' doubloons';$('#tv-next').hidden=false;$('#tv-next').textContent=round.i===round.qs.length-1?'See results':'Next question';$('#tv-next').focus()}
+$('#tv-next').onclick=()=>{round.i++;if(round.i<round.qs.length)showQ();else finish()};
+function finish(){$('#tv-play').hidden=true;$('#tv-done').hidden=false;$('#tv-bar').style.width='100%';
+  const pct=round.score/(round.qs.length*10);
+  $('#tv-result').textContent=round.score+' doubloons. '+(pct>=.75?'Captain material!':pct>=.5?'A worthy deckhand.':'Swab the deck and try again.');
+  const crews=getCrews();const c=crews.find(c=>c.id===round.crew);
+  if(c){c.rounds++;c.score+=round.score;store.set('poy-crews',crews);$('#tv-result-sub').textContent='Added to '+c.name+'.'}else $('#tv-result-sub').textContent='';}
+$('#tv-start').onclick=startRound;$('#tv-ai').onclick=aiRound;
+$('#tv-again').onclick=()=>{$('#tv-done').hidden=true;$('#tv-setup').hidden=false};
+
+/* ---------- crews ---------- */
+const TYPES=[["family","Family","Home port crew"],["friends","Friends","Your regulars"],["camp","Camp","Cabins & counselors"],["school","School","Classes & clubs"],["prep","Prep School","Houses & teams"],["college","College","Dorms, clubs, alumni"]];
+const SAFE=['camp','school','prep'];
+const SEED=[{id:'s1',name:'Gaspar\'s Grotto Regulars',type:'friends',code:'GROT-7Q',rounds:4,score:270,ex:1},{id:'s2',name:'Kornreich Family',type:'family',code:'KORN-3P',rounds:3,score:210,ex:1},{id:'s3',name:'Cabin 7 Buccaneers',type:'camp',code:'CABI-9X',rounds:2,score:120,ex:1}];
+function getCrews(){return store.get('poy-crews',null)||SEED.map(c=>({...c}))}
+let pickType='family';
+function renderTypes(){const box=$('#crew-types');box.innerHTML='';TYPES.forEach(([k,n,d])=>{const b=document.createElement('button');b.type='button';b.setAttribute('aria-pressed',String(k===pickType));b.innerHTML='<b></b><span></span>';b.querySelector('b').textContent=n;b.querySelector('span').textContent=d+(SAFE.includes(k)?' · family-safe':'');b.onclick=()=>{pickType=k;renderTypes()};box.appendChild(b)})}
+function renderCrews(){const crews=getCrews().sort((a,b)=>b.score-a.score);const tb=$('#crew-body');tb.innerHTML='';
+  crews.forEach(c=>{const tr=document.createElement('tr');const t=TYPES.find(x=>x[0]===c.type);
+    [c.name+(c.ex?' (example)':''),t?t[1]:'',null,c.rounds,c.score].forEach((v,i)=>{const td=document.createElement('td');if(i===2){const s=document.createElement('span');s.className='code';s.textContent=c.code;td.appendChild(s)}else td.textContent=v;tr.appendChild(td)});tb.appendChild(tr)})}
+function fillCrewSelect(){const s=$('#tv-crew');const cur=s.value;s.innerHTML='<option value="">Just me</option>';getCrews().forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;s.appendChild(o)});s.value=cur||''}
+$('#crew-add').onclick=()=>{const n=$('#crew-name').value.trim();if(!n){toast('Give your crew a name first');$('#crew-name').focus();return}
+  const crews=getCrews();const code=n.replace(/[^a-z]/gi,'').slice(0,4).toUpperCase().padEnd(4,'X')+'-'+Math.random().toString(36).slice(2,4).toUpperCase();
+  crews.push({id:'c'+Date.now(),name:n,type:pickType,code,rounds:0,score:0});store.set('poy-crews',crews);$('#crew-name').value='';renderCrews();toast('Crew created. Invite code '+code)};
+
+/* ---------- arcade ---------- */
+const GAMES=[["Treasure Hunt","Find the chest with a compass","live",""],["Trivia","Film, pirate lore, Florida, fresh AI rounds","live","#trivia"],["Reel Maker","Photos into a pirate movie","live","#reels"],["Andy Golf Club","Drive, chip and putt past sand traps and water hazards","build",""],["Shere's Revenge","Swashbuckling sword duels, 1P vs AI or 2P","build",""],["Pirate Chess","Chess with a pirate crew and a smarter AI","build",""],["Checkers","Classic board, Gaspar's Grotto theme","build",""],["Pirate Darts","Throw at the tavern board","plan",""],["Ping Pong","Table tennis on the quarterdeck","plan",""],["Pirate Pool","Eight-ball in the captain's cabin","plan",""],["Flip Cup & Down the Hatch","Party games, root-beer rules","plan",""],["Shuffleboard & Bowling","Tavern classics","plan",""],["Jousting","Medieval lances with a pirate edge","plan",""],["Pirate Bingo","Crew-wide bingo nights","plan",""],["Crosswords & Puzzles","Daily Tampa and Ybor puzzles","plan",""],["Find Waldo's Treasure","Seek-and-find scenes","plan",""]];
+const TAG={live:['live','Playable'],build:['build','In build'],plan:['plan','Planned']};
+const al=$('#arcade-list');GAMES.forEach(([n,d,s,link])=>{const c=document.createElement('div');c.className='card';
+  c.innerHTML='<span class="tag '+TAG[s][0]+'">'+TAG[s][1]+'</span><h3></h3><p class="muted"></p>';c.querySelector('h3').textContent=n;c.querySelector('p').textContent=d;
+  if(link){const a=document.createElement('a');a.className='btn btn-ghost';a.href=link;a.textContent='Play';c.appendChild(a)}
+  al.appendChild(c)});
+
+/* ---------- treasure hunt ---------- */
+let th;
+function newMap(){th={chest:Math.random()*36|0,left:6,over:false,last:null};const g=$('#th-grid');g.innerHTML='';
+  for(let i=0;i<36;i++){const b=document.createElement('button');b.type='button';b.setAttribute('aria-label','Row '+(1+(i/6|0))+' column '+(1+i%6));b.onclick=()=>dig(i,b);g.appendChild(b)}
+  $('#th-left').textContent='Digs left: 6';$('#th-msg').textContent='Tap a square to dig.'}
+function dist(a,b){return Math.abs((a/6|0)-(b/6|0))+Math.abs(a%6-b%6)}
+function dig(i,b){if(th.over)return;b.disabled=true;th.left--;
+  if(i===th.chest){b.classList.add('gold');b.textContent='★';th.over=true;$('#th-msg').textContent='Treasure! Pippy is proud of you.';$('#th-left').textContent='Found with '+th.left+' to spare';return}
+  const d=dist(i,th.chest);b.classList.add('dug');b.textContent=d;
+  let msg=d<=1?'Scorching hot':d<=2?'Hot':d<=4?'Warm':'Cold';
+  if(th.last!==null)msg+=d<th.last?', getting warmer.':d>th.last?', getting colder.':', same distance.';else msg+='.';th.last=d;
+  $('#th-left').textContent='Digs left: '+th.left;
+  if(th.left===0){th.over=true;const gb=$('#th-grid').children[th.chest];gb.classList.add('gold');gb.textContent='★';msg='Out of digs. The chest was here.'}
+  $('#th-msg').textContent=msg+(th.over?'':' Numbers show steps to the chest.')}
+$('#th-reset').onclick=newMap;newMap();
+
+/* ---------- reel maker ---------- */
+const cv=$('#cv'),ctx=cv.getContext('2d');
+const markImg=new Image();
+markImg.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 300">'+document.getElementById('popspippy').innerHTML+'</svg>');
+markImg.onload=()=>drawAt(1.4);
+let photos=[];let playing=null;
+const XF=0.6,T0=2.6,TEND=3.2;
+function S(){return Math.min(cv.width,cv.height)}
+function serif(px,italic){return (italic?'italic ':'')+'600 '+px+'px "Cormorant Garamond", Georgia, serif'}
+function sans(px,w){return (w||700)+' '+px+'px "Alegreya Sans", system-ui, sans-serif'}
+function wrapLines(text,maxW){const words=text.split(/\s+/);const lines=[];let cur='';words.forEach(w=>{const t=cur?cur+' '+w:w;if(ctx.measureText(t).width>maxW&&cur){lines.push(cur);cur=w}else cur=t});if(cur)lines.push(cur);return lines}
+function velvet(){const W=cv.width,H=cv.height;const g=ctx.createRadialGradient(W/2,H*.42,10,W/2,H*.5,Math.max(W,H)*.75);g.addColorStop(0,'#4a2433');g.addColorStop(.55,'#22121a');g.addColorStop(1,'#0b0608');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
+function sparkles(t,n){const W=cv.width,H=cv.height;for(let k=0;k<n;k++){const x=((k*97)%100)/100*W,y=((k*53+17)%100)/100*H;if(y>H*.44&&y<H*.66&&x>W*.08&&x<W*.92)continue;const a=.25+.75*Math.abs(Math.sin(t*1.7+k));const r=S()*(.006+((k*7)%5)*.002);ctx.globalAlpha=a;ctx.fillStyle='#ffd77a';ctx.beginPath();ctx.moveTo(x,y-r*3);ctx.lineTo(x+r,y-r);ctx.lineTo(x+r*3,y);ctx.lineTo(x+r,y+r);ctx.lineTo(x,y+r*3);ctx.lineTo(x-r,y+r);ctx.lineTo(x-r*3,y);ctx.lineTo(x-r,y-r);ctx.closePath();ctx.fill()}ctx.globalAlpha=1}
+function drawMark(x,y,w,a){if(!markImg.complete||!markImg.naturalWidth)return;ctx.globalAlpha=a;ctx.drawImage(markImg,x,y,w,w*300/320);ctx.globalAlpha=1}
+function titleCard(t){const W=cv.width,H=cv.height,s=S();velvet();sparkles(t,14);
+  const a=Math.min(1,t/.8);const mw=s*.5;drawMark((W-mw)/2,H*.5-mw*1.05,mw,a);
+  ctx.globalAlpha=a;ctx.textAlign='center';ctx.fillStyle='#d9786a';ctx.font=sans(Math.round(s*.032),800);ctx.fillText('P I R A T E S   O F   Y B O R   P R E S E N T S',W/2,H*.5+s*.06);
+  ctx.fillStyle='#f6e9d6';ctx.font=serif(Math.round(s*.11),true);const lines=wrapLines($('#rl-title').value.trim()||'Welcome Aboard',W*.84);lines.forEach((l,i)=>ctx.fillText(l,W/2,H*.5+s*.19+i*s*.12));
+  ctx.globalAlpha=1}
+function endCard(t){const W=cv.width,H=cv.height,s=S();velvet();sparkles(t+3,18);
+  const mw=s*.62;drawMark((W-mw)/2,H*.46-mw,mw,1);ctx.textAlign='center';
+  ctx.fillStyle='#f6e9d6';ctx.font=serif(Math.round(s*.12),true);ctx.fillText('Welcome aboard.',W/2,H*.46+s*.12);
+  ctx.fillStyle='#f0b45c';ctx.font=sans(Math.round(s*.04),800);ctx.fillText('piratesofybor.com',W/2,H*.46+s*.2);
+  ctx.fillStyle='#c4ada6';ctx.font=sans(Math.round(s*.026),500);ctx.fillText(COPY,W/2,H-s*.06)}
+function grade(){const W=cv.width,H=cv.height;const g=ctx.createRadialGradient(W/2,H/2,S()*.3,W/2,H/2,Math.max(W,H)*.75);g.addColorStop(0,'rgba(20,11,14,0)');g.addColorStop(1,'rgba(20,11,14,.6)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);ctx.fillStyle='rgba(240,180,92,.06)';ctx.fillRect(0,0,W,H)}
+function watermark(t){const W=cv.width,H=cv.height,s=S();const mw=s*.17;drawMark(W-mw-s*.04,H-mw*300/320-s*.09,mw,.6);
+  ctx.save();ctx.globalAlpha=.75+.25*Math.sin(t*2);ctx.fillStyle='#ffd77a';ctx.beginPath();ctx.arc(W-s*.05,H-mw*.95-s*.09,s*.006,0,7);ctx.fill();ctx.restore();
+  ctx.textAlign='center';ctx.font=sans(Math.round(s*.022),600);ctx.fillStyle='rgba(246,233,214,.8)';ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=6;ctx.fillText(COPY,W/2,H-s*.035);ctx.shadowBlur=0}
+function caption(text){const W=cv.width,H=cv.height,s=S();ctx.textAlign='left';ctx.font=sans(Math.round(s*.03),700);ctx.fillStyle='rgba(20,11,14,.55)';const w=ctx.measureText(text).width+s*.05;ctx.fillRect(s*.04,s*.05,w,s*.065);ctx.fillStyle='#f6e9d6';ctx.fillText(text,s*.065,s*.095)}
+function cover(img,p,i){const W=cv.width,H=cv.height;const iw=img.naturalWidth,ih=img.naturalHeight;const base=Math.max(W/iw,H/ih);const z=i%2?1.14-.14*p:1+.14*p;const sc=base*z;const dw=iw*sc,dh=ih*sc;const mx=dw-W,my=dh-H;const px=i%3===0?p:i%3===1?1-p:.5;const py=i%2?.5:.3+p*.4;ctx.drawImage(img,-mx*px,-my*py,dw,dh)}
+/* sample scenes */
+function paintSunset(W,H,p){const s=S();const hy=H*.62;const g=ctx.createLinearGradient(0,0,0,hy);g.addColorStop(0,'#2a1238');g.addColorStop(.6,'#c4504a');g.addColorStop(1,'#f3b867');ctx.fillStyle=g;ctx.fillRect(0,0,W,hy);
+  const w=ctx.createLinearGradient(0,hy,0,H);w.addColorStop(0,'#5a2534');w.addColorStop(1,'#140b0e');ctx.fillStyle=w;ctx.fillRect(0,hy,W,H-hy);
+  ctx.fillStyle='#ffd58a';ctx.beginPath();ctx.arc(W*.62,hy,s*.13,Math.PI,0);ctx.fill();
+  ctx.fillStyle='rgba(255,213,138,.35)';for(let k=0;k<9;k++){const y=hy+(k+1)*s*.035,ww=s*(.28-k*.026);ctx.fillRect(W*.62-ww/2+Math.sin(p*6+k)*s*.01,y,ww,s*.007)}
+  const sx=W*(.18+p*.14),sy=hy+s*.01,k=s/700;ctx.fillStyle='#120a0d';
+  ctx.beginPath();ctx.moveTo(sx-120*k,sy-34*k);ctx.lineTo(sx+135*k,sy-34*k);ctx.lineTo(sx+100*k,sy);ctx.lineTo(sx-92*k,sy);ctx.closePath();ctx.fill();
+  ctx.fillRect(sx-45*k,sy-230*k,6*k,200*k);ctx.fillRect(sx+35*k,sy-260*k,6*k,230*k);
+  [[-42,-215,-120],[-42,-110,-48],[38,-245,-150],[38,-140,-52]].forEach(([dx,t,b])=>{const x=sx+dx*k;ctx.beginPath();ctx.moveTo(x,sy+t*k);ctx.quadraticCurveTo(x+70*k,sy+(t+b)/2*k,x,sy+b*k);ctx.closePath();ctx.fill()});
+  ctx.fillRect(sx-40*k,sy-250*k,30*k,14*k)}
+function paintTavern(W,H,p){const s=S();ctx.fillStyle='#1a0d10';ctx.fillRect(0,0,W,H);
+  const cs=[[.2,.62],[.5,.58],[.8,.63],[.35,.66],[.66,.67]];
+  cs.forEach(([x,y],i)=>{const cx=W*x,cy=H*y,f=1+.08*Math.sin(p*20+i*2);const g=ctx.createRadialGradient(cx,cy-s*.06,1,cx,cy-s*.06,s*.32*f);g.addColorStop(0,'rgba(255,190,100,.55)');g.addColorStop(1,'rgba(255,190,100,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)});
+  ctx.fillStyle='#2c1810';ctx.fillRect(0,H*.68,W,H*.32);ctx.fillStyle='#4a2a1a';ctx.fillRect(0,H*.68,W,s*.02);
+  for(let b=0;b<9;b++){const bx=W*(.06+b*.11),bh=s*(.16+(b%3)*.04);ctx.fillStyle=['#2f4a3a','#5a2a1e','#3a2a4a'][b%3];ctx.fillRect(bx,H*.36-bh,s*.045,bh);ctx.fillRect(bx+s*.014,H*.36-bh-s*.05,s*.017,s*.05)}
+  ctx.fillStyle='#3a2216';ctx.fillRect(0,H*.36,W,s*.015);
+  cs.forEach(([x,y],i)=>{const cx=W*x,cy=H*y;ctx.fillStyle='#efe0c4';ctx.fillRect(cx-s*.015,cy-s*.07,s*.03,s*.08);const f=1+.15*Math.sin(p*24+i);ctx.fillStyle='#ffc46a';ctx.beginPath();ctx.ellipse(cx,cy-s*.09,s*.012,s*.025*f,0,0,7);ctx.fill()})}
+function paintTreasure(W,H,p){const s=S();const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#1d1420');g.addColorStop(1,'#5a4128');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const cx=W/2,cy=H*.6,w=s*.5,h=s*.26;const gl=ctx.createRadialGradient(cx,cy-h*.6,1,cx,cy-h*.6,s*.6);gl.addColorStop(0,'rgba(255,210,110,'+(.55+.2*Math.sin(p*8))+')');gl.addColorStop(1,'rgba(255,210,110,0)');ctx.fillStyle=gl;ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#6b3a1e';ctx.fillRect(cx-w/2,cy-h/2,w,h);ctx.fillStyle='#e0a645';ctx.fillRect(cx-w/2,cy-h/2,w,s*.025);ctx.fillRect(cx-s*.03,cy-h/2,s*.06,s*.08);
+  ctx.fillStyle='#4f2914';ctx.beginPath();ctx.moveTo(cx-w/2,cy-h/2);ctx.lineTo(cx-w/2+s*.03,cy-h/2-s*.2);ctx.lineTo(cx+w/2+s*.03,cy-h/2-s*.2);ctx.lineTo(cx+w/2,cy-h/2);ctx.closePath();ctx.fill();
+  ctx.fillStyle='#ffd166';for(let k=0;k<14;k++){ctx.beginPath();ctx.ellipse(cx-w*.4+((k*37)%100)/100*w*.8,cy-h/2-s*.01-((k*13)%5)*s*.012,s*.025,s*.012,0,0,7);ctx.fill()}
+  for(let k=0;k<6;k++){ctx.beginPath();ctx.ellipse(cx-w*.7+k*w*.28,cy+h*.62+((k%2)*s*.02),s*.022,s*.01,0,0,7);ctx.fill()}}
+const SAMPLES=[{paint:paintSunset,cap:'Sample scene · Sunset on Tampa Bay'},{paint:paintTavern,cap:'Sample scene · Candlelit tavern'},{paint:paintTreasure,cap:'Sample scene · Pippy\'s treasure'}];
+function slides(){return photos.length?photos:SAMPLES}
+function total(){return T0+slides().length*+$('#rl-sec').value+TEND}
+function drawSlide(sl,i,p){const W=cv.width,H=cv.height;if(sl.img){cover(sl.img,p,i);grade()}else{sl.paint(W,H,p);grade();caption(sl.cap)}}
+function drawAt(t){const W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);ctx.globalAlpha=1;
+  const per=+$('#rl-sec').value,list=slides(),body=list.length*per;
+  if(t<T0){titleCard(t);return}
+  if(t<T0+body){const lt=t-T0,i=Math.min(list.length-1,Math.floor(lt/per)),loc=lt-i*per;drawSlide(list[i],i,loc/per);
+    if(loc<XF){ctx.globalAlpha=1-loc/XF;if(i>0)drawSlide(list[i-1],i-1,1);else titleCard(T0);ctx.globalAlpha=1}
+    watermark(t);return}
+  const e=t-T0-body;endCard(e);if(e<XF){ctx.globalAlpha=1-e/XF;drawSlide(list[list.length-1],list.length-1,1);watermark(t);ctx.globalAlpha=1}}
+function stopPlay(){if(playing){cancelAnimationFrame(playing.raf);playing=null}$('#rl-play').textContent='Play preview'}
+function play(onEnd){stopPlay();const start=performance.now(),T=total();playing={raf:0};$('#rl-play').textContent='Stop';
+  const tick=now=>{const t=(now-start)/1000;if(t>=T){drawAt(T-.01);stopPlay();onEnd&&onEnd();return}drawAt(t);playing.raf=requestAnimationFrame(tick)};playing.raf=requestAnimationFrame(tick)}
+$('#rl-play').onclick=()=>{if(playing&&!recording){stopPlay();return}if(!recording)play()};
+$('#rl-fmt').onchange=()=>{const f=$('#rl-fmt').value;cv.width=f==='wide'?1280:720;cv.height=f==='wide'?720:1280;$('#stage').dataset.fmt=f;drawAt(1.4)};
+$('#rl-sec').onchange=()=>{if(!playing)drawAt(1.4)};
+$('#rl-title').oninput=()=>{if(!playing)drawAt(1.4)};
+$('#rl-files').onchange=async e=>{const files=[...e.target.files].filter(f=>f.type.startsWith('image/')).slice(0,20-photos.length);
+  for(const f of files){const url=URL.createObjectURL(f);const img=new Image();img.src=url;try{await img.decode();photos.push({img,url})}catch(err){URL.revokeObjectURL(url)}}
+  e.target.value='';renderThumbs()};
+$('#rl-clear').onclick=()=>{photos.forEach(p=>URL.revokeObjectURL(p.url));photos=[];renderThumbs()};
+function renderThumbs(){const box=$('#rl-thumbs');box.innerHTML='';photos.forEach((p,i)=>{const im=document.createElement('img');im.src=p.url;im.alt='Photo '+(i+1);box.appendChild(im)});
+  $('#rl-clear').hidden=!photos.length;$('#rl-note').textContent=photos.length?photos.length+' photo'+(photos.length>1?'s':'')+' · about '+Math.round(total())+' seconds with title and end cards.':'Showing three sample scenes. Add up to 20 photos to make it yours.';if(!playing)drawAt(T0+.8)}
+/* save video */
+let downloads=null,recording=false;
+const recMime=(()=>{if(!window.MediaRecorder||!cv.captureStream)return null;return['video/mp4;codecs=avc1','video/mp4','video/webm;codecs=vp9','video/webm'].find(m=>MediaRecorder.isTypeSupported(m))||null})();
+if(window.claude&&window.claude.use){window.claude.use('downloads').then(d=>{downloads=d;if(d&&recMime)$('#rl-save').hidden=false}).catch(()=>{})}
+$('#rl-save').onclick=()=>{if(recording)return;let rec;try{rec=new MediaRecorder(cv.captureStream(30),{mimeType:recMime,videoBitsPerSecond:6e6})}catch(err){$('#rl-status').textContent='This browser can\'t record the movie. Try Chrome or the store app.';return}
+  const chunks=[];rec.ondataavailable=ev=>{if(ev.data&&ev.data.size)chunks.push(ev.data)};
+  rec.onstop=async()=>{recording=false;$('#rl-save').disabled=false;$('#rl-play').disabled=false;const ext=recMime.includes('mp4')?'mp4':'webm';const blob=new Blob(chunks,{type:recMime.split(';')[0]});
+    const name=($('#rl-title').value.trim()||'pirates-of-ybor-reel').replace(/[^a-z0-9]+/gi,'-').replace(/^-|-$/g,'').toLowerCase()+'.'+ext;
+    $('#rl-status').textContent='Movie ready. Confirm the save to keep it.';
+    try{await downloads.save({filename:name,data:blob});$('#rl-status').textContent='Saved '+name+'. Post it to Reels, Stories or TikTok.'}catch(err){$('#rl-status').textContent=err&&err.code==='declined'?'Save cancelled.':'Saving isn\'t available here. The store app saves straight to your camera roll.'}};
+  recording=true;$('#rl-save').disabled=true;$('#rl-play').disabled=true;$('#rl-status').textContent='Recording your movie in real time… about '+Math.round(total())+' seconds.';
+  rec.start(250);play(()=>setTimeout(()=>rec.stop(),150))};
+
+/* ---------- quartermaster ---------- */
+const RULES='You are the Quartermaster aboard Pirates of Ybor, a pirate-themed game and entertainment app from Ybor City in Tampa, Florida, inspired by Gaspar\'s Grotto, the pirate bar at 1805 E 7th Ave. The mascots are Pops, the bar cat, and Pippy, a pirate chihuahua. Games in the app: trivia (Silver Screen, Pirate Lore, Florida Pirate Trail), Treasure Hunt (find the chest in 6 digs on a 6x6 map; each dig shows how many steps away the chest is, counting rows plus columns), Reel Maker (turns photos into a short pirate movie), crews (private leaderboards for family, friends, camp, schools, prep schools and colleges), with Andy Golf Club, Shere\'s Revenge swordplay, pirate chess and checkers coming soon. Speak with warm, playful pirate flair and make every player feel welcome aboard. Keep it family-friendly, since students and kids play too. Keep answers under 120 words unless asked for more. Never give away answers to a trivia round in progress. For bar hours, menu, events or reservations, point people to gasparsgrotto.com because details change. You cannot place orders, book tables or see the player\'s scores.';
+let turns=[],qmCtl=null;
+function addMsg(who,text){const d=document.createElement('div');d.className='msg '+who;if(who==='qm'){const b=document.createElement('b');b.textContent='Quartermaster';d.appendChild(b)}const sp=document.createElement('span');sp.textContent=text;d.appendChild(sp);$('#chat').appendChild(d);$('#chat').scrollTop=$('#chat').scrollHeight;return sp}
+async function send(text){text=(text||'').trim();if(!text||qmCtl)return;if(!sample){$('#qm-note').textContent='The Quartermaster answers when this page is opened in Claude.';return}
+  $('#qm-in').value='';addMsg('me',text);turns.push({role:'user',content:text});if(turns.length>16)turns=turns.slice(-16);while(turns.length&&turns[0].role!=='user')turns.shift();
+  const out=addMsg('qm','Thinking…');qmCtl=new AbortController();$('#qm-send').hidden=true;$('#qm-stop').hidden=false;
+  try{const {text:reply}=await sample([{role:'user',content:RULES},...turns],{cache:false,modelTier:'quick',signal:qmCtl.signal,onText:({text})=>{out.textContent=text;$('#chat').scrollTop=$('#chat').scrollHeight}});turns.push({role:'assistant',content:reply})}
+  catch(e){const code=e&&e.code;if(code==='cancelled'){out.textContent=e.text||'(stopped)'}else if(code==='refused'){out.textContent=qmCopy(code)}else{out.textContent=e&&e.text?e.text+'\n\n(cut off)':qmCopy(code)}
+    if(e&&e.text)turns.push({role:'assistant',content:e.text});else turns.pop();
+    if(HIDE.includes(code)){$('#composer').hidden=true;$('#chips').hidden=true;$('#qm-note').textContent=qmCopy(code)}}
+  finally{qmCtl=null;$('#qm-send').hidden=false;$('#qm-stop').hidden=true}}
+$('#qm-send').onclick=()=>send($('#qm-in').value);
+$('#qm-stop').onclick=()=>qmCtl&&qmCtl.abort();
+$('#qm-in').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send($('#qm-in').value)}});
+$('#chips').addEventListener('click',e=>{if(e.target.tagName==='BUTTON')send(e.target.textContent)});
+claudeReady.then(s=>{if(s){$('#tv-ai').hidden=false}else{$('#composer').hidden=true;$('#chips').hidden=true;$('#qm-note').textContent='The Quartermaster answers when this page is opened in Claude. In the store app, he runs through the Pirates of Ybor server.'}});
+
+/* ---------- launch checklist ---------- */
+const CHECKS=["Real Pops & Pippy poster art placed as the official watermark on every screen and video","Written permission from Gaspar's Grotto to use its name, logo and photos","Privacy policy and support pages live on piratesofybor.com","Age plan: all-ages deck for school, camp and prep crews; tavern games behind an age gate","Sign in with Apple added alongside Google and Facebook","Game unlocks through Apple and Google in-app purchases; merch through store checkout","Claude API key kept on the server only, never inside the app","App icon (1024px), splash screen and store screenshots for phone and tablet","Store description, keywords and promo video made in Reel Maker","No real-money wagering anywhere in bar games","Permission on file for every person named in credits","Test build on a real iPhone and Android phone"];
+const done=store.get('poy-checks',[]);const cb=$('#checks');
+CHECKS.forEach((t,i)=>{const l=document.createElement('label');l.className='check';l.innerHTML='<input type="checkbox" id="chk'+i+'"><span></span>';l.querySelector('span').textContent=t;const inp=l.querySelector('input');inp.checked=done.includes(i);
+  inp.onchange=()=>{const d=store.get('poy-checks',[]).filter(x=>x!==i);if(inp.checked)d.push(i);store.set('poy-checks',d)};cb.appendChild(l)});
+
+$('#copy-mail').onclick=()=>{const t=$('#mail').textContent;const sel=()=>{const r=document.createRange();r.selectNodeContents($('#mail'));const s=getSelection();s.removeAllRanges();s.addRange(r);toast('Email selected. Copy it from here.')};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>toast('Email copied'),sel)}else sel()};
+
+renderTypes();route();
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(!playing)drawAt(1.4)});
+})();
+</script>
+
+</body></html>

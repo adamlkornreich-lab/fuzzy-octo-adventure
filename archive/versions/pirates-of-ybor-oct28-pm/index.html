@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pirates of Ybor</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Work+Sans:wght@400;600&display=swap">
+<style>
+:root{--bg:#0d2530;--panel:#143543;--ink:#eef4f2;--mute:#9db8bd;--gold:#f0b429;--sea:#58b8a8;--bad:#ff8a7a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:dark}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#eaf2f1;--panel:#fff;--ink:#12303b;--mute:#4b6a72;--gold:#9a6a00;--sea:#1d7f70;--bad:#b3392b;color-scheme:light}}
+:root[data-theme="dark"]{color-scheme:dark}
+*{box-sizing:inherit}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 'Work Sans',system-ui,sans-serif}
+main{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+h1,h2{font-family:'Pirata One',Georgia,serif;font-weight:400;margin:0}
+h1{font-size:clamp(3rem,13vw,5.5rem);line-height:.95;color:var(--gold)}
+h2{font-size:1.8rem;margin:36px 0 10px}
+.sub{color:var(--mute);max-width:46ch}
+nav{display:flex;gap:8px;margin:18px 0;flex-wrap:wrap}
+button,.tab{font:inherit;background:var(--panel);color:var(--ink);border:2px solid transparent;border-radius:10px;padding:10px 14px;cursor:pointer;min-height:44px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.tab[aria-selected=true]{border-color:var(--gold)}
+.primary{background:var(--gold);color:#1a1405;font-weight:600}
+.card{background:var(--panel);border-radius:14px;padding:18px}
+.q{font-size:1.2rem;margin:8px 0 14px}
+.opts{display:grid;gap:8px}
+.opts button{text-align:left}
+.ok{border-color:var(--sea)!important}.no{border-color:var(--bad)!important}
+.meta{display:flex;justify-content:space-between;color:var(--mute);font-size:.9rem}
+select,input{font:inherit;width:100%;padding:10px;border-radius:10px;border:2px solid var(--mute);background:var(--bg);color:var(--ink);min-height:44px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:12px 0}
+.grid button{aspect-ratio:1;padding:0;font-size:1.4rem}
+ul{padding-left:1.1em}li{margin:4px 0}
+.wide{overflow-x:auto}
+footer{margin-top:40px;color:var(--mute);font-size:.9rem;border-top:2px solid var(--panel);padding-top:14px}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:no-preference){.hero{animation:rise .7s ease-out}@keyframes rise{from{opacity:0;transform:translateY(10px)}}}
+</style></head><body><main>
+<header class="hero"><h1>Pirates of Ybor</h1>
+<p class="sub">Trivia, treasure hunts and tavern games from Gaspar’s Grotto. Try everything free. No sign-in needed to play.</p></header>
+
+<nav role="tablist" aria-label="Games">
+<button class="tab" role="tab" aria-selected="true" data-t="trivia">Trivia</button>
+<button class="tab" role="tab" aria-selected="false" data-t="hunt">Treasure hunt</button>
+<button class="tab" role="tab" aria-selected="false" data-t="soon">Tavern</button>
+</nav>
+
+<section id="trivia" class="card">
+<label for="cat">Category</label>
+<select id="cat"><option value="movies">Pirate movies</option><option value="fl">Florida Pirate Trail</option><option value="lore">Pirate lore</option></select>
+<div id="quiz" style="margin-top:14px"></div>
+</section>
+
+<section id="hunt" class="card" hidden>
+<div class="meta"><span id="hmsg">Find the treasure chest. Each dig shows how close you are.</span><span id="hleft"></span></div>
+<div class="grid" id="grid"></div>
+<button class="primary" id="hnew">New map</button>
+</section>
+
+<section id="soon" class="card" hidden>
+<p><strong>Coming to the tavern</strong></p>
+<ul><li>Pirate chess, 1 player vs AI and 2 player</li><li>Darts, ping pong, beer pong, bowling and shuffleboard</li><li>Swashbuckling duels</li><li>Bar tournament mode</li><li>Fresh AI-written trivia every day</li></ul>
+<p class="sub">Apps for Apple, Google Play and Samsung are planned. Sign-in will use Google, Apple, Samsung, Facebook or TikTok, and payments will go through the store’s own checkout.</p>
+</section>
+
+<h2>Crew and credits</h2>
+<p class="sub">With thanks to Captain Shiller and Co-Navigator Shere and their family; Mark Brenner; Ed Lafferty; Ruben and Rene Alvarez and their whole family; Amber Kornreich, the smartest person on Earth; Adam’s dad; and Princess Atara 👑. Ship’s cats: Pops, the world-famous bar cat, and Pippy. Tanker Ray inspired the copyright page.</p>
+
+<h2>Support</h2>
+<div class="card">
+<p>Questions, bugs or permission requests? Email <a href="mailto:adamlkornreich@gmail.com" style="color:var(--gold)">adamlkornreich@gmail.com</a>.</p>
+<label for="msg">Quick note (we’ll open your email app)</label>
+<input id="msg" maxlength="300" placeholder="What can we help with?">
+<p id="warn" role="alert" style="color:var(--bad);min-height:1.5em;margin:6px 0"></p>
+<button class="primary" id="send">Send note</button>
+</div>
+
+<h2>Copyright and fair use</h2>
+<p class="sub">Movie titles, brand names and logos mentioned here belong to their owners and are used for commentary and trivia only. We don’t host or link to pirated downloads, and torrent or magnet links are blocked on this site. Owners can request changes by email.</p>
+
+<footer>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.</footer>
+
+<script>
+const Q={
+movies:[
+["Which ship does Captain Jack Sparrow call his own?",["Black Pearl","Flying Dutchman","Queen Anne’s Revenge","Jolly Roger"],0],
+["Who wrote the novel Treasure Island?",["Mark Twain","Robert Louis Stevenson","Jules Verne","Herman Melville"],1],
+["In Hook (1991), who plays Peter Pan as a grown-up?",["Robin Williams","Dustin Hoffman","Tom Hanks","Bill Murray"],0],
+["Which 2003 film began the Pirates of the Caribbean series?",["Dead Man’s Chest","The Curse of the Black Pearl","At World’s End","On Stranger Tides"],1],
+["What is the name of Peter Pan’s fairy friend?",["Tinker Bell","Silvermist","Fauna","Navi"],0]],
+fl:[
+["Which Florida city hosts the Gasparilla Pirate Festival?",["Miami","Tampa","Orlando","Pensacola"],1],
+["Ybor City is best known historically for what industry?",["Cigars","Citrus","Shipbuilding","Phosphate"],0],
+["Tampa’s Channelside area sits on which waterway?",["Tampa Bay channels","The Everglades","Lake Okeechobee","St. Johns River"],0],
+["Apollo Beach, near Tampa, is a popular spot to see which animal?",["Manatees","Penguins","Moose","Bison"],0],
+["The legendary pirate José Gaspar is also called…",["Gasparilla","Blackbeard","Calico Jack","Redbeard"],0]],
+lore:[
+["What flag is traditionally called the Jolly Roger?",["Skull and crossbones","Red anchor","White cross","Green parrot"],0],
+["Which pirate was nicknamed Blackbeard?",["Edward Teach","Henry Morgan","Anne Bonny","William Kidd"],0],
+["A pirate’s ‘doubloon’ was a coin made of what?",["Gold","Paper","Wood","Copper only"],0],
+["What do you call the left side of a ship when facing forward?",["Port","Starboard","Stern","Bow"],0]]};
+const $=s=>document.querySelector(s);
+const tabs=[...document.querySelectorAll('.tab')];
+tabs.forEach(b=>b.onclick=()=>{tabs.forEach(t=>t.setAttribute('aria-selected',t===b));['trivia','hunt','soon'].forEach(id=>$('#'+id).hidden=id!==b.dataset.t)});
+let list,i,score;
+function shuffle(a){return a.map(x=>[Math.random(),x]).sort((a,b)=>a[0]-b[0]).map(x=>x[1])}
+function start(){list=shuffle(Q[$('#cat').value]);i=0;score=0;show()}
+function show(){const box=$('#quiz');
+if(i>=list.length){box.innerHTML=`<p class="q">You scored ${score} of ${list.length}.</p><button class="primary" id="again">Play again</button>`;$('#again').onclick=start;return}
+const [q,o,a]=list[i];const idx=shuffle(o.map((t,n)=>n));
+box.innerHTML=`<div class="meta"><span>Question ${i+1} of ${list.length}</span><span>Score ${score}</span></div><p class="q"></p><div class="opts"></div>`;
+box.querySelector('.q').textContent=q;
+const wrap=box.querySelector('.opts');
+idx.forEach(n=>{const b=document.createElement('button');b.textContent=o[n];b.onclick=()=>{
+wrap.querySelectorAll('button').forEach(x=>{x.disabled=true;if(x.textContent===o[a])x.classList.add('ok')});
+if(n===a)score++;else b.classList.add('no');
+setTimeout(()=>{i++;show()},1100)};wrap.appendChild(b)})}
+$('#cat').onchange=start;start();
+let chest,digs,done;
+function hunt(){chest=Math.floor(Math.random()*25);digs=8;done=false;$('#hmsg').textContent='Find the treasure chest.';$('#hleft').textContent=digs+' digs left';
+const g=$('#grid');g.innerHTML='';for(let n=0;n<25;n++){const b=document.createElement('button');b.setAttribute('aria-label','Dig spot '+(n+1));b.onclick=()=>dig(n,b);g.appendChild(b)}}
+function dig(n,b){if(done||b.disabled)return;b.disabled=true;digs--;
+if(n===chest){b.textContent='💰';done=true;$('#hmsg').textContent='You found the treasure!';}
+else{const d=Math.abs(n%5-chest%5)+Math.abs(Math.floor(n/5)-Math.floor(chest/5));b.textContent=d<=1?'🔥':d<=3?'🌤':'❄';
+$('#hmsg').textContent=d<=1?'Hot. Very close.':d<=3?'Warm.':'Cold.';
+if(!digs){done=true;$('#hmsg').textContent='Out of digs. The chest was at spot '+(chest+1)+'.'}}
+$('#hleft').textContent=digs+' digs left'}
+$('#hnew').onclick=hunt;hunt();
+const bad=/(magnet:|\.torrent|\btorrent\b|bittorrent|thepiratebay)/i;
+$('#send').onclick=()=>{const v=$('#msg').value.trim();
+if(bad.test(v)){$('#warn').textContent='Torrent and magnet links are blocked on this site.';return}
+$('#warn').textContent='';location.href='mailto:adamlkornreich@gmail.com?subject='+encodeURIComponent('Pirates of Ybor support')+'&body='+encodeURIComponent(v)};
+document.addEventListener('paste',e=>{const t=(e.clipboardData||window.clipboardData).getData('text');if(/magnet:/i.test(t)){e.preventDefault();$('#warn').textContent='Torrent and magnet links are blocked on this site.'}});
+</script></main></body></html>

@@ -1,0 +1,310 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pirates of Ybor</title>
+<meta name="description" content="Pirate trivia, treasure hunts and tavern games with Pops & Pippy. Play free in your browser or install the app.">
+<meta name="theme-color" content="#0f5c73">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pirates of Ybor">
+<meta property="og:title" content="Pirates of Ybor">
+<meta property="og:description" content="Trivia, treasure & mischief with Pops & Pippy. Play free — no sign-up.">
+<meta property="og:url" content="https://thepiratesofybor.com/">
+<style>
+:root{--bg:#1a0f08;--panel:#2b1a0e;--ink:#f6e7c1;--muted:#cdb88a;--gold:#e0a82e;--red:#b3261e;--sea:#0f5c73;--ok:#1f7a3a;--bad:#7a1f1f;--line:#e0a82e;--head:#e0a82e}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f3e2b8;--panel:#fff4d6;--ink:#2b1a0e;--muted:#6b4a22;--line:#b9842a;--head:#8a5a12}}
+:root[data-theme="light"]{--bg:#f3e2b8;--panel:#fff4d6;--ink:#2b1a0e;--muted:#6b4a22;--line:#b9842a;--head:#8a5a12}
+:root[data-theme="dark"]{--bg:#1a0f08;--panel:#2b1a0e;--ink:#f6e7c1;--muted:#cdb88a;--line:#e0a82e;--head:#e0a82e}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif;line-height:1.5;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,0)}
+a{color:var(--head)}
+header{background:linear-gradient(#0f5c73,#0a3a4a);text-align:center;padding:calc(20px + env(safe-area-inset-top,0)) 16px 16px;position:relative}
+h1{font-size:clamp(2rem,7vw,3.2rem);margin:6px 0;color:var(--gold);text-shadow:2px 2px 0 #000;line-height:1.1}
+h2{margin:.2em 0 .5em;line-height:1.25}
+.tag{font-style:italic;color:#f6e7c1}
+nav{display:flex;justify-content:center;gap:2px;flex-wrap:wrap;padding:10px 16px;position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+nav button{margin:0;padding:8px 9px;font-size:.92rem;background:transparent;color:var(--ink);border-color:transparent}
+nav button[aria-current="page"]{border-color:var(--gold);background:var(--panel)}
+main{max-width:760px;margin:auto;padding:16px;position:relative;z-index:1}
+.card{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:18px;margin:16px 0}
+button{font:inherit;cursor:pointer;border:2px solid var(--gold);background:var(--red);color:#fff;padding:12px 18px;border-radius:10px;margin:5px 5px 5px 0;font-weight:bold;min-height:44px}
+button:hover{filter:brightness(1.12)}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button.alt{background:var(--sea)}
+a.btn{display:inline-block;text-align:center;text-decoration:none;border:2px solid var(--gold);background:var(--red);color:#fff;padding:12px 18px;border-radius:10px;margin:5px 5px 5px 0;font-weight:bold}
+a.btn:hover{filter:brightness(1.12)}
+a.btn:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button.ghost{background:transparent;color:var(--ink)}
+button:disabled{opacity:.5;cursor:not-allowed}
+.opts button{display:block;width:100%;text-align:left;background:var(--panel);color:var(--ink)}
+.opts button.ok{background:var(--ok);color:#fff}.opts button.bad{background:var(--bad);color:#fff}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.hide{display:none!important}
+.muted{color:var(--muted);font-size:.92rem}
+.tryban{color:var(--head);font-weight:bold;margin-top:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.game{border:2px solid var(--line);border-radius:12px;padding:14px;background:var(--bg);display:flex;flex-direction:column}
+.game h3{margin:.1em 0 .3em;color:var(--head)}
+.game p{margin:0 0 10px;flex:1}
+.badge{display:inline-block;font-size:.75rem;padding:2px 8px;border-radius:99px;border:1px solid var(--gold);color:var(--head);margin-bottom:6px;align-self:flex-start}
+.badge.live{background:var(--ok);color:#fff;border-color:var(--ok)}
+.bar{height:8px;background:var(--bg);border-radius:9px;overflow:hidden;margin:6px 0 12px}
+.bar i{display:block;height:100%;background:var(--gold);transition:width .3s}
+/* treasure hunt */
+.map{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;max-width:420px;margin:10px auto;padding:10px;border-radius:12px;background:#d9b77a;border:3px solid #6b3d1a}
+.map button{margin:0;padding:0;aspect-ratio:1;min-height:0;background:#c9a466;border:2px dashed #6b3d1a;color:#2b1a0e;font-size:clamp(1rem,5vw,1.6rem);border-radius:8px}
+.map button.dug{background:#a8844a;border-style:solid}
+.map button.hot{background:#e07a2e}.map button.warm{background:#e0b02e}.map button.cold{background:#7aa7b8}
+.map button.win{background:var(--gold)}
+/* watermark */
+.wm{position:fixed;right:-20px;bottom:40px;width:min(62vw,420px);opacity:.16;pointer-events:none;z-index:4;filter:saturate(1.1)}
+.wm img{width:100%;display:block}
+.wm .sp{position:absolute;color:#ffd45e;animation:tw 2.6s ease-in-out infinite}
+.wm .sp:nth-child(2){left:10%;top:8%}.wm .sp:nth-child(3){right:12%;top:2%;animation-delay:.8s}.wm .sp:nth-child(4){left:46%;top:-6%;animation-delay:1.6s}
+@keyframes tw{0%,100%{opacity:.2;transform:scale(.7)}50%{opacity:1;transform:scale(1.2)}}
+@media (prefers-reduced-motion:reduce){.wm .sp{animation:none}.bar i{transition:none}}
+footer{text-align:center;font-size:.85rem;padding:20px 16px 28px;position:relative;z-index:1}
+footer .wmline{color:var(--head);font-weight:bold}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--panel);border:2px solid var(--gold);padding:10px 16px;border-radius:10px;z-index:20;max-width:calc(100% - 32px)}
+dialog{background:var(--panel);color:var(--ink);border:2px solid var(--gold);border-radius:14px;max-width:420px}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+</style>
+</head>
+<body>
+<div class="wm" aria-hidden="true"><img src="assets/pops-pippy.svg" alt=""><span class="sp">✦</span><span class="sp">✦</span><span class="sp">✦</span></div>
+
+<header>
+<svg viewBox="0 0 200 120" width="170" role="img" aria-label="Pirate ship"><path d="M20 80h160l-20 28H40z" fill="#6b3d1a" stroke="#e0a82e" stroke-width="3"/><rect x="98" y="14" width="5" height="68" fill="#e0a82e"/><path d="M103 18l50 22-50 24z" fill="#f6e7c1" stroke="#000"/><path d="M98 18L56 38l42 22z" fill="#f6e7c1" stroke="#000"/><circle cx="125" cy="40" r="6" fill="#000"/><path d="M0 112q25-12 50 0t50 0 50 0 50 0v8H0z" fill="#0f5c73"/></svg>
+<h1>☠ Pirates of Ybor ☠</h1>
+<div class="tag">Trivia, treasure &amp; mischief with Pops &amp; Pippy — welcome aboard, matey!</div>
+<button id="install" class="alt hide" style="margin-top:10px">⬇ Install the app</button>
+</header>
+
+<nav aria-label="Main">
+<button data-go="games" aria-current="page">🏴‍☠️ Games</button>
+<button data-go="trivia">❓ Trivia</button>
+<button data-go="treasure">🗺 Treasure</button>
+<button data-go="about">⚓ Crew</button>
+</nav>
+
+<main>
+<!-- GAMES HUB -->
+<section id="v-games">
+  <div class="card">
+    <p class="tryban">⚓ Try first — no sign-up, no card. Play free right here.</p>
+    <div class="grid">
+      <div class="game"><span class="badge live">Play now</span><h3>Trivia Ahoy</h3><p>Pirates, movies, Ybor &amp; Tampa, science of the sea — and a cheeky 17+ deck.</p><button data-go="trivia">Set sail</button></div>
+      <div class="game"><span class="badge live">Play now</span><h3>Gaspar's Treasure Hunt</h3><p>Dig the map, follow Pippy's nose — hot or cold — and find the chest in 8 digs.</p><button data-go="treasure">Grab a shovel</button></div>
+      <div class="game"><span class="badge">Coming to the app</span><h3>Pirate Chess</h3><p>Captains vs. crew. Play the AI or a friend at the tavern table.</p><button class="ghost" disabled>Soon</button></div>
+      <div class="game"><span class="badge live">Play now</span><h3>Andy Golf Club</h3><p>Tee it up with Andy on nine seaside holes — read the wind, three-tap swing, sink the putt.</p><a class="btn" href="games/andy-golf-club.html">Tee off</a></div>
+      <div class="game"><span class="badge live">Play now</span><h3>Shere's Revenge &amp; Classics</h3><p>Swordplay duel, sea-horse jousting, cannon battle, Kraken tug-o'-war, Find Pippy and more.</p><a class="btn" href="games/grotto-classics.html">Draw swords</a></div>
+      <div class="game"><span class="badge live">Play now</span><h3>Tavern Games</h3><p>Flip cup, darts, crossword, bingo, trivia, pool, ping pong, Down the Hatch and Powder Keg.</p><a class="btn" href="games/tavern-games.html">Pull up a stool</a></div>
+      <div class="game"><span class="badge live">Play now</span><h3>Gaspar's Pour-Off</h3><p>Adam vs Steph behind the bar, plus the Mixology Showdown for up to 4 players.</p><a class="btn" href="games/pour-off.html">Start pouring</a></div>
+      <div class="game"><span class="badge live">Play now</span><h3>Whack-a-Kraken</h3><p>Bonk krakens in the grotto portholes, grab doubloons — and leave Pippy be!</p><a class="btn" href="games/whack-a-kraken.html">Grab the mallet</a></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>Your logbook</h2>
+    <p id="log" class="muted">No voyages yet — play a game and your best scores land here.</p>
+  </div>
+</section>
+
+<!-- TRIVIA -->
+<section id="v-trivia" class="hide">
+  <div class="card" id="t-home">
+    <h2>Trivia Ahoy</h2>
+    <p class="muted">Pick a deck. 5 questions per round, shuffled every time.</p>
+    <div class="row" id="cats"></div>
+    <p class="muted">Love Ahoy is cheeky PG-13 fun — flirty, never explicit. Players must be 17+ for that deck.</p>
+  </div>
+  <div class="card hide" id="t-quiz">
+    <div class="row" style="justify-content:space-between"><span id="meta" class="muted"></span><span id="tscore" class="muted"></span></div>
+    <div class="bar"><i id="prog" style="width:0"></i></div>
+    <h2 id="q"></h2>
+    <div class="opts" id="opts"></div>
+    <p id="fb" aria-live="polite"></p>
+    <button id="next" class="alt hide">Next, matey ➜</button>
+  </div>
+  <div class="card hide" id="t-end">
+    <h2 id="score"></h2>
+    <p id="rank"></p>
+    <div class="row">
+      <button id="again">Play another deck</button>
+      <button id="share" class="alt">Share my score</button>
+    </div>
+  </div>
+</section>
+
+<!-- TREASURE -->
+<section id="v-treasure" class="hide">
+  <div class="card">
+    <h2>Gaspar's Treasure Hunt</h2>
+    <p class="muted">Tap a square to dig. Pippy sniffs the dirt: 🔥 hot (right next to it), 🌤 warm (2 away), 🧊 cold (far). Find the chest in 8 digs!</p>
+    <p id="hstatus" aria-live="polite"><b>Digs left: 8</b></p>
+    <div class="map" id="map" role="grid" aria-label="Treasure map"></div>
+    <div class="row" style="justify-content:center"><button id="hnew" class="alt">New map</button></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="v-about" class="hide">
+  <div class="card">
+    <h2>The crew</h2>
+    <p>With heartfelt thanks to <b>Captain Shiller</b> and <b>Co-Navigator Shere</b> and their whole family — the crew behind this voyage.</p>
+    <p>Mascots: <b>Pops</b>, the bar cat (in the line of the world-famous bar cat Tanker Ray), and <b>Pippy</b>, the pirate chihuahua.</p>
+    <p>Created by Adam Kornreich, R.A. Consulting.</p>
+  </div>
+  <div class="card">
+    <h2>Get the app</h2>
+    <p><b>iPhone / iPad:</b> open this site in Safari → Share → <i>Add to Home Screen</i>.</p>
+    <p><b>Android / Chrome / Edge:</b> tap <i>Install the app</i> at the top, or browser menu → <i>Install app</i>.</p>
+    <p class="muted">Works offline once installed. Full versions on the Apple App Store and Google Play are on the way.</p>
+  </div>
+  <div class="card">
+    <h2>Contact &amp; legal</h2>
+    <p>Copyright or permissions questions: <a href="mailto:adamlkornreich@gmail.com">adamlkornreich@gmail.com</a></p>
+    <p><a href="privacy.html">Privacy policy</a></p>
+    <p class="muted">All third-party names, films and brands are the property of their owners and are used for trivia only. No endorsement by them is implied.</p>
+  </div>
+</section>
+</main>
+
+<dialog id="age">
+  <h2>Ahoy — 17+ deck</h2>
+  <p>Love Ahoy is flirty pirate humour for players 17 and older. Are ye 17 or over?</p>
+  <div class="row"><button id="ageYes">Aye, I'm 17+</button><button id="ageNo" class="alt">Nay, take me back</button></div>
+</dialog>
+
+<footer>
+  <div class="wmline">© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy</div>
+  All rights reserved · <a href="https://thepiratesofybor.com">thepiratesofybor.com</a>
+</footer>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=localStorage.getItem("poy:"+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem("poy:"+k,JSON.stringify(v))}catch(e){}}};
+function toast(msg){const t=document.createElement("div");t.className="toast";t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+/* ---------- navigation ---------- */
+const views=["games","trivia","treasure","about"];
+function go(v,push=true){
+  if(!views.includes(v))v="games";
+  views.forEach(x=>$("v-"+x).classList.toggle("hide",x!==v));
+  document.querySelectorAll("nav button").forEach(b=>{if(b.dataset.go===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
+  if(v==="trivia")triviaHome();
+  if(v==="treasure"&&!hunt)newHunt();
+  if(v==="games")renderLog();
+  if(push&&location.hash!=="#"+v){try{history.pushState(null,"","#"+v)}catch(e){location.hash=v}}
+  window.scrollTo(0,0);
+}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)go(b.dataset.go)});
+window.addEventListener("popstate",()=>go(location.hash.slice(1),false));
+
+/* ---------- logbook ---------- */
+function renderLog(){
+  const best=store.get("best",{});const keys=Object.keys(best);
+  $("log").innerHTML=keys.length?keys.map(k=>`<b>${k}</b>: ${best[k]}`).join(" · "):"No voyages yet — play a game and your best scores land here.";
+}
+function record(game,val,better){const best=store.get("best",{});if(best[game]==null||better(val,best[game])){best[game]=val;store.set("best",best);return true}return false}
+
+/* ---------- trivia ---------- */
+const D={
+"Pirates":[
+["Which pirate was known as Blackbeard?","Edward Teach",["Edward Teach","Henry Morgan","Jack Rackham","Bartholomew Roberts"]],
+["What is the classic skull-and-crossbones pirate flag called?","Jolly Roger",["Jolly Roger","Union Jack","Black Pearl","Red Ensign"]],
+["Which female pirate sailed with Calico Jack?","Anne Bonny",["Anne Bonny","Grace O’Malley","Ching Shih","Lady Killigrew"]],
+["Sailors ate what to prevent scurvy?","Citrus fruit",["Citrus fruit","Rum","Salt pork","Tobacco"]],
+["Which Tampa festival features a pirate ship invasion?","Gasparilla",["Gasparilla","Mardi Gras","Fiesta Day","Carnaval"]],
+["José Gaspar, Tampa’s legendary pirate, was also called…","Gasparilla",["Gasparilla","Redbeard","The Sea Wolf","Captain Kidd"]],
+["A pirate’s ‘booty’ is…","Treasure",["Treasure","A boot","A ship’s cook","A cannon"]]],
+"Movies":[
+["Who played Captain Jack Sparrow?","Johnny Depp",["Johnny Depp","Brad Pitt","Orlando Bloom","Tom Cruise"]],
+["Which film series features the ship the Black Pearl?","Pirates of the Caribbean",["Pirates of the Caribbean","Hook","Cutthroat Island","Waterworld"]],
+["In Titanic, what is the famous necklace called?","Heart of the Ocean",["Heart of the Ocean","Hope Diamond","Star of India","Black Orlov"]],
+["Who directed Jaws?","Steven Spielberg",["Steven Spielberg","James Cameron","Ridley Scott","George Lucas"]],
+["Which film has the line “I’ll be back”?","The Terminator",["The Terminator","Rocky","Alien","Die Hard"]],
+["In Hook, who plays Captain Hook?","Dustin Hoffman",["Dustin Hoffman","Robin Williams","Bob Hoskins","Alan Rickman"]],
+["Which animated film features the pirate planet Treasure Planet?","Treasure Planet",["Treasure Planet","Atlantis","Moana","Sinbad"]]],
+"Ybor & Tampa":[
+["Ybor City was famous for making what?","Cigars",["Cigars","Rum","Sugar","Furniture"]],
+["What is Tampa’s NFL team?","Buccaneers",["Buccaneers","Dolphins","Jaguars","Saints"]],
+["What body of water is Tampa on?","Tampa Bay",["Tampa Bay","Biscayne Bay","Mobile Bay","Chesapeake Bay"]],
+["Which animals roam Ybor’s streets freely?","Chickens",["Chickens","Goats","Peacocks","Geese"]],
+["Which sandwich is a Tampa classic?","Cuban sandwich",["Cuban sandwich","Reuben","Po’ boy","Philly cheesesteak"]],
+["Ybor City was founded by which cigar maker?","Vicente Martinez-Ybor",["Vicente Martinez-Ybor","Henry Plant","José Martí","Hamilton Disston"]],
+["Tampa’s NHL team is the…","Lightning",["Lightning","Panthers","Thunder","Storm"]]],
+"Science & Sea":[
+["What is the largest ocean?","Pacific",["Pacific","Atlantic","Indian","Arctic"]],
+["How many hearts does an octopus have?","Three",["Three","One","Two","Eight"]],
+["What mostly pulls the tides?","The Moon’s gravity",["The Moon’s gravity","Wind","The Sun’s heat","Whales"]],
+["Which planet is the Red Planet?","Mars",["Mars","Venus","Jupiter","Mercury"]],
+["What tool do sailors use to find north?","Compass",["Compass","Telescope","Barometer","Anchor"]],
+["What is a group of fish called?","A school",["A school","A pod","A herd","A flock"]],
+["Which gentle sea mammal is common in Tampa Bay?","Manatee",["Manatee","Walrus","Orca","Seal"]]],
+"Love Ahoy (17+)":[
+["In Titanic’s “I’m flying” scene, who is at the bow?","Jack and Rose",["Jack and Rose","Romeo and Juliet","Antony and Cleopatra","Tristan and Isolde"]],
+["Which flower classically says “I love you”?","Red rose",["Red rose","Daisy","Tulip","Sunflower"]],
+["Which goddess of love was born from sea foam?","Aphrodite",["Aphrodite","Athena","Hera","Artemis"]],
+["In Pirates of the Caribbean, who does Will Turner love?","Elizabeth Swann",["Elizabeth Swann","Tia Dalma","Anamaria","Angelica"]],
+["A pirate’s gallant greeting for a lady is…","A bow and a kiss on the hand",["A bow and a kiss on the hand","A cannon salute","Walking the plank","A mutiny"]],
+["What’s a pirate’s favourite way to flirt?","With a wink of the good eye",["With a wink of the good eye","Shouting “Avast!”","Swabbing the deck","Firing a flare"]]]
+};
+let set=[],qi=0,sc=0,cat="";const ROUND=5;
+function triviaHome(){$("t-home").classList.remove("hide");$("t-quiz").classList.add("hide");$("t-end").classList.add("hide")}
+Object.keys(D).forEach(c=>{const b=document.createElement("button");b.textContent=c;if(c.includes("17+"))b.classList.add("alt");b.onclick=()=>c.includes("17+")&&!store.get("age17",false)?askAge(c):start(c);$("cats").appendChild(b)});
+function askAge(c){const d=$("age");$("ageYes").onclick=()=>{store.set("age17",true);d.close();start(c)};$("ageNo").onclick=()=>d.close();if(d.showModal)d.showModal();else if(confirm("Are you 17 or older?")){store.set("age17",true);start(c)}}
+function start(c){cat=c;set=shuffle(D[c]).slice(0,ROUND);qi=0;sc=0;$("t-home").classList.add("hide");$("t-end").classList.add("hide");$("t-quiz").classList.remove("hide");show()}
+function show(){const q=set[qi];$("meta").textContent=`${cat} · Question ${qi+1} of ${set.length}`;$("tscore").textContent=`Score: ${sc}`;$("prog").style.width=(qi/set.length*100)+"%";
+  $("q").textContent=q[0];$("fb").textContent="";$("next").classList.add("hide");const o=$("opts");o.innerHTML="";
+  shuffle(q[2]).forEach(t=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>pick(b,t,q[1]);o.appendChild(b)});o.firstChild.focus({preventScroll:true})}
+function pick(b,t,a){document.querySelectorAll("#opts button").forEach(x=>{x.disabled=true;if(x.textContent===a)x.classList.add("ok")});
+  if(t===a){sc++;$("fb").textContent="Aye, ye got it! 🏴‍☠️"}else{b.classList.add("bad");$("fb").textContent="Arr, the answer be: "+a}
+  $("tscore").textContent=`Score: ${sc}`;$("next").textContent=qi+1<set.length?"Next, matey ➜":"See my score ➜";$("next").classList.remove("hide");$("next").focus({preventScroll:true})}
+$("next").onclick=()=>{qi++;if(qi<set.length)return show();
+  $("prog").style.width="100%";$("t-quiz").classList.add("hide");$("t-end").classList.remove("hide");
+  $("score").textContent=`Ye scored ${sc} of ${set.length}!`;
+  const ranks=["Bilge rat — Pippy believes in ye!","Deckhand","Able seaman","Bosun","First mate","Captain of Ybor! ☠"];
+  const nb=record("Trivia · "+cat,`${sc}/${set.length}`,(n,o)=>parseInt(n)>parseInt(o));
+  $("rank").textContent="Rank: "+ranks[Math.min(sc,5)]+(nb?" · New best!":"")};
+$("again").onclick=triviaHome;
+$("share").onclick=async()=>{const text=`I scored ${sc}/${set.length} on ${cat} trivia at Pirates of Ybor! ☠ Can ye beat me?`,url="https://thepiratesofybor.com/";
+  try{if(navigator.share){await navigator.share({title:"Pirates of Ybor",text,url});return}}catch(e){return}
+  try{await navigator.clipboard.writeText(text+" "+url);toast("Copied — paste it to yer crew!")}catch(e){toast(text)}};
+
+/* ---------- treasure hunt ---------- */
+const N=6,DIGS=8;let hunt=null;
+function newHunt(){hunt={x:Math.floor(Math.random()*N),y:Math.floor(Math.random()*N),left:DIGS,done:false};
+  const m=$("map");m.innerHTML="";for(let y=0;y<N;y++)for(let x=0;x<N;x++){const b=document.createElement("button");b.setAttribute("aria-label",`Dig row ${y+1} column ${x+1}`);b.onclick=()=>dig(b,x,y);m.appendChild(b)}
+  $("hstatus").innerHTML="<b>Digs left: 8</b>"}
+function dig(b,x,y){if(hunt.done||b.classList.contains("dug"))return;hunt.left--;b.classList.add("dug");
+  const d=Math.max(Math.abs(x-hunt.x),Math.abs(y-hunt.y));
+  if(d===0){b.classList.add("win");b.textContent="💰";hunt.done=true;const used=DIGS-hunt.left;
+    const nb=record("Treasure Hunt",used+" digs",(n,o)=>parseInt(n)<parseInt(o));
+    $("hstatus").innerHTML=`<b>Treasure found in ${used} dig${used>1?"s":""}! Pops &amp; Pippy are rich! 🏴‍☠️</b>${nb?" New best!":""}`;return}
+  if(d===1){b.classList.add("hot");b.textContent="🔥"}else if(d===2){b.classList.add("warm");b.textContent="🌤"}else{b.classList.add("cold");b.textContent="🧊"}
+  b.setAttribute("aria-label",b.getAttribute("aria-label").replace("Dig","Dug")+(d===1?", hot":d===2?", warm":", cold"));
+  if(hunt.left<=0){hunt.done=true;const i=hunt.y*N+hunt.x,t=$("map").children[i];t.textContent="💰";t.classList.add("win");$("hstatus").innerHTML="<b>Out of digs! The chest was here — try a new map, matey.</b>"}
+  else $("hstatus").innerHTML=`<b>Digs left: ${hunt.left}</b>`}
+$("hnew").onclick=newHunt;
+
+/* ---------- install / offline ---------- */
+let deferred=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;$("install").classList.remove("hide")});
+$("install").onclick=async()=>{if(!deferred)return;deferred.prompt();try{await deferred.userChoice}catch(e){}deferred=null;$("install").classList.add("hide")};
+window.addEventListener("appinstalled",()=>toast("Installed — find Pirates of Ybor on yer home screen!"));
+if("serviceWorker" in navigator&&location.protocol.startsWith("http")){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{})})}
+
+go(location.hash.slice(1)||"games",false);
+</script>
+</body>
+</html>
+
+</body></html>
