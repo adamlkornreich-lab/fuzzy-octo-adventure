@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pirate Trivia Night poster</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&amp;family=Alegreya:wght@400;700&amp;family=Alegreya+Sans:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0b1a26}a:hover{color:#5a3720}
+</style>
+</helmet>
+<div style="width: 1728px; height: 2304px; box-sizing: border-box; background: #f3ead7; color: #0b1a26; font-family: Alegreya, Georgia, serif; padding: 110px 120px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; text-align: center; border: 28px solid {{accent}}">
+<div style="display: flex; flex-direction: column; gap: 20px; align-items: center">
+<p style="margin: 0; font-family: 'Alegreya Sans', sans-serif; font-weight: 700; font-size: 44px; letter-spacing: 0.22em; text-transform: uppercase; color: #5a3720">Gaspar's Grotto presents</p>
+<h1 style="margin: 0; font-family: 'Pirata One', Georgia, serif; font-weight: 400; font-size: 270px; line-height: 0.88; color: #0b1a26">Pirate Trivia Night</h1>
+<p style="margin: 0; font-family: 'Alegreya Sans', sans-serif; font-weight: 800; font-size: 84px; color: #c4572b">Every [DAY] · [TIME]</p>
+</div>
+<img src="/_blob/4fc7630bc01a9b3d993bb6984a96f8fc" alt="Pops and Pippy pirate poster art" style="width: 760px; height: 908px; object-fit: cover; border-radius: 24px; border: 8px solid #0b1a26">
+<div style="display: flex; gap: 72px; align-items: center; justify-content: center; width: 100%">
+<img src="/_blob/9be0ad74e6b7a88c38210e6206bb35c7" alt="QR code that opens thepiratesofybor.com" style="width: 380px; height: 380px; display: block; flex-shrink: 0">
+<div style="display: flex; flex-direction: column; gap: 18px; align-items: flex-start; text-align: left">
+<p style="margin: 0; font-family: 'Alegreya Sans', sans-serif; font-weight: 800; font-size: 64px; line-height: 1.05; color: #0b1a26">Scan to join your crew</p>
+<p style="margin: 0; font-size: 46px; line-height: 1.3; color: #3b2414">Free to play. Teams of any size.<br>Winning crew goes on the wall.</p>
+<p style="margin: 0; font-family: 'Alegreya Sans', sans-serif; font-weight: 700; font-size: 44px; color: #5a3720">thepiratesofybor.com</p>
+<p style="margin: 0; font-size: 34px; color: #3b2414">1805 E 7th Ave, Ybor City</p>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 16px">
+<img src="/_blob/a8053dfe81f28d9bb62b27f5dbcd2761" alt="Pops and Pippy watermark" style="width: 80px; height: 82px">
+<span style="font-family: 'Alegreya Sans', sans-serif; font-size: 26px; color: #3b2414">© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy</span>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#e0b056","options":["#e0b056","#3fb6a8","#c4572b"]},"$preview":{"width":1728,"height":2304}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#e0b056' };
+  }
+}
+</script>
+</body>
+</html>

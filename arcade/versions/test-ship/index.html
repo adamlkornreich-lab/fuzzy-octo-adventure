@@ -1,0 +1,375 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="assets/poy-config.js"></script><script src="assets/poy.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pirates of Ybor Test Ship</title>
+<meta name="description" content="Pirates of Ybor, presented by Gaspar's Grotto in Ybor City. Walk aboard the wreck: Game Room, Movie Room, Family Room, the Grotto tavern and the app.">
+<meta property="og:title" content="Pirates of Ybor · Gaspar's Grotto">
+<meta property="og:description" content="Welcome aboard the wreck. Games, movies, family and the Grotto tavern, all on one broken pirate ship.">
+<meta property="og:image" content="assets/poster.jpg">
+<meta name="theme-color" content="#0b1a26">
+<link rel="icon" href="assets/watermark.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Alegreya:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b1a26;--panel:#12293a;--panel2:#173447;--ink:#f3ead7;--mute:#a9bcc0;--brass:#e0b056;--rum:#c4572b;--sea:#3fb6a8;--line:#28495b;--wood:#5a3720;--wood2:#3b2414}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a26}}
+:root[data-theme="dark"]{--bg:#0b1a26}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Alegreya,Georgia,serif;overflow-x:hidden}
+a{color:inherit}
+h1,h2,h3{font-family:"Pirata One",Georgia,serif;font-weight:400;margin:0;line-height:1.05}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+
+/* ---------- arrival ---------- */
+.arrive{text-align:center;padding:22px 0 6px}
+.kicker{color:var(--sea);letter-spacing:.1em;text-transform:uppercase;font-size:.8rem;font-weight:700}
+.arrive h1{font-size:clamp(2.6rem,10vw,5rem);color:var(--brass);margin:4px 0 6px;text-shadow:0 3px 18px #0008}
+.arrive p{color:var(--mute);margin:0 auto;max-width:52ch}
+
+/* ---------- the wreck ---------- */
+.wreck{position:relative;margin:10px -16px 0;}
+.wreck svg{display:block;width:100%;height:auto}
+.room{cursor:pointer;outline:none}
+.room .glow{opacity:0;transition:opacity .25s}
+.room:hover .glow,.room:focus-visible .glow{opacity:1}
+.room:focus-visible .plaque rect{stroke:#3fb6a8;stroke-width:5}
+.room .plaque text{font-family:"Pirata One",Georgia,serif}
+@media (prefers-reduced-motion:no-preference){
+  .bob{animation:bob 5s ease-in-out infinite;transform-origin:500px 520px}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+  .flag{animation:wave 2.4s ease-in-out infinite;transform-origin:742px 92px}
+  @keyframes wave{0%,100%{transform:skewY(0)}50%{transform:skewY(-5deg)}}
+  .lamp{animation:flick 3s ease-in-out infinite}
+  @keyframes flick{0%,100%{opacity:.9}45%{opacity:.6}55%{opacity:1}}
+  .tw{animation:tw 3.4s ease-in-out infinite}
+  @keyframes tw{0%,100%{opacity:.15}50%{opacity:1}}
+  .surf{animation:surf 6s ease-in-out infinite}
+  @keyframes surf{0%,100%{transform:translateX(0)}50%{transform:translateX(-18px)}}
+  .chestglow{animation:pulse 2.6s ease-in-out infinite;transform-origin:500px 560px}
+  @keyframes pulse{0%,100%{opacity:.55;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+}
+.hint{text-align:center;color:var(--mute);font-size:.95rem;margin:4px 0 0}
+
+/* ---------- rooms list ---------- */
+section{padding:26px 0}
+h2{font-size:clamp(2rem,6vw,2.6rem);color:var(--brass);margin-bottom:6px}
+.lead{color:var(--mute);margin:0 0 16px}
+.rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.rcard{display:flex;flex-direction:column;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;scroll-margin-top:70px}
+.rcard .ic{font-size:2rem}
+.rcard h3{font-size:1.7rem}
+.rcard p{margin:0;color:var(--mute);font-size:.98rem}
+.rcard ul{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.rcard li a{display:inline-flex;align-items:center;min-height:38px;padding:0 12px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);text-decoration:none;font-size:.95rem}
+.rcard li a:hover,.rcard li a:focus-visible{border-color:var(--brass);outline:none}
+.rcard .enter{margin-top:auto;align-self:flex-start;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border-radius:12px;background:var(--rum);color:#fff;text-decoration:none;font-weight:700}
+.rcard.grotto{background:linear-gradient(160deg,#2a1a10,#12293a 70%);border-color:#6b4a2b}
+.stores{display:flex;flex-wrap:wrap;gap:8px}
+.stores span{border:1px solid var(--line);border-radius:99px;padding:6px 14px;color:var(--mute);font-size:.92rem}
+.crew{background:var(--panel);border-radius:16px;padding:18px;border:1px solid var(--line)}
+.crew p{margin:6px 0;color:var(--mute)}
+.spot{padding-top:18px}
+.spot-card{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:0;background:linear-gradient(150deg,#13361f,#12293a 65%);border:1px solid #3f7a4a;border-radius:20px;overflow:hidden;text-decoration:none;color:var(--ink);transition:transform .2s,box-shadow .2s}
+.spot-card:hover,.spot-card:focus-visible{transform:translateY(-3px);box-shadow:0 14px 40px #000a;outline:none;border-color:var(--brass)}
+.spot-card:focus-visible{outline:3px solid var(--sea);outline-offset:3px}
+.spot-shot{width:100%;height:100%;max-height:440px;object-fit:cover;object-position:center 30%;display:block}
+.spot-text{padding:22px 20px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.spot-text h2{font-size:clamp(2.4rem,7vw,3.4rem);margin:0}
+.spot-text p{margin:0;color:#d9e2d6}
+.spot-facts{list-style:none;margin:2px 0;padding:0;display:flex;flex-wrap:wrap;gap:8px}
+.spot-facts li{background:#0b1a26aa;border:1px solid #3f7a4a;border-radius:10px;padding:6px 12px;font-size:.95rem;color:var(--mute)}
+.spot-facts b{color:var(--brass);font-size:1.1rem;margin-right:4px}
+.spot-more{font-size:.95rem}
+.spot-btn{align-self:flex-start;margin-top:4px;display:inline-flex;align-items:center;min-height:48px;padding:0 22px;border-radius:12px;background:var(--brass);color:#1b1305;font-weight:700;font-size:1.05rem}
+@media (max-width:700px){.spot-card{grid-template-columns:1fr}.spot-shot{max-height:300px}}
+footer{border-top:1px solid var(--line);margin-top:30px;padding:22px 0 calc(110px + env(safe-area-inset-bottom,0px));color:var(--mute);font-size:.92rem}
+footer nav{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:12px}
+footer nav a{color:var(--ink);text-decoration:none;padding:6px 0}
+footer nav a:hover{color:var(--brass)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="arrive">
+    <div class="kicker">Gaspar's Grotto presents · Ybor City, Florida</div>
+    <h1>Welcome aboard the wreck</h1>
+    <p>The Pirates of Ybor ship ran aground and broke clean in two. Step through the gap and every deck is open: the Game Room, the Movie Room, the Family Room and Gaspar's Grotto tavern, with the app glowing in the treasure chest.</p>
+  </header>
+
+  <div class="wreck">
+  <svg viewBox="15 70 975 605" role="group" aria-label="A broken pirate ship washed up on the beach, split in the middle. Tap a room to enter.">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1b3a"/><stop offset=".55" stop-color="#5a2f52"/><stop offset=".85" stop-color="#e0774a"/><stop offset="1" stop-color="#f3b45a"/></linearGradient>
+      <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b4f6b"/><stop offset="1" stop-color="#173447"/></linearGradient>
+      <linearGradient id="sand" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d9b77c"/><stop offset="1" stop-color="#a9814b"/></linearGradient>
+      <linearGradient id="hull" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b4226"/><stop offset="1" stop-color="#2e1b0f"/></linearGradient>
+      <radialGradient id="warm" cx=".5" cy=".55" r=".7"><stop offset="0" stop-color="#ffcf7a" stop-opacity=".55"/><stop offset="1" stop-color="#ffcf7a" stop-opacity="0"/></radialGradient>
+      <radialGradient id="gold" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".5" stop-color="#ffc94d" stop-opacity=".55"/><stop offset="1" stop-color="#ffc94d" stop-opacity="0"/></radialGradient>
+      <pattern id="planks" width="40" height="22" patternUnits="userSpaceOnUse"><rect width="40" height="22" fill="none"/><path d="M0 21.5H40M18 0V22" stroke="#00000040" stroke-width="1.5"/></pattern>
+      <filter id="soft"><feGaussianBlur stdDeviation="6"/></filter>
+    </defs>
+
+    <!-- sky, sun, stars -->
+    <rect width="1000" height="420" fill="url(#sky)"/>
+    <circle cx="830" cy="360" r="62" fill="#ffd27a" opacity=".9"/>
+    <g fill="#fff">
+      <circle class="tw" cx="80" cy="50" r="2"/><circle class="tw" cx="210" cy="90" r="1.6" style="animation-delay:1s"/>
+      <circle class="tw" cx="360" cy="40" r="1.8" style="animation-delay:2s"/><circle class="tw" cx="560" cy="70" r="1.5" style="animation-delay:.6s"/>
+      <circle class="tw" cx="920" cy="60" r="2" style="animation-delay:1.6s"/><circle class="tw" cx="660" cy="30" r="1.4" style="animation-delay:2.4s"/>
+    </g>
+    <!-- Ybor skyline -->
+    <g fill="#24183a" opacity=".85">
+      <rect x="20" y="330" width="40" height="60"/><rect x="62" y="300" width="22" height="90"/><path d="M62 300l11-22 11 22z"/>
+      <rect x="90" y="345" width="70" height="45"/><rect x="900" y="335" width="60" height="55"/><rect x="960" y="312" width="30" height="78"/>
+      <path d="M150 390v-30q8-14 16 0v30zM120 390v-22q6-10 12 0v22z"/>
+    </g>
+    <g stroke="#24183a" stroke-width="4" fill="none" opacity=".85"><path d="M178 390q-2-40 8-62"/><path d="M968 390q2-36-6-58"/></g>
+    <g fill="#24183a" opacity=".85"><path d="M186 328q-22 0-30 10q18-6 30-6zM186 328q20-4 32 4q-16-2-32 0zM186 328q-8-16-24-18q14 8 24 22z"/><path d="M962 332q-20-2-28 8q16-6 28-4zM962 332q18-6 30 2q-14-2-30 2z"/></g>
+
+    <!-- sea + surf -->
+    <rect y="388" width="1000" height="60" fill="url(#sea)"/>
+    <path d="M830 392h-60M830 404h-90M830 416h-40" stroke="#ffd27a" stroke-width="3" opacity=".5"/>
+    <path class="surf" d="M-20 438q40-12 80 0t80 0t80 0t80 0t80 0t80 0t80 0t80 0t80 0t80 0t80 0t80 0t80 0v14h-1060z" fill="#e8f4f2" opacity=".75"/>
+    <!-- beach -->
+    <path d="M0 446q250-20 500-6t500 4v236H0z" fill="url(#sand)"/>
+    <g fill="#8c6a3c" opacity=".5"><ellipse cx="120" cy="620" rx="40" ry="5"/><ellipse cx="880" cy="640" rx="60" ry="6"/><ellipse cx="420" cy="660" rx="30" ry="4"/></g>
+    <!-- shadows under wreck -->
+    <ellipse cx="270" cy="600" rx="250" ry="22" fill="#5c4325" opacity=".45" filter="url(#soft)"/>
+    <ellipse cx="740" cy="600" rx="250" ry="22" fill="#5c4325" opacity=".45" filter="url(#soft)"/>
+
+    <g class="bob">
+    <!-- ============ LEFT HALF (bow) ============ -->
+    <g transform="rotate(-5 300 520)">
+      <!-- broken foremast -->
+      <path d="M250 300 L238 120" stroke="#3b2414" stroke-width="12" stroke-linecap="round"/>
+      <path d="M238 120 l-8 -14 l10 4 l6 -12 l2 16" fill="#3b2414"/>
+      <path d="M180 160 H300" stroke="#3b2414" stroke-width="7"/>
+      <path d="M186 164 Q240 200 296 164 L290 250 Q240 230 192 255 Z" fill="#e9dcbc" opacity=".92"/>
+      <path d="M232 205 l14 20 l-22 4 z" fill="#0b1a26" opacity=".35"/>
+      <!-- bowsprit -->
+      <path d="M60 300 L-10 250" stroke="#3b2414" stroke-width="9" stroke-linecap="round"/>
+      <!-- hull outline with jagged break on the right -->
+      <path d="M40 292 H470 L462 330 L478 352 L458 384 L474 410 L452 446 L468 476 L446 512 L456 540 Q300 600 150 560 Q70 520 40 292 Z" fill="url(#hull)" stroke="#1e110a" stroke-width="4"/>
+      <path d="M40 292 H470 L462 330 L478 352 L458 384 L474 410 L452 446 L468 476 L446 512 L456 540 Q300 600 150 560 Q70 520 40 292 Z" fill="url(#planks)"/>
+      <!-- gunwale -->
+      <path d="M34 284 H476 v12 H40 z" fill="#2a170c"/>
+      <g fill="#c99a4a"><circle cx="90" cy="290" r="3"/><circle cx="180" cy="290" r="3"/><circle cx="270" cy="290" r="3"/><circle cx="360" cy="290" r="3"/><circle cx="450" cy="290" r="3"/></g>
+
+      <!-- GAME ROOM (upper deck cutaway) -->
+      <a class="room" href="arcade/index.html" aria-label="Game Room: arcade, golf, tavern games, trivia, chess and more">
+        <rect x="110" y="304" width="335" height="112" rx="6" fill="#20140c"/>
+        <rect x="110" y="304" width="335" height="112" rx="6" fill="url(#warm)"/>
+        <rect class="glow" x="104" y="298" width="347" height="124" rx="10" fill="none" stroke="#ffd27a" stroke-width="4"/>
+        <!-- dartboard -->
+        <g transform="translate(160 344)"><circle r="22" fill="#1a1a1a"/><circle r="17" fill="#c0392b"/><circle r="11" fill="#f3ead7"/><circle r="5" fill="#2a8c4a"/><circle r="2" fill="#c0392b"/><path d="M8 -20 l18 -8" stroke="#c99a4a" stroke-width="2"/></g>
+        <!-- arcade cabinet -->
+        <g transform="translate(205 318)"><rect width="40" height="88" rx="4" fill="#3a2a6b"/><rect x="5" y="8" width="30" height="24" fill="#3fb6a8"/><path d="M10 28l6-10 6 6 8-12" stroke="#fff" stroke-width="2" fill="none"/><rect x="6" y="40" width="28" height="10" fill="#241a45"/><circle cx="14" cy="45" r="3" fill="#e74c3c"/><circle cx="26" cy="45" r="3" fill="#f2b84b"/></g>
+        <!-- chess table -->
+        <g transform="translate(262 368)"><rect x="-4" y="22" width="6" height="18" fill="#3b2414"/><rect x="56" y="22" width="6" height="18" fill="#3b2414"/>
+          <rect width="58" height="22" fill="#c9a66b"/><g fill="#6b4a2b"><rect x="0" y="0" width="7.25" height="5.5"/><rect x="14.5" y="0" width="7.25" height="5.5"/><rect x="29" y="0" width="7.25" height="5.5"/><rect x="43.5" y="0" width="7.25" height="5.5"/><rect x="7.25" y="5.5" width="7.25" height="5.5"/><rect x="21.75" y="5.5" width="7.25" height="5.5"/><rect x="36.25" y="5.5" width="7.25" height="5.5"/><rect x="50.75" y="5.5" width="7.25" height="5.5"/><rect x="0" y="11" width="7.25" height="5.5"/><rect x="14.5" y="11" width="7.25" height="5.5"/><rect x="29" y="11" width="7.25" height="5.5"/><rect x="43.5" y="11" width="7.25" height="5.5"/><rect x="7.25" y="16.5" width="7.25" height="5.5"/><rect x="21.75" y="16.5" width="7.25" height="5.5"/><rect x="36.25" y="16.5" width="7.25" height="5.5"/><rect x="50.75" y="16.5" width="7.25" height="5.5"/></g>
+          <text x="20" y="-2" font-size="18" fill="#f3ead7">♞</text><text x="36" y="-2" font-size="18" fill="#111">♛</text></g>
+        <!-- golf flag -->
+        <g transform="translate(350 340)"><path d="M0 0v60" stroke="#ddd" stroke-width="3"/><path d="M0 0l26 8-26 8z" fill="#e74c3c"/><ellipse cx="0" cy="62" rx="22" ry="5" fill="#2a8c4a"/></g>
+        <!-- ping pong paddle -->
+        <g transform="translate(405 352) rotate(20)"><circle r="14" fill="#c0392b"/><rect x="-3" y="12" width="6" height="18" rx="2" fill="#6b4a2b"/></g>
+        <circle class="lamp" cx="278" cy="314" r="6" fill="#ffd27a"/>
+        <g class="plaque"><rect x="186" y="392" width="184" height="36" rx="8" fill="#e9d9ae" stroke="#7a2e12" stroke-width="3"/><text x="278" y="418" text-anchor="middle" font-size="27" fill="#5a1f0b">Game Room</text></g>
+      </a>
+
+      <!-- MOVIE ROOM (lower deck cutaway) -->
+      <a class="room" href="play/index.html" aria-label="Movie Room: Name That Reel movie trivia and movie night">
+        <rect x="140" y="440" width="290" height="96" rx="6" fill="#0a0f1a"/>
+        <rect class="glow" x="134" y="434" width="302" height="108" rx="10" fill="none" stroke="#ffd27a" stroke-width="4"/>
+        <!-- projector beam + screen -->
+        <path d="M402 470 L196 450 L196 512 Z" fill="#fff6c9" opacity=".18"/>
+        <rect x="170" y="450" width="120" height="60" fill="#e9eef2"/>
+        <rect x="174" y="454" width="112" height="52" fill="#2b4f6b"/><path d="M174 506 l30 -26 l20 16 l24 -22 l38 32z" fill="#3fb6a8" opacity=".8"/><circle cx="262" cy="468" r="7" fill="#ffd27a"/>
+        <!-- projector -->
+        <g transform="translate(392 458)"><rect width="30" height="20" rx="3" fill="#555"/><circle cx="8" cy="-6" r="7" fill="none" stroke="#777" stroke-width="3"/><circle cx="22" cy="-6" r="7" fill="none" stroke="#777" stroke-width="3"/><circle cx="0" cy="10" r="4" fill="#fff6c9"/></g>
+        <!-- seats -->
+        <g fill="#8e2b1f"><rect x="300" y="500" width="22" height="22" rx="5"/><rect x="326" y="500" width="22" height="22" rx="5"/><rect x="352" y="500" width="22" height="22" rx="5"/></g>
+        <g transform="translate(330 482)"><path d="M0 0h12l-2 14h-8z" fill="#e74c3c"/><path d="M0 0h12" stroke="#fff" stroke-width="2"/><circle cx="3" cy="-2" r="3" fill="#fff6c9"/><circle cx="8" cy="-3" r="3" fill="#fff6c9"/></g>
+        <g class="plaque"><rect x="186" y="516" width="184" height="36" rx="8" fill="#e9d9ae" stroke="#7a2e12" stroke-width="3"/><text x="278" y="542" text-anchor="middle" font-size="27" fill="#5a1f0b">Movie Room</text></g>
+      </a>
+      <!-- portholes on bow -->
+      <g fill="#ffd27a" class="lamp"><circle cx="78" cy="350" r="9"/><circle cx="94" cy="440" r="9"/></g>
+      <g fill="none" stroke="#c99a4a" stroke-width="3"><circle cx="78" cy="350" r="11"/><circle cx="94" cy="440" r="11"/></g>
+    </g>
+
+    <!-- ============ RIGHT HALF (stern) ============ -->
+    <g transform="rotate(4 720 520)">
+      <!-- mainmast with torn sail + flag -->
+      <path d="M690 290 L700 70" stroke="#3b2414" stroke-width="13" stroke-linecap="round"/>
+      <path d="M622 120 H780" stroke="#3b2414" stroke-width="7"/>
+      <path d="M628 124 Q700 168 774 124 L766 236 L740 214 L728 240 L706 220 L690 246 L672 222 L640 240 Z" fill="#e9dcbc" opacity=".92"/>
+      <g transform="translate(700 175)"><circle r="16" fill="#1b1305" opacity=".75"/><circle cx="-5" cy="-3" r="3.4" fill="#e9dcbc"/><circle cx="5" cy="-3" r="3.4" fill="#e9dcbc"/><path d="M-10 18l20-12M10 18l-20-12" stroke="#1b1305" stroke-width="4" opacity=".75"/></g>
+      <path d="M700 70 L742 76" stroke="#3b2414" stroke-width="3"/>
+      <g class="flag"><path d="M742 76 h60 l-8 18 l8 18 h-60 z" fill="#111"/><circle cx="768" cy="92" r="7" fill="#f3ead7"/><path d="M758 104l20-6M778 104l-20-6" stroke="#f3ead7" stroke-width="2.5"/></g>
+      <!-- hull with jagged break on the left, raised stern castle on right -->
+      <path d="M530 292 H860 V250 H960 L948 300 Q930 520 840 562 Q690 600 548 540 L540 512 L558 476 L536 446 L552 410 L534 384 L554 352 L538 330 Z" fill="url(#hull)" stroke="#1e110a" stroke-width="4"/>
+      <path d="M530 292 H860 V250 H960 L948 300 Q930 520 840 562 Q690 600 548 540 L540 512 L558 476 L536 446 L552 410 L534 384 L554 352 L538 330 Z" fill="url(#planks)"/>
+      <path d="M524 284 H866 v12 H530 z" fill="#2a170c"/><path d="M854 242 H966 v12 H860 z" fill="#2a170c"/>
+      <!-- stern windows -->
+      <g fill="#ffd27a" class="lamp"><rect x="880" y="268" width="16" height="22" rx="7"/><rect x="906" y="268" width="16" height="22" rx="7"/><rect x="932" y="268" width="12" height="22" rx="6"/></g>
+      <!-- stern lantern -->
+      <path d="M956 242 v-24" stroke="#3b2414" stroke-width="4"/><circle class="lamp" cx="956" cy="212" r="9" fill="#ffd27a"/>
+
+      <!-- GASPAR'S GROTTO TAVERN (upper deck cutaway) -->
+      <a class="room" href="grotto-arcade/index.html" aria-label="Gaspar's Grotto tavern: the Grotto arcade, the Pour-Off and tavern games">
+        <rect x="560" y="304" width="300" height="112" rx="6" fill="#26150b"/>
+        <rect x="560" y="304" width="300" height="112" rx="6" fill="url(#warm)"/>
+        <rect class="glow" x="554" y="298" width="312" height="124" rx="10" fill="none" stroke="#ffd27a" stroke-width="4"/>
+        <!-- back shelf with bottles -->
+        <rect x="580" y="330" width="200" height="5" fill="#6b4a2b"/>
+        <g><rect x="590" y="306" width="9" height="24" rx="2" fill="#2a8c4a"/><rect x="606" y="310" width="9" height="20" rx="2" fill="#c0392b"/><rect x="622" y="304" width="9" height="26" rx="2" fill="#d6a84a"/><rect x="638" y="308" width="9" height="22" rx="2" fill="#5a3a8a"/><rect x="654" y="306" width="9" height="24" rx="2" fill="#2a8c9a"/><rect x="670" y="310" width="9" height="20" rx="2" fill="#c0392b"/><rect x="686" y="305" width="9" height="25" rx="2" fill="#d6a84a"/></g>
+        <!-- G sign -->
+        <g transform="translate(748 318)"><circle r="14" fill="#7a1f12" stroke="#d6a84a" stroke-width="3"/><text y="7" text-anchor="middle" font-size="20" fill="#f3ead7" font-family="Georgia,serif" font-weight="700">G</text></g>
+        <!-- bar counter -->
+        <rect x="575" y="370" width="220" height="12" fill="#8a5a33"/><rect x="580" y="382" width="210" height="30" fill="#5a3720"/>
+        <!-- mugs -->
+        <g transform="translate(600 352)"><rect width="14" height="18" rx="2" fill="#f2c14e"/><rect width="14" height="5" fill="#fff"/><path d="M14 4h4v9h-4" fill="none" stroke="#f2c14e" stroke-width="2"/></g>
+        <g transform="translate(640 356)"><path d="M0 0h20l-8 10v4h4v2h-12v-2h4v-4z" fill="#ffffff" opacity=".85"/><path d="M3 2h14l-6 7z" fill="#e7609a"/></g>
+        <!-- Pops the bar cat on the counter -->
+        <g transform="translate(716 348)">
+          <ellipse cx="0" cy="18" rx="20" ry="9" fill="#f3ead7"/><circle cx="-14" cy="6" r="10" fill="#f3ead7"/>
+          <path d="M-22 0l2-11l6 7zM-10 -1l2-11l-6 6z" fill="#f3ead7"/><path d="M-21 -9l-2 4 8 0z" fill="#8a7f72" opacity=".6"/>
+          <ellipse cx="-4" cy="14" rx="7" ry="5" fill="#8a7f72" opacity=".55"/><path d="M18 18q14 -2 10 -18" stroke="#f3ead7" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <circle cx="-17" cy="6" r="1.6" fill="#222"/><circle cx="-11" cy="6" r="1.6" fill="#222"/>
+          <path d="M-26 -4 q12 -12 26 0 z" fill="#111"/><circle cx="-13" cy="-7" r="2" fill="#f3ead7"/>
+        </g>
+        <!-- stools -->
+        <g fill="#3b2414"><rect x="808" y="380" width="22" height="5"/><rect x="817" y="385" width="4" height="26"/></g>
+        <circle class="lamp" cx="700" cy="314" r="6" fill="#ffd27a"/>
+        <g class="plaque"><rect x="604" y="392" width="216" height="36" rx="8" fill="#e9d9ae" stroke="#7a2e12" stroke-width="3"/><text x="712" y="418" text-anchor="middle" font-size="25" fill="#5a1f0b">Gaspar's Grotto</text></g>
+      </a>
+
+      <!-- FAMILY ROOM (lower deck cutaway) -->
+      <a class="room" href="crew/index.html" aria-label="Family Room: the crew, family and friends, gallery and the movie">
+        <rect x="575" y="440" width="300" height="96" rx="6" fill="#1d1410"/>
+        <rect x="575" y="440" width="300" height="96" rx="6" fill="url(#warm)"/>
+        <rect class="glow" x="569" y="434" width="312" height="108" rx="10" fill="none" stroke="#ffd27a" stroke-width="4"/>
+        <!-- portrait frames (silhouettes, privacy-friendly) -->
+        <g stroke="#d6a84a" stroke-width="3">
+          <rect x="598" y="452" width="34" height="40" fill="#2b4f6b"/><rect x="644" y="448" width="40" height="46" fill="#5a2f52"/><rect x="696" y="452" width="34" height="40" fill="#2a5a3a"/>
+        </g>
+        <g fill="#e9d9ae" opacity=".8"><circle cx="615" cy="466" r="6"/><path d="M605 488q10-16 20 0z"/><circle cx="664" cy="463" r="7"/><path d="M652 490q12-18 24 0z"/><circle cx="713" cy="466" r="6"/><path d="M703 488q10-16 20 0z"/></g>
+        <!-- Pippy portrait -->
+        <g transform="translate(790 470)"><ellipse rx="26" ry="30" fill="#3b2414" stroke="#d6a84a" stroke-width="3"/>
+          <ellipse cx="0" cy="6" rx="12" ry="11" fill="#9c5a2c"/><path d="M-12 -2l-8 -12l12 6zM12 -2l8 -12l-12 6z" fill="#9c5a2c"/><ellipse cx="0" cy="11" rx="6" ry="5" fill="#f3ead7"/>
+          <path d="M-16 -6q16 -16 32 0z" fill="#111"/><circle cx="-4" cy="4" r="1.6" fill="#111"/><circle cx="4" cy="4" r="1.6" fill="#111"/></g>
+        <!-- couch -->
+        <g><rect x="600" y="500" width="130" height="26" rx="8" fill="#7a2e12"/><rect x="592" y="494" width="18" height="34" rx="6" fill="#5e2210"/><rect x="722" y="494" width="18" height="34" rx="6" fill="#5e2210"/></g>
+        <g class="plaque"><rect x="620" y="516" width="184" height="36" rx="8" fill="#e9d9ae" stroke="#7a2e12" stroke-width="3"/><text x="712" y="542" text-anchor="middle" font-size="27" fill="#5a1f0b">Family Room</text></g>
+      </a>
+    </g>
+    </g>
+
+    <!-- spilled planks in the gap -->
+    <g fill="#4a2c18" stroke="#1e110a" stroke-width="2"><rect x="470" y="570" width="70" height="10" transform="rotate(-18 505 575)"/><rect x="455" y="600" width="60" height="9" transform="rotate(12 485 604)"/></g>
+
+    <!-- THE APP: treasure chest in the gap -->
+    <a class="room" href="app/index.html" aria-label="The App: get Pirates of Ybor on phones, tablets and TVs">
+      <circle class="chestglow" cx="500" cy="560" r="78" fill="url(#gold)"/>
+      <rect class="glow" x="440" y="476" width="120" height="140" rx="14" fill="none" stroke="#ffd27a" stroke-width="4"/>
+      <!-- phone rising from chest -->
+      <g transform="translate(482 488)"><rect width="36" height="64" rx="7" fill="#111" stroke="#d6a84a" stroke-width="2.5"/><rect x="4" y="8" width="28" height="46" rx="3" fill="#2b4f6b"/><text x="18" y="38" text-anchor="middle" font-size="18">☠</text></g>
+      <!-- chest -->
+      <path d="M458 556 h84 v40 h-84z" fill="#6b4226" stroke="#2a170c" stroke-width="3"/>
+      <path d="M458 556 q42 -34 84 0" fill="#7a4a2a" stroke="#2a170c" stroke-width="3"/>
+      <path d="M458 570 h84M470 556v40M530 556v40" stroke="#c99a4a" stroke-width="4"/>
+      <rect x="494" y="566" width="12" height="14" rx="2" fill="#c99a4a"/>
+      <g fill="#ffc94d"><circle cx="452" cy="602" r="6"/><circle cx="548" cy="600" r="6"/><circle cx="540" cy="610" r="5"/><circle cx="462" cy="612" r="5"/></g>
+      <g class="plaque"><rect x="436" y="622" width="128" height="36" rx="8" fill="#e9d9ae" stroke="#7a2e12" stroke-width="3"/><text x="500" y="648" text-anchor="middle" font-size="27" fill="#5a1f0b">The App</text></g>
+    </a>
+
+    <!-- sparkles -->
+    <g fill="#ffe7a8" font-size="20"><text class="tw" x="492" y="470">✦</text><text class="tw" x="420" y="540" style="animation-delay:1.2s">✧</text><text class="tw" x="566" y="530" style="animation-delay:2s">✦</text></g>
+    <!-- Gaspar's Grotto sign post on the beach -->
+    <g transform="translate(40 560)"><rect x="34" y="0" width="8" height="90" fill="#3b2414"/><path d="M0 4 h96 l12 14 l-12 14 h-96z" fill="#e9d9ae" stroke="#7a2e12" stroke-width="3"/><text x="50" y="25" text-anchor="middle" font-size="15" fill="#5a1f0b" font-family="Georgia,serif" font-weight="700">Ybor City →</text></g>
+  </svg>
+  </div>
+  <p class="hint">Tap any room on the ship to step inside.</p>
+
+  <section class="spot" aria-labelledby="agc">
+    <a class="spot-card" href="golf/index.html">
+      <img class="spot-shot" src="assets/andy-golf.jpg" alt="Andy Golf Club: Andy lines up his drive on hole 1, Skull Cove, par 4, with palm trees and Tampa Bay behind the fairway" width="560" height="638" loading="lazy">
+      <div class="spot-text">
+        <span class="kicker">Now on the first tee</span>
+        <h2 id="agc">Andy Golf Club</h2>
+        <p>Andy tees it up against the pirate tour pros on nine seaside holes: Skull Cove, Kraken’s Elbow, the island green at Davy Jones’ Drop, and a closing hole at Gaspar’s Grotto. Read the wind, pick your club, then drag back and push through for an arcade-style pro swing. Every hole opens with a flyover, and every drive gets a TV-style carry and distance card.</p>
+        <ul class="spot-facts"><li><b>9</b> holes</li><li><b>Par 36</b></li><li><b>5</b> pirate pros</li><li><b>8</b> clubs</li></ul>
+        <p class="spot-more">Then take on the <b>Ybor Links Back Nine</b> in the app: Cigar Factory, Seventh Avenue, Gasparilla Gulch and six more.</p>
+        <span class="spot-btn">⛳ Tee off free</span>
+      </div>
+    </a>
+  </section>
+
+  <section aria-labelledby="walk">
+    <h2 id="walk">Walk the ship</h2>
+    <p class="lead">Every deck is open, free, and plays right here on any phone, tablet, computer or TV.</p>
+    <div class="rooms">
+      <article class="rcard" id="game-room">
+        <span class="ic">🎯</span><h3>Game Room</h3>
+        <p>The full arcade and marketplace, plus every game on its own shelf. One player against the crew or two players side by side.</p>
+        <ul>
+          <li><a href="golf/index.html">Andy Golf Club</a></li><li><a href="tavern/index.html">Tavern Games</a></li><li><a href="trivia/index.html">Trivia</a></li>
+          <li><a href="game-deck/index.html">Chess &amp; Checkers</a></li><li><a href="kraken/index.html">Whack-a-Kraken</a></li><li><a href="classics/index.html">Shere's Revenge &amp; Classics</a></li>
+        </ul>
+        <a class="enter" href="arcade/index.html">Enter the Game Room</a>
+      </article>
+      <article class="rcard" id="movie-room">
+        <span class="ic">🎬</span><h3>Movie Room</h3>
+        <p>Name That Reel movie trivia, games of skill on the boardwalk, and your night on the big screen.</p>
+        <ul><li><a href="play/index.html">Name That Reel</a></li><li><a href="trivia/index.html">Movie trivia</a></li><li><a href="crew/index.html">The Movie</a></li></ul>
+        <a class="enter" href="play/index.html">Enter the Movie Room</a>
+      </article>
+      <article class="rcard grotto" id="grotto">
+        <span class="ic">🍺</span><h3>Gaspar's Grotto</h3>
+        <p>The notorious pirate bar of Ybor City, now on board. Pops the bar cat keeps watch over the Pour-Off, the Grotto cabinet and tournament night.</p>
+        <ul><li><a href="grotto-arcade/index.html">Grotto Arcade</a></li><li><a href="pour-off/index.html">The Pour-Off (21+)</a></li><li><a href="tavern/index.html">Bar games</a></li></ul>
+        <a class="enter" href="grotto-arcade/index.html">Pull up a stool</a>
+      </article>
+      <article class="rcard" id="family-room">
+        <span class="ic">🖼️</span><h3>Family Room</h3>
+        <p>The crew, family and friends, camp friends and schoolmates, the gallery and the stories behind the ship.</p>
+        <ul><li><a href="crew/index.html">Meet the crew</a></li><li><a href="dashboard/index.html">Captain's Dashboard</a></li></ul>
+        <a class="enter" href="crew/index.html">Enter the Family Room</a>
+      </article>
+      <article class="rcard" id="the-app">
+        <span class="ic">📱</span><h3>The App</h3>
+        <p>The whole ship in your pocket: iPhone, Android, Samsung, Amazon and Facebook. Coming to every store.</p>
+        <a class="enter" href="app/index.html">Get the app</a>
+      </article>
+    </div>
+  </section>
+
+  <section aria-labelledby="c">
+    <h2 id="c">The crew</h2>
+    <div class="crew">
+      <p>Presented by Gaspar's Grotto, the notorious pirate bar of Ybor City. Crowned by Atara, blessed by Pippy. Pops is the bar cat, carrying on for the world famous Tanker Ray, and Pippy is our pirate chihuahua.</p>
+      <p>With thanks to Captain Eric Schiller and Co-Navigator Shere Schiller and their family; Andy, the star of Andy Golf Club; Steph, Landon, and Stephania Schiller of the Pour-Off; painter and musician Waldo Nuhel and his great-grandson Waldo Jr. Jr.; Mark Brenner; Ed Lafferty; Ruben and Rene Alvarez and their whole family; Amber Kornreich; my dad; and Kornreich &amp; Associates.</p>
+      <p><a href="crew/index.html" style="color:var(--brass)">Meet the whole crew in the Family Room</a></p>
+    </div>
+  </section>
+
+  <footer>
+    <nav aria-label="Site">
+      <a href="app/index.html">The App</a>
+      <a href="support/index.html">Support</a>
+      <a href="privacy/index.html">Privacy Policy</a>
+      <a href="delete-my-data/index.html">Delete My Data</a>
+      <a href="no-endorsement/index.html">No-Endorsement Notice</a>
+    </nav>
+    <div>Pirates of Ybor, presented by Gaspar's Grotto, Ybor City, Florida.<br>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.<br>Questions or permissions: <a href="mailto:adamlkornreich@gmail.com">adamlkornreich@gmail.com</a><br>Please play and drink responsibly. Drink-themed games are for ages 21 and up.</div>
+  </footer>
+</div>
+<script src="assets/ship.js" data-root="./" defer></script>
+</body>
+</html>
+
+</body></html>
