@@ -7,6 +7,17 @@ Plain HTML/CSS/JS with no build step. It's published to GitHub Pages by
 `.github/workflows/pages.yml` on every push to `main`. Sign-in uses
 [Supabase](https://supabase.com) (free tier).
 
+## Site choices
+
+- **Sign-in:** Email and password via Supabase Auth; user accounts are stored in the
+  Supabase project. GitHub OAuth is not configured. Supabase sends confirmation and
+  password-reset emails through the configured email provider.
+- **Pages:** A public home page, sign-up/sign-in page, and members-only page.
+- **Publishing:** GitHub Pages, with `piratesofybor.com` available as an optional
+  custom domain (setup below).
+- **Sharing:** “Send a link” means sharing the published site URL. There is no
+  invitation or email-a-link feature.
+
 ## Edit the site
 
 - **Events, contact email:** `config.js`
