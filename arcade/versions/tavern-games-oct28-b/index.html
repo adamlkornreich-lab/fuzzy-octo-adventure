@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Pirates of Ybor – Tavern Games</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--bg:#f6ecd6;--card:#fffaf0;--ink:#2a1a0c;--acc:#9a2a14;--gold:#c58a12;--mut:#7a6650;--sq1:#ead6a8;--sq2:#a4743c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#150e08;--card:#241810;--ink:#f3e4c4;--acc:#e0623f;--gold:#e8b13a;--mut:#b09a7a;--sq1:#cdb27a;--sq2:#7c5428}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Georgia,serif;max-width:900px;margin:auto;padding:12px}
+h1{margin:4px 0;color:var(--acc);font-size:1.6rem}nav{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+button{font:inherit;background:var(--card);color:var(--ink);border:2px solid var(--gold);border-radius:8px;padding:6px 10px;cursor:pointer}
+button.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.card{background:var(--card);border:1px solid var(--gold);border-radius:10px;padding:12px;margin:8px 0}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px}
+.chip{font-size:.7rem;padding:1px 7px;border-radius:9px;background:var(--gold);color:#201000;margin-right:6px}
+.bd{display:grid;grid-template-columns:repeat(8,1fr);max-width:420px;margin:auto}
+.sq{aspect-ratio:1;border:0;border-radius:0;padding:0;font-size:clamp(20px,6vw,32px);background:var(--sq1);color:#000}.sq.d{background:var(--sq2)}.sq.s{outline:3px solid var(--acc);outline-offset:-3px}
+.tg{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;max-width:360px;margin:auto}.tg button{aspect-ratio:1;padding:0;font-size:1.3rem}
+canvas{max-width:100%;background:#0d3b4a;border-radius:8px;display:block;margin:auto;touch-action:none}
+#msg{font-weight:bold;min-height:1.5em;margin:6px 0}small{color:var(--mut)}
+</style></head><body>
+<h1>🏴‍☠️ Pirates of Ybor <small>Tavern Games</small></h1>
+<div>Mode: <button id="m1" class="on">1 Player vs AI</button> <button id="m2">2 Players</button></div>
+<nav id="nav"></nav><div id="msg"></div><div id="tb" style="font-weight:bold;color:var(--acc)"></div><div id="S"></div>
+<p><small>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.</small></p>
+<script>
+const $=s=>document.querySelector(s),S=$('#S');let mode='ai',stop=null,cur='Dashboard';
+const W={p1:0,p2:0,ai:0,n:0},T={active:0,cb:null,launch:0,vs:'',log:[],round:[],next:[],i:0,game:'Darts'};
+const esc=s=>s.replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const nm=n=>n==1?'Captain':mode=='ai'?'Bilge AI':'First Mate';
+const say=t=>$('#msg').textContent=t;
+function done(w){W.n++;w==1?W.p1++:mode=='ai'?W.ai++:W.p2++;say('🏆 '+nm(w)+' wins! Pick a game to sail again.');if(T.cb){const c=T.cb;T.cb=null;setTimeout(()=>c(w),1500)}}
+const R=n=>Math.floor(Math.random()*n);
+const G={Dashboard:dash,Chess:chess,Trivia:trivia,'Find Treasure':treasure,Darts:darts,'Ping Pong':pong,'Rum Dice':dice,Swashbuckle:sword,Tournament:tourney};
+Object.keys(G).forEach(k=>{const b=document.createElement('button');b.textContent=k;b.onclick=()=>show(k);$('#nav').append(b)});
+function show(k){if(!T.launch)T.cb=null;T.launch=0;$('#tb').textContent=T.cb?T.vs:'';stop&&stop();stop=null;cur=k;S.onclick=null;S.innerHTML='';say('');
+[...$('#nav').children].forEach(b=>b.classList.toggle('on',b.textContent==k));G[k]()}
+$('#m1').onclick=()=>setMode('ai');$('#m2').onclick=()=>setMode('2p');
+function setMode(m){mode=m;$('#m1').classList.toggle('on',m=='ai');$('#m2').classList.toggle('on',m=='2p');show(cur)}
+
+function dash(){
+const L=[['Live now','7 games: Chess (smarter 3-move-deep AI), Trivia (26 questions, 10 per game), Find Treasure, Darts, Ping Pong, Rum Dice, Swashbuckle — each 1P vs AI or 2P'],['Live now','Tavern Tournament: 4 or 8 players, automatic bracket, winners advance, you pick the game for each match'],
+['Live now','Pirate-themed hub with scoreboard, mascots Pops &amp; Pippy 🐱🐱 and your copyright line'],
+['Next','Publish to Apple App Store, Google Play and Samsung Galaxy Store as one app'],
+['Next','Sign in with Google, Apple, Samsung, Facebook, TikTok; tap-to-pay via Apple/Google Pay'],
+['Next','AI-generated trivia that refreshes constantly (movies, Ybor history, pirates, bar trivia)'],
+['Next','Online 2P matches, friend codes, global leaderboards'],
+['Next','Online tournaments: QR join from phones, big-screen bracket and prizes for Ybor bars'],
+['Beyond','Movie game tie-ins, sponsor/brand rounds, merch, season passes, Captain Shiller &amp; Co-Navigator Shere credits'],
+['Beyond','New invented games: Gaspar’s Grotto checkers, beer pong, shuffleboard, bowling']];
+S.innerHTML=`<div class=g><div class=card><b>Captain</b><h2>${W.p1}</h2></div><div class=card><b>${mode=='ai'?'Bilge AI':'First Mate'}</b><h2>${mode=='ai'?W.ai:W.p2}</h2></div><div class=card><b>Games played</b><h2>${W.n}</h2></div></div>
+<div class=card><b>What we can do with piratesofybor.com and beyond</b><br><small>Live = playable on this page. Next and Beyond are the roadmap, not built yet.</small>${L.map(x=>`<p><span class=chip>${x[0]}</span>${x[1]}</p>`).join('')}</div>`}
+
+function chess(){
+let b='rnbqkbnrpppppppp................................PPPPPPPPRNBQKBNR'.split(''),sel=-1,t=1,over=0;
+const U={K:'♔',Q:'♕',R:'♖',B:'♗',N:'♘',P:'♙',k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'},V={p:1,n:3,b:3,r:5,q:9,k:99};
+const own=(p,t)=>p!='.'&&((p<'a')==(t==1));
+function gen(i){const p=b[i],w=p<'a',x=p.toLowerCase(),r=i>>3,c=i&7,m=[];
+const add=(a,d,k)=>{if(a<0||a>7||d<0||d>7)return 0;const q=b[a*8+d],e=q!='.';if(e&&(q<'a')==w)return 0;if(k===0&&e)return 0;if(k===1&&!e)return 0;m.push(a*8+d);return !e};
+if(x=='p'){const d=w?-1:1;add(r+d,c,0)&&r==(w?6:1)&&add(r+2*d,c,0);add(r+d,c-1,1);add(r+d,c+1,1)}
+else if(x=='n'||x=='k'){(x=='n'?[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]]:[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]]).forEach(d=>add(r+d[0],c+d[1]))}
+else{const D=[];if(x!='b')D.push([1,0],[-1,0],[0,1],[0,-1]);if(x!='r')D.push([1,1],[1,-1],[-1,1],[-1,-1]);D.forEach(d=>{for(let k=1;k<8;k++)if(!add(r+d[0]*k,c+d[1]*k))break})}
+return m}
+function mv(a,z){const cp=b[z];b[z]=b[a];b[a]='.';if(b[z]=='P'&&z<8)b[z]='Q';if(b[z]=='p'&&z>55)b[z]='q';
+if(cp.toLowerCase()=='k'){over=1;draw();return done(t)}t=t==1?2:1;draw()}
+function draw(){S.innerHTML='<div class=bd>'+b.map((p,i)=>`<button class="sq ${((i>>3)+i)&1?'d':''} ${i==sel?'s':''}" data-i="${i}">${U[p]||''}</button>`).join('')+'</div>';if(!over)say((t==1?'White':'Black')+' ('+nm(t)+') to move. Capture the king to win!')}
+function ev(){let s=0;for(let i=0;i<64;i++){const p=b[i];if(p=='.')continue;const x=p.toLowerCase(),c=7-Math.abs((i&7)-3.5)-Math.abs((i>>3)-3.5);s+=(p<'a'?1:-1)*(V[x]*10+(x=='k'?0:c*.3))}return s}
+function srch(d,t,al,be){if(!d)return t==1?ev():-ev();let best=-1e9;for(let i=0;i<64;i++)if(own(b[i],t))for(const z of gen(i)){const f=b[i],cp=b[z];if(cp.toLowerCase()=='k')return 9999+d;b[z]=f;b[i]='.';if(f=='P'&&z<8)b[z]='Q';if(f=='p'&&z>55)b[z]='q';const s=-srch(d-1,t==1?2:1,-be,-al);b[i]=f;b[z]=cp;if(s>best)best=s;if(best>al)al=best;if(al>=be)return best}return best==-1e9?0:best}
+function ai(){if(over)return;let best=-1e9,bf,bt;for(let i=0;i<64;i++)if(own(b[i],2))for(const z of gen(i)){const f=b[i],cp=b[z];if(cp=='K'){bf=i;bt=z;best=1e9;break}b[z]=f;b[i]='.';if(f=='p'&&z>55)b[z]='q';const s=-srch(2,1,-1e9,1e9)+Math.random()*.3;b[i]=f;b[z]=cp;if(s>best){best=s;bf=i;bt=z}}bf!=null&&mv(bf,bt)}
+S.onclick=e=>{const i=e.target.dataset.i;if(i==null||over)return;const n=+i;
+if(sel>=0&&gen(sel).includes(n)){const a=sel;sel=-1;mv(a,n);if(!over&&mode=='ai')setTimeout(ai,400)}
+else if(own(b[n],t)&&!(mode=='ai'&&t==2)){sel=n;draw()}};draw()}
+
+const Q=[['Which Tampa neighborhood is famous for cigars?',['Ybor City','Hyde Park','Seminole Heights'],0],['Tampa’s NFL team is the…',['Buccaneers','Dolphins','Jaguars'],0],['Pirate flag nickname?',['Jolly Roger','Blue Peter','Old Glory'],0],['Johnny Depp played which pirate?',['Jack Sparrow','Long John Silver','Blackbeard'],0],['A pirate’s favorite letter?',['R (Arrr)','C (the sea)','P'],1],['Gasparilla honors pirate José…',['Gaspar','Morgan','Kidd'],0],['What do you call a pirate’s left-behind gold?',['Buried treasure','Bounty hunt','Ghost pay'],0],['Chess piece that moves in an L?',['Knight','Bishop','Rook'],0],['Which Gulf city hosts the Gasparilla pirate festival?',['Tampa','Miami','Mobile'],0],['Who sailed as Captain Hook’s nemesis in Peter Pan?',['Peter Pan','Wendy','Tinker Bell'],0],['In Pirates of the Caribbean, the ship is the Black…',['Pearl','Jewel','Star'],0],['Which movie features the line “I’ll be back”?',['The Terminator','Titanic','Jaws'],0],['Which shark film made people fear the beach in 1975?',['Jaws','Splash','Free Willy'],0],['What is the Tampa Bay pro hockey team?',['Lightning','Sharks','Flames'],0],['How many squares on a chess board?',['64','72','56'],0],['The Tampa Bay baseball team is the…',['Rays','Marlins','Braves'],0],['Which drink is famous in pirate lore?',['Rum','Milk','Tea'],0],['In darts, what is the center called?',['Bullseye','Hub','Pin'],0],['A ping pong ball is also called…',['Table tennis ball','Squash ball','Shuttlecock'],0],['Which pirate novel features Long John Silver?',['Treasure Island','Moby-Dick','Robinson Crusoe'],0],['What is a pirate’s ship’s kitchen called?',['Galley','Brig','Poop deck'],0],['Which movie has a talking toy cowboy named Woody?',['Toy Story','Cars','Up'],0],['What do you shout to start a toast at sea?',['Cheers, me hearties!','Game over','Touchdown'],0],['The Titanic movie ship sank after hitting an…',['Iceberg','Reef','Whale'],0]];
+function trivia(){Q.sort(()=>Math.random()-.5);let i=0,sc=[0,0];
+function ask(){if(i>=10){say(sc[0]==sc[1]?'Tie, matey! Replay!':'');if(sc[0]!=sc[1])done(sc[0]>sc[1]?1:2);return S.innerHTML+='<p>Final: '+sc.join(' – ')+'</p>'}
+const p=i%2?2:1,q=Q[i],o=q[1].map((t,k)=>[t,k]).sort(()=>Math.random()-.5);
+say(nm(p)+' answers ('+sc.join(' – ')+')');
+S.innerHTML=`<div class=card><b>${q[0]}</b><p>${o.map(x=>`<button data-k="${x[1]}">${x[0]}</button>`).join(' ')}</p></div>`;
+if(p==2&&mode=='ai'){S.innerHTML+='<p>Bilge AI is thinking…</p>';setTimeout(()=>pick(Math.random()<.65?q[2]:(q[2]+1)%3),900)}
+S.onclick=e=>{if(e.target.dataset.k!=null&&!(p==2&&mode=='ai'))pick(+e.target.dataset.k)}}
+function pick(k){const p=i%2?1:0;if(k==Q[i][2])sc[p]++;i++;ask()}
+ask()}
+
+function treasure(){const N=6,ch=[R(N),R(N)];let t=1,over=0;
+S.innerHTML='<div class=tg>'+[...Array(N*N)].map((_,i)=>`<button data-i="${i}">🟫</button>`).join('')+'</div>';
+function dig(i){const b=S.children[0].children[i];if(b.disabled||over)return;b.disabled=1;const d=Math.max(Math.abs((i/N|0)-ch[0]),Math.abs(i%N-ch[1]));
+if(!d){b.textContent='💰';over=1;return done(t)}b.textContent=d<2?'🔥':d<3?'🌤️':'❄️';t=t==1?2:1;turn()}
+function turn(){say(nm(t)+' digs — 🔥 close, ❄️ far');if(mode=='ai'&&t==2){const f=[...S.children[0].children].filter(b=>!b.disabled);setTimeout(()=>dig([...S.children[0].children].indexOf(f[R(f.length)])),600)}}
+S.onclick=e=>{if(e.target.dataset.i!=null&&!(mode=='ai'&&t==2))dig(+e.target.dataset.i)};turn()}
+
+function darts(){const c=document.createElement('canvas');c.width=c.height=300;S.append(c);const x=c.getContext('2d'),O=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
+let t=1,left=3,tot=[0,0],rd=1,hits=[];
+function board(){x.clearRect(0,0,300,300);for(let i=0;i<20;i++)[[140,'#222'],[128,i%2?'#e8d9a8':'#222'],[96,i%2?'#2a8a3a':'#b22'],[84,i%2?'#e8d9a8':'#222'],[0,0]].forEach((r,k)=>{});
+for(let i=0;i<20;i++){const a=(i-.5)*Math.PI/10-Math.PI/2;[[140,i%2?'#2a8a3a':'#b22'],[128,i%2?'#e8d9a8':'#222'],[96,i%2?'#2a8a3a':'#b22'],[84,i%2?'#e8d9a8':'#222']].forEach(r=>{x.fillStyle=r[1];x.beginPath();x.moveTo(150,150);x.arc(150,150,r[0],a,a+Math.PI/10);x.fill()})}
+x.fillStyle='#2a8a3a';x.beginPath();x.arc(150,150,18,0,7);x.fill();x.fillStyle='#b22';x.beginPath();x.arc(150,150,8,0,7);x.fill();
+hits.forEach(h=>{x.fillStyle='#fff';x.beginPath();x.arc(h[0],h[1],4,0,7);x.fill()})}
+function sc(px,py){const dx=px-150,dy=py-150,r=Math.hypot(dx,dy);if(r<8)return 50;if(r<18)return 25;if(r>140)return 0;const a=(Math.atan2(dx,-dy)+2*Math.PI+Math.PI/20)%(2*Math.PI),n=O[Math.floor(a/(Math.PI/10))];return r<84?n:r<96?n*3:r<128?n:n*2}
+function th(px,py){hits.push([px,py]);const s=sc(px,py);tot[t-1]+=s;left--;board();say(nm(t)+' hit '+s+' — totals '+tot.join(' – ')+' (round '+rd+'/3)');
+if(!left){if(t==1){t=2;left=3}else{t=1;left=3;rd++}hits=[];setTimeout(()=>{board();nxt()},900)}else if(mode=='ai'&&t==2)setTimeout(ai,600)}
+function nxt(){if(rd>3){say('Final '+tot.join(' – '));return tot[0]==tot[1]?say('Tie! Switch games and rematch'):done(tot[0]>tot[1]?1:2)}
+say(nm(t)+' throws '+left+' darts — tap the board ('+tot.join(' – ')+')');if(mode=='ai'&&t==2)setTimeout(ai,700)}
+function ai(){th(150+(Math.random()-.5)*110,150+(Math.random()-.5)*110)}
+c.onclick=e=>{if(rd>3||(mode=='ai'&&t==2))return;const r=c.getBoundingClientRect(),k=300/r.width;th((e.clientX-r.left)*k+(Math.random()-.5)*26,(e.clientY-r.top)*k+(Math.random()-.5)*26)};board();nxt()}
+
+function pong(){const c=document.createElement('canvas');c.width=400;c.height=240;S.append(c);const x=c.getContext('2d');
+let y=[100,100],bl={x:200,y:120,vx:3,vy:2},s=[0,0],k={},run=1,end=0;say('P1: mouse/touch or W/S · P2: ↑/↓ · first to 5');
+const kd=e=>k[e.key]=1,ku=e=>k[e.key]=0;addEventListener('keydown',kd);addEventListener('keyup',ku);
+c.onpointermove=e=>{const r=c.getBoundingClientRect();y[0]=(e.clientY-r.top)*240/r.height-20};
+stop=()=>{run=0;removeEventListener('keydown',kd);removeEventListener('keyup',ku)};
+function rs(d){bl={x:200,y:120,vx:3*d,vy:(Math.random()-.5)*4}}
+(function f(){if(!run)return;if(!end){if(k.w)y[0]-=4;if(k.s)y[0]+=4;
+if(mode=='ai')y[1]+=Math.sign(bl.y-20-y[1])*2.6;else{if(k.ArrowUp)y[1]-=4;if(k.ArrowDown)y[1]+=4}
+y=y.map(v=>Math.max(0,Math.min(200,v)));bl.x+=bl.vx;bl.y+=bl.vy;if(bl.y<4||bl.y>236)bl.vy*=-1;
+[[16,0,1],[384,1,-1]].forEach(p=>{if(Math.abs(bl.x-p[0])<6&&bl.y>y[p[1]]-4&&bl.y<y[p[1]]+44&&bl.vx*p[2]<0){bl.vx*=-1.08;bl.vy+=(bl.y-y[p[1]]-20)/8}});
+if(bl.x<0){s[1]++;rs(1)}if(bl.x>400){s[0]++;rs(-1)}
+if(s[0]>4||s[1]>4){end=1;done(s[0]>4?1:2)}}
+x.fillStyle='#0d3b4a';x.fillRect(0,0,400,240);x.fillStyle='#fff';x.fillRect(10,y[0],6,40);x.fillRect(384,y[1],6,40);x.beginPath();x.arc(bl.x,bl.y,5,0,7);x.fill();x.font='20px Georgia';x.fillText(s[0]+'  :  '+s[1],165,24);requestAnimationFrame(f)})()}
+
+function dice(){let t=1,sum=[0,0],hold=[0,0];
+function ui(){const p=t;S.innerHTML=`<div class=card><b>Hit 21 without busting (Rum Dice)</b><p>Captain: ${sum[0]}${hold[0]?' (held)':''} · ${nm(2)}: ${sum[1]}${hold[1]?' (held)':''}</p><p><button id=r>🎲 Roll</button> <button id=h>✋ Hold</button></p></div>`;
+say(nm(t)+'’s turn');$('#r').onclick=()=>go(1);$('#h').onclick=()=>go(0);
+if(mode=='ai'&&t==2){S.querySelectorAll('button').forEach(b=>b.disabled=1);setTimeout(()=>go(sum[1]<16?1:0),800)}}
+function go(r){const i=t-1;if(r){sum[i]+=1+R(6);if(sum[i]>21){sum[i]=-1;return fin()}}else hold[i]=1;
+if(hold[0]&&hold[1])return fin();if(!hold[2-t])t=t==1?2:1;ui()}
+function fin(){const a=sum[0],b=sum[1];S.innerHTML=`<div class=card>Final: ${a<0?'BUST':a} – ${b<0?'BUST':b}</div>`;if(a==b)return say('Tie! Roll again by reopening the game');done(a>b?1:2)}
+ui()}
+
+function sword(){const M=['⚔️ Slash','🤺 Lunge','🛡️ Parry'],hp=[5,5];let pick=null;
+function ui(){S.innerHTML=`<div class=card><h3>🏴‍☠️ Captain ❤${hp[0]} vs ${nm(2)} ❤${hp[1]}</h3><small>Slash cuts Lunge · Lunge pierces Parry · Parry beats Slash</small><p>${M.map((m,i)=>`<button data-m="${i}">${m}</button>`).join(' ')}</p><p id=lg></p></div>`;say(pick===null?'Captain, choose your move':nm(2)+', choose (Captain’s pick is hidden)')}
+S.onclick=e=>{const m=e.target.dataset.m;if(m==null||hp[0]<1||hp[1]<1)return;
+if(mode=='ai')return fight(+m,R(3));if(pick===null){pick=+m;ui()}else{const a=pick;pick=null;fight(a,+m)}};
+function fight(a,b){let r=a==b?0:(a-b+3)%3==2?1:2;if(r)hp[2-r]--;ui();$('#lg').textContent=M[a]+' vs '+M[b]+' → '+(r==0?'Clash! No damage.':r==1?'Captain lands a hit!':nm(2)+' lands a hit!');
+if(hp[0]<1||hp[1]<1)done(hp[1]<1?1:2)}
+ui()}
+function tourney(){
+if(!T.active){S.innerHTML=`<div class=card><b>🍻 Tavern Tournament</b><p>Enter 4 or 8 player names, one per line. Matches are 2 Players on one device.</p><textarea id=nl rows=8 style="width:100%" placeholder="Player 1&#10;Player 2&#10;Player 3&#10;Player 4"></textarea><p><button id=go>Start bracket</button></p></div>`;
+$('#go').onclick=()=>{const n=$('#nl').value.split('\n').map(s=>s.trim()).filter(Boolean);if(n.length!=4&&n.length!=8)return say('Need exactly 4 or 8 names (you have '+n.length+').');T.round=n.sort(()=>Math.random()-.5);T.next=[];T.i=0;T.log=[];T.active=1;tourney()};return}
+const r=T.round;
+if(r.length==1){S.innerHTML=`<div class=card><h2>🏆 ${esc(r[0])} wins the tournament!</h2><p>${T.log.map(esc).join('<br>')}</p><button id=nt>New tournament</button></div>`;$('#nt').onclick=()=>{T.active=0;tourney()};return}
+const a=r[2*T.i],b=r[2*T.i+1],lb=r.length==2?'Final':r.length==4?'Semifinals':'Quarterfinals',gs=['Darts','Ping Pong','Swashbuckle','Rum Dice','Trivia','Find Treasure','Chess'];
+S.innerHTML=`<div class=card><b>${lb}</b><h3>${esc(a)} (Captain) vs ${esc(b)} (First Mate)</h3><p>Game: <select id=gm>${gs.map(g=>`<option${g==T.game?' selected':''}>${g}</option>`).join('')}</select> <button id=pl>Play match</button></p><small>Winner advances automatically. If a game ends in a tie, come back here and replay it.</small><p>${T.log.map(esc).join('<br>')}</p></div>`;
+$('#pl').onclick=()=>{T.game=$('#gm').value;T.vs=a+' (Captain) vs '+b+' (First Mate) — '+lb;mode='2p';$('#m1').classList.remove('on');$('#m2').classList.add('on');
+T.cb=w=>{const win=w==1?a:b;T.next.push(win);T.log.push(a+' vs '+b+' → '+win);T.i++;if(T.next.length==r.length/2){T.round=T.next;T.next=[];T.i=0}show('Tournament')};T.launch=1;show(T.game)}}
+show('Dashboard');
+</script></body></html>

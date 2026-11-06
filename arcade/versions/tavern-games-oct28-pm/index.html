@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pirates of Ybor – Tavern Games</title>
+<style>
+:root{--bg:#f3e6c8;--fg:#2a1a0c;--card:#e8d4a6;--ac:#7a1f1f;--ac2:#1f4a5c;--lt:#f0d9a0;--dk:#8b5a2b;box-sizing:border-box;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b130b;--fg:#f1dfb8;--card:#2c1f12;--ac:#d9534f;--ac2:#5fb3c9;--lt:#c9a46a;--dk:#5a3a1c}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:Georgia,"Times New Roman",serif;padding:12px;max-width:520px;margin:auto}
+h1{font-size:1.5rem;margin:4px 0}p{margin:6px 0}
+nav{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+button{font:inherit;background:var(--ac);color:#fff;border:0;border-radius:6px;padding:8px 12px;cursor:pointer}
+nav button.on{background:var(--ac2)}button:focus-visible{outline:3px solid var(--ac2)}
+section{background:var(--card);border-radius:8px;padding:12px}
+.opt{display:block;width:100%;margin:6px 0;text-align:left;background:var(--dk)}
+#bd{display:grid;grid-template-columns:repeat(8,1fr);width:100%;aspect-ratio:1;border:3px solid var(--dk)}
+#bd button{border-radius:0;padding:0;font-size:min(7vw,34px);line-height:1;background:var(--lt);color:#000}
+#bd button.d{background:var(--dk)}#bd button.s{outline:3px solid var(--ac);outline-offset:-3px}#bd button.m{box-shadow:inset 0 0 0 40px rgba(31,74,92,.45)}
+#tg{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}#tg button{aspect-ratio:1;padding:0;font-size:1.3rem;background:var(--dk)}
+canvas{width:100%;background:var(--lt);border-radius:6px;touch-action:none;display:block}
+footer{font-size:.75rem;margin:14px 0 6px;text-align:center}
+</style></head><body>
+<h1>⚓ Pirates of Ybor Tavern</h1>
+<p>Pick a game, matey. Pops &amp; Pippy are watching the bar.</p>
+<nav id="nv"></nav>
+
+<section id="trivia"><b id="tq"></b><div id="to"></div><p id="ts"></p></section>
+
+<section id="chess" hidden>
+<p><button id="cm">Mode: vs AI</button> <button id="cr">New game</button></p>
+<p id="cs">White to move</p><div id="bd"></div></section>
+
+<section id="treasure" hidden>
+<p id="hs"></p><div id="tg"></div><p><button id="hr">New map</button></p></section>
+
+<section id="darts" hidden><p id="ds">Tap to throw when the cross is on the bullseye. 3 darts each, you vs the ship’s AI.</p>
+<canvas id="dc" width="280" height="280"></canvas><p><button id="dr">New round</button></p></section>
+
+<section id="pong" hidden><p id="ps">Drag to move your paddle. First to 5 wins.</p>
+<canvas id="pc" width="300" height="200"></canvas><p><button id="pb">Start / pause</button></p></section>
+
+<footer>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.<br>Contact: adamlkornreich@gmail.com</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const games=[['trivia','Trivia'],['chess','Chess'],['treasure','Treasure'],['darts','Darts'],['pong','Ping Pong']];
+function show(g){games.forEach(([k])=>{$(k).hidden=k!==g});[...$('nv').children].forEach((b,i)=>b.className=games[i][0]===g?'on':'')}
+games.forEach(([k,n])=>{const b=document.createElement('button');b.textContent=n;b.onclick=()=>show(k);$('nv').append(b)});
+show('trivia');
+
+/* TRIVIA */
+const Q=[
+["Who plays Jack Sparrow in Pirates of the Caribbean?",["Johnny Depp","Orlando Bloom","Geoffrey Rush"],0],
+["Which Tampa festival stars a pirate ship invasion?",["Mardi Gras","Gasparilla","Oktoberfest"],1],
+["Tampa’s Ybor City is famous for what industry?",["Cigars","Oranges","Steel"],0],
+["Who wrote Treasure Island?",["Mark Twain","Robert Louis Stevenson","Jules Verne"],1],
+["What is a pirate flag called?",["Union Jack","Jolly Roger","Blue Peter"],1],
+["What is Jack Sparrow’s ship?",["Flying Dutchman","Black Pearl","Queen Anne’s Revenge"],1],
+["Captain Hook is the enemy of whom?",["Peter Pan","Pinocchio","Aladdin"],0],
+["What do pirates say the treasure map shows?",["X marks the spot","Y marks the spot","O marks the spot"],0]];
+let qi=0,qs=0;
+function trivia(){const q=Q[qi];$('tq').textContent=`Q${qi+1}/${Q.length}: ${q[0]}`;$('ts').textContent=`Doubloons: ${qs}`;
+const o=$('to');o.innerHTML='';q[1].forEach((t,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=t;
+b.onclick=()=>{if(i===q[2])qs++;qi++;if(qi<Q.length)trivia();else{$('tq').textContent=`Round over! You earned ${qs} of ${Q.length} doubloons.`;o.innerHTML='';const r=document.createElement('button');r.textContent='Play again';r.onclick=()=>{qi=0;qs=0;trivia()};o.append(r)}};o.append(b)})}
+trivia();
+
+/* CHESS */
+const U={K:'♔',Q:'♕',R:'♖',B:'♗',N:'♘',P:'♙',k:'♚',q:'♛',r:'♜',b:'♝',n:'♞',p:'♟'};
+const V={p:1,n:3,b:3,r:5,q:9,k:100};
+let B,sel=null,wt=true,ai=true,over=false;
+const isW=p=>p===p.toUpperCase();
+function init(){B='rnbqkbnrpppppppp'.split('').concat(Array(32).fill(''),'PPPPPPPPRNBQKBNR'.split(''));sel=null;wt=true;over=false;draw()}
+function gen(b,w){const m=[];for(let i=0;i<64;i++){const p=b[i];if(!p||isW(p)!==w)continue;const r=i>>3,c=i&7,t=p.toLowerCase();
+const add=(r2,c2)=>{if(r2<0||r2>7||c2<0||c2>7)return 0;const q=b[r2*8+c2];if(q&&isW(q)===w)return 0;m.push([i,r2*8+c2]);return q?2:1};
+if(t==='p'){const d=w?-1:1,s=w?6:1;if(r+d>=0&&r+d<8){if(!b[(r+d)*8+c]){m.push([i,(r+d)*8+c]);if(r===s&&!b[(r+2*d)*8+c])m.push([i,(r+2*d)*8+c])}
+for(const dc of[-1,1]){const c2=c+dc;if(c2>=0&&c2<8){const q=b[(r+d)*8+c2];if(q&&isW(q)!==w)m.push([i,(r+d)*8+c2])}}}}
+else if(t==='n'){for(const[a,e]of[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]])add(r+a,c+e)}
+else if(t==='k'){for(let a=-1;a<2;a++)for(let e=-1;e<2;e++)if(a||e)add(r+a,c+e)}
+else{const ds=[];if(t!=='b')ds.push([1,0],[-1,0],[0,1],[0,-1]);if(t!=='r')ds.push([1,1],[1,-1],[-1,1],[-1,-1]);
+for(const[a,e]of ds){let k=1,x;do{x=add(r+a*k,c+e*k);k++}while(x===1)}}}return m}
+function mv(b,m){const n=b.slice(),p=n[m[0]];n[m[1]]=p;n[m[0]]='';if(p==='P'&&m[1]<8)n[m[1]]='Q';if(p==='p'&&m[1]>55)n[m[1]]='q';return n}
+function ev(b){let s=0;for(const p of b)if(p)s+=(isW(p)?1:-1)*V[p.toLowerCase()];return s}
+function aiMove(){let best=null,bs=1e9;for(const m of gen(B,false)){const n=mv(B,m);let w=-1e9;for(const r of gen(n,true))w=Math.max(w,ev(mv(n,r)));if(w===-1e9)w=ev(n);w+=Math.random()*.3;if(w<bs){bs=w;best=m}}return best}
+function draw(){const bd=$('bd');bd.innerHTML='';const mvs=sel!==null?gen(B,wt).filter(m=>m[0]===sel).map(m=>m[1]):[];
+B.forEach((p,i)=>{const b=document.createElement('button');b.className=((i>>3)+(i&7))%2?'d':'';if(i===sel)b.className+=' s';if(mvs.includes(i))b.className+=' m';b.textContent=p?U[p]:'';b.setAttribute('aria-label','square '+i);b.onclick=()=>click(i);bd.append(b)});
+const wk=B.includes('K'),bk=B.includes('k');
+if(!wk||!bk){over=true;$('cs').textContent=wk?'White captures the king – White wins!':'Black captures the king – Black wins!'}else $('cs').textContent=wt?'White to move':'Black to move'}
+function click(i){if(over||(ai&&!wt))return;const p=B[i];
+if(sel!==null&&gen(B,wt).some(m=>m[0]===sel&&m[1]===i)){B=mv(B,[sel,i]);sel=null;wt=!wt;draw();
+if(ai&&!wt&&!over)setTimeout(()=>{const m=aiMove();if(m){B=mv(B,m);wt=true}draw()},300)}
+else{sel=p&&isW(p)===wt?i:null;draw()}}
+$('cm').onclick=()=>{ai=!ai;$('cm').textContent=ai?'Mode: vs AI':'Mode: 2 players';init()};
+$('cr').onclick=init;init();
+
+/* TREASURE */
+let chest,digs,done;
+function treasure(){chest=Math.floor(Math.random()*36);digs=8;done=false;$('hs').textContent='Find the chest! 8 digs left.';const g=$('tg');g.innerHTML='';
+for(let i=0;i<36;i++){const b=document.createElement('button');b.textContent='·';b.setAttribute('aria-label','dig '+i);
+b.onclick=()=>{if(done||b.dataset.x)return;b.dataset.x=1;digs--;
+if(i===chest){b.textContent='💰';done=true;$('hs').textContent='Yarr! You found the treasure!'}
+else{const d=Math.hypot((i%6)-(chest%6),(i/6|0)-(chest/6|0));b.textContent=d<=1.5?'🔥':d<=3?'🌡️':'❄️';
+if(digs<=0){done=true;$('hs').textContent='Out of digs. The chest was at the 💰.';g.children[chest].textContent='💰'}else $('hs').textContent=`${digs} digs left. 🔥 hot, 🌡️ warm, ❄️ cold.`}};g.append(b)}}
+$('hr').onclick=treasure;treasure();
+
+/* DARTS */
+(function(){const c=$('dc'),x=c.getContext('2d');let t=0,me=[],cp=[],cur;
+function reset(){me=[];cp=[];$('ds').textContent='Tap to throw when the cross is on the bullseye. 3 darts each, you vs the ship’s AI.'}
+function frame(){if(!$('darts').hidden){t+=.035;cur=[140+Math.sin(t*1.3)*105,140+Math.cos(t*1.7)*105];
+x.clearRect(0,0,280,280);for(let r=10;r>=1;r--){x.fillStyle=r%2?'#7a1f1f':'#1f4a5c';if(r===1)x.fillStyle='#d9a400';x.beginPath();x.arc(140,140,r*12,0,7);x.fill()}
+x.fillStyle='#fff';me.forEach(p=>{x.beginPath();x.arc(p[0],p[1],4,0,7);x.fill()});
+if(me.length<3){x.strokeStyle='#000';x.lineWidth=2;x.beginPath();x.moveTo(cur[0]-10,cur[1]);x.lineTo(cur[0]+10,cur[1]);x.moveTo(cur[0],cur[1]-10);x.lineTo(cur[0],cur[1]+10);x.stroke()}}
+requestAnimationFrame(frame)}
+c.onclick=()=>{if(me.length>=3)return;me.push(cur.slice());if(me.length===3){
+const sc=p=>Math.max(0,10-Math.floor(Math.hypot(p[0]-140,p[1]-140)/12));
+const a=me.reduce((s,p)=>s+sc(p),0);cp=[0,0,0].map(()=>Math.floor(2+Math.random()*8));const b=cp.reduce((s,v)=>s+v,0);
+$('ds').textContent=`You: ${a}  AI: ${b} – ${a>b?'you win!':a<b?'the AI wins.':'a draw.'}`}else $('ds').textContent=`Dart ${me.length} of 3 thrown.`};
+$('dr').onclick=reset;frame()})();
+
+/* PONG */
+(function(){const c=$('pc'),x=c.getContext('2d');let b,py=80,ay=80,s=[0,0],run=false;
+function serve(){b={x:150,y:100,vx:3*(Math.random()<.5?-1:1),vy:(Math.random()-.5)*4}}
+function win(){return s[0]>=5||s[1]>=5}
+function frame(){if(run){b.x+=b.vx;b.y+=b.vy;if(b.y<5||b.y>195)b.vy*=-1;ay+=Math.sign(b.y-ay-20)*2.3;
+if(b.vx<0&&b.x<18&&b.x>8&&b.y>py&&b.y<py+40){b.vx*=-1.07;b.vy+=(b.y-py-20)/8}
+if(b.vx>0&&b.x>282&&b.x<292&&b.y>ay&&b.y<ay+40){b.vx*=-1.07;b.vy+=(b.y-ay-20)/8}
+if(b.x<0){s[1]++;serve()}if(b.x>300){s[0]++;serve()}
+$('ps').textContent=`You ${s[0]} – ${s[1]} AI`;if(win()){run=false;$('ps').textContent+=s[0]>=5?' – you win!':' – the AI wins.';s=[0,0];serve()}}
+x.fillStyle=getComputedStyle(document.body).backgroundColor;x.fillRect(0,0,300,200);x.fillStyle='#7a1f1f';x.fillRect(8,py,6,40);x.fillRect(286,ay,6,40);x.beginPath();x.arc(b.x,b.y,5,0,7);x.fill();
+requestAnimationFrame(frame)}
+const mp=e=>{const r=c.getBoundingClientRect();py=Math.max(0,Math.min(160,(e.clientY-r.top)*200/r.height-20))};
+c.onpointermove=mp;c.onpointerdown=mp;$('pb').onclick=()=>{run=!run};serve();frame()})();
+</script></body></html>

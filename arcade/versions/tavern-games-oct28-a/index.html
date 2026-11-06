@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pirates of Ybor – Tavern Games</title>
+<style>
+:root{--bg:#f3e6c4;--fg:#1b2a3a;--card:#fff8e1;--acc:#a8741a;--line:#c9b27a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a2b;--fg:#f1e7c8;--card:#13293f;--acc:#e6b54a;--line:#2d4a66;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b1a2b;--fg:#f1e7c8;--card:#13293f;--acc:#e6b54a;--line:#2d4a66;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 Georgia,serif;text-align:center}
+h1{margin:.6em 0 .1em;font-size:1.6em;color:var(--acc)}p.sub{margin:0 0 .8em;opacity:.8}
+nav{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 8px}
+button{font:inherit;background:var(--card);color:var(--fg);border:2px solid var(--acc);border-radius:10px;padding:8px 12px;cursor:pointer}
+button.on,button:hover{background:var(--acc);color:var(--bg)}
+main{max-width:560px;margin:12px auto;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;min-height:340px}
+section{display:none}section.on{display:block}
+canvas{width:100%;max-width:480px;background:#0e6b4a;border-radius:10px;touch-action:none}
+.bar{height:16px;background:var(--line);border-radius:8px;margin:6px auto;max-width:320px;position:relative}
+.bar i{position:absolute;top:-3px;width:8px;height:22px;background:var(--acc);border-radius:4px}
+.big{font-size:2.2em;margin:8px}.log{min-height:3em}
+.q button{display:block;width:100%;margin:6px 0;text-align:left}
+.b{display:grid;grid-template-columns:repeat(8,1fr);max-width:400px;margin:auto;aspect-ratio:1}
+.b div{display:flex;align-items:center;justify-content:center;font-size:clamp(20px,7vw,34px);cursor:pointer;user-select:none}
+.b .l{background:#e8d3a2;color:#222}.b .d{background:#a47a45;color:#222}.b .s{outline:3px solid var(--acc);outline-offset:-3px}
+footer{font-size:.8em;opacity:.8;padding:10px 14px 24px}
+</style></head><body>
+<h1>🏴‍☠️ Pirates of Ybor – Tavern Games</h1>
+<p class="sub">Pops &amp; Pippy’s tavern: six games, all original.</p>
+<nav id="nav"></nav>
+<main>
+<section id="trivia"></section>
+<section id="pong"><div id="pongInfo">First to 7 · move your finger or mouse</div><canvas id="cv" width="480" height="300"></canvas><div><button id="pongGo">Start / Restart</button></div></section>
+<section id="bowl"></section>
+<section id="cups"></section>
+<section id="shuffle"></section>
+<section id="chess"><div id="cInfo">White moves first</div><div class="b" id="board"></div><button id="cReset">New game</button><p style="font-size:.8em">Pass-and-play. Win by capturing the king. Castling and en passant are not in yet.</p></section>
+</main>
+<footer>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.<br>Questions or permissions: adamlkornreich@gmail.com<br>Games are for entertainment only: no wagering, no prizes. Drink-themed games use pretend mugs only. 17+ recommended.</footer>
+<script>
+const $=id=>document.getElementById(id);
+const tabs=[["trivia","🧠 Trivia"],["pong","🏓 Ping Pong"],["bowl","🎳 Bowling"],["cups","🍺 Cup Pong"],["shuffle","🪙 Shuffleboard"],["chess","♞ Chess"]];
+let cur="trivia",pongRun=false;
+tabs.forEach(([id,t])=>{const b=document.createElement("button");b.textContent=t;b.dataset.id=id;b.onclick=()=>show(id);$("nav").appendChild(b)});
+function show(id){cur=id;pongRun=false;document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id===id));document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.id===id))}
+
+/* TRIVIA – original questions */
+const Q=[["Which Florida city is home to the historic Ybor City cigar district?",["Tampa","Naples","Pensacola"],0],["What flag is famously a skull and crossbones?",["Jolly Roger","Union Jack","Red Ensign"],0],["How many players start on one side in a standard chess game?",["16 pieces","12 pieces","20 pieces"],0],["A ship’s left side is called…",["Port","Starboard","Stern"],0],["What does a compass needle point toward?",["Magnetic north","The sun","The nearest port"],0],["How many pins are in a full bowling rack?",["10","8","12"],0],["Treasure maps traditionally mark the spot with…",["An X","A triangle","A star"],0],["Which is the largest ocean?",["Pacific","Atlantic","Indian"],0]];
+let qi=0,qs=0;
+function trivia(){const T=$("trivia");if(qi>=Q.length){T.innerHTML=`<div class="big">${qs}/${Q.length}</div><p>${qs>6?"Ye be a true Captain! ⚓":qs>3?"Solid first mate!":"Back to the deck, matey!"}</p><button id="tr">Play again</button>`;$("tr").onclick=()=>{qi=0;qs=0;trivia()};return}
+const [q,a,c]=Q[qi],o=a.map((t,i)=>[t,i]).sort(()=>Math.random()-.5);
+T.innerHTML=`<p>Question ${qi+1} of ${Q.length} · Score ${qs}</p><h3>${q}</h3><div class="q"></div><p class="log"></p>`;
+o.forEach(([t,i])=>{const b=document.createElement("button");b.textContent=t;b.onclick=()=>{const ok=i===c;if(ok)qs++;T.querySelector(".log").textContent=ok?"Aye, correct!":"Nay! Answer: "+a[c];T.querySelectorAll("button").forEach(x=>x.disabled=true);setTimeout(()=>{qi++;trivia()},1100)};T.querySelector(".q").appendChild(b)})}
+
+/* TIMING GAMES: bowling, cup pong, shuffleboard (click: lock aim, click: lock power) */
+function meter(id,title,turns,hint,resolve,init){
+const S=$(id);let t=0,score=0,stage=0,a=0,p=0,raf,ts=0,st=init?init():{},msg=hint;
+S.innerHTML=`<h3>${title}</h3><div>Aim</div><div class="bar"><i id="${id}a"></div><div>Power</div><div class="bar"><i id="${id}p"></div><div class="big" id="${id}v"></div><p class="log" id="${id}m"></p><button id="${id}b">Aim!</button>`;
+const A=$(id+"a"),P=$(id+"p"),V=$(id+"v"),M=$(id+"m"),Bn=$(id+"b");
+function draw(){V.textContent=st.vis?st.vis():"";M.textContent=msg;Bn.textContent=t>=turns?"Play again":stage==0?"Lock aim":stage==1?"Lock power":"…";}
+function loop(n){ts=n/1000;if(stage==0){a=Math.sin(ts*2.4)}if(stage==1){p=(Math.sin(ts*2.9)+1)/2}A.style.left=(a+1)/2*97+"%";P.style.left=p*97+"%";raf=requestAnimationFrame(loop)}
+Bn.onclick=()=>{if(t>=turns){t=0;score=0;stage=0;st=init?init():{};msg=hint;draw();return}
+if(stage==0){stage=1}else if(stage==1){stage=2;const r=resolve(a,p,st,t);score+=r.pts;t++;msg=r.text+` (Score ${score}/${r.max||"∞"})`;setTimeout(()=>{stage=0;if(t>=turns)msg+=" · Final round done!";draw()},900)}draw()};
+cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);draw();}
+
+/* Bowling: 5 frames, 2 rolls each */
+meter("bowl","🎳 Bowling · 5 frames",10,"Aim for the center, power near 80%.",(a,p,s,t)=>{
+if(t%2==0)s.left=10;const acc=Math.max(0,1-Math.abs(a)*1.5-Math.abs(p-.8)*1.3),k=Math.min(s.left,Math.round(acc*s.left+Math.random()*1.5));s.left-=k;
+const strike=k==10,spare=t%2==1&&s.left==0;if(strike)s.left=0;
+if(strike&&t%2==0){s.skip=1}
+return{pts:k,text:strike?"STRIKE! 🎳":spare?`SPARE! knocked ${k}`:`Knocked ${k} pin${k==1?"":"s"}`,max:50}},()=>({left:10,vis:function(){return"🎳".repeat(this.left)||"✅"}}));
+
+/* Cup pong: 6 pretend mugs, 10 throws */
+meter("cups","🍺 Cup Pong · 10 throws",10,"Match aim and power to a mug. Pretend mugs only!",(a,p,s)=>{
+let best=-1,bd=9;s.m.forEach((c,i)=>{if(c){const d=Math.hypot(a-c[0],(p-c[1])*2);if(d<bd){bd=d;best=i}}});
+if(bd<.35){s.m[best]=null;return{pts:1,text:"Splash! Mug sunk 🎉",max:6}}return{pts:0,text:"Missed! Try again.",max:6}},
+()=>({m:[[-.5,.3],[0,.3],[.5,.3],[-.25,.6],[.25,.6],[0,.85]],vis:function(){return this.m.map(x=>x?"🍺":"▫️").join("")}}));
+
+/* Shuffleboard: 8 pucks, zones 1-2-3 */
+meter("shuffle","🪙 Shuffleboard · 8 pucks",8,"Center aim; power high but not too high.",(a,p)=>{
+if(Math.abs(a)>.7)return{pts:0,text:"Into the gutter!",max:24};
+if(p>.93)return{pts:0,text:"Off the end!",max:24};
+const z=p>.8?3:p>.65?2:p>.5?1:0;return{pts:z,text:z?`Landed in the ${z}-point zone`:"Too short!",max:24}});
+
+/* PING PONG: vs computer */
+const cv=$("cv"),cx=cv.getContext("2d");let b,py,ay,ps,as;
+function resetBall(d){b={x:240,y:150,vx:d*4,vy:(Math.random()-.5)*4}}
+function pongStart(){py=ay=125;ps=as=0;resetBall(1);pongRun=true;requestAnimationFrame(pongLoop)}
+$("pongGo").onclick=()=>{pongRun=false;setTimeout(pongStart,30)};
+function move(e){const r=cv.getBoundingClientRect(),y=((e.touches?e.touches[0].clientY:e.clientY)-r.top)/r.height*300;py=Math.max(0,Math.min(250,y-25))}
+cv.addEventListener("mousemove",move);cv.addEventListener("touchmove",e=>{e.preventDefault();move(e)},{passive:false});
+function pongLoop(){if(!pongRun)return;
+b.x+=b.vx;b.y+=b.vy;if(b.y<6||b.y>294)b.vy*=-1;
+ay+=Math.max(-3.2,Math.min(3.2,b.y-25-ay));
+if(b.x<22&&b.y>py&&b.y<py+50&&b.vx<0){b.vx*=-1.07;b.vy+=(b.y-py-25)/6}
+if(b.x>458&&b.y>ay&&b.y<ay+50&&b.vx>0){b.vx*=-1.04;b.vy+=(b.y-ay-25)/8}
+if(b.x<0){as++;resetBall(1)}if(b.x>480){ps++;resetBall(-1)}
+cx.clearRect(0,0,480,300);cx.strokeStyle="#fff8";cx.setLineDash([8,8]);cx.beginPath();cx.moveTo(240,0);cx.lineTo(240,300);cx.stroke();
+cx.fillStyle="#fff";cx.fillRect(10,py,8,50);cx.fillRect(462,ay,8,50);cx.beginPath();cx.arc(b.x,b.y,6,0,7);cx.fill();
+$("pongInfo").textContent=`You ${ps} – ${as} Computer`;
+if(ps>=7||as>=7){pongRun=false;$("pongInfo").textContent=(ps>=7?"You win! 🏆 ":"Computer wins. ")+`${ps}–${as}`;return}
+requestAnimationFrame(pongLoop)}
+
+/* CHESS: pass-and-play, pseudo-legal */
+const G={p:"♟",r:"♜",n:"♞",b:"♝",q:"♛",k:"♚"};let B,turn,sel,over;
+function cReset(){B=[..."rnbqkbnr","p".repeat(8),...Array(32).fill(""),"P".repeat(8),..."RNBQKBNR"].join("").split("");B=B.map(x=>x==" "?"":x);
+B=[];"rnbqkbnr".split("").forEach(x=>B.push(x));for(let i=0;i<8;i++)B.push("p");for(let i=0;i<32;i++)B.push("");for(let i=0;i<8;i++)B.push("P");"RNBQKBNR".split("").forEach(x=>B.push(x));turn=true;sel=-1;over=false;cDraw()}
+function isW(q){return q===q.toUpperCase()}
+function mv(i){const p=B[i],w=isW(p),t=p.toLowerCase(),r=i>>3,c=i&7,o=[];
+const add=(rr,cc)=>{if(rr<0||rr>7||cc<0||cc>7)return 0;const q=B[rr*8+cc];if(q===""){o.push(rr*8+cc);return 1}if(isW(q)!==w)o.push(rr*8+cc);return 0};
+if(t=="p"){const d=w?-1:1,f=r+d;if(f>=0&&f<8&&!B[f*8+c]){o.push(f*8+c);if((w?r==6:r==1)&&!B[(r+2*d)*8+c])o.push((r+2*d)*8+c)}
+[-1,1].forEach(x=>{const cc=c+x;if(f>=0&&f<8&&cc>=0&&cc<8){const q=B[f*8+cc];if(q&&isW(q)!==w)o.push(f*8+cc)}})}
+else if(t=="n")[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]].forEach(([x,y])=>add(r+x,c+y));
+else{const D=[];if(t!="b")D.push([1,0],[-1,0],[0,1],[0,-1]);if(t!="r")D.push([1,1],[1,-1],[-1,1],[-1,-1]);
+D.forEach(([x,y])=>{if(t=="k")add(r+x,c+y);else for(let k=1;add(r+k*x,c+k*y);k++);})}
+return o}
+function cDraw(){const E=$("board");E.innerHTML="";B.forEach((q,i)=>{const d=document.createElement("div");d.className=((i>>3)+(i&7))%2?"d":"l";if(i==sel)d.classList.add("s");if(q){d.textContent=G[q.toLowerCase()];d.style.color=isW(q)?"#fff":"#111";d.style.textShadow=isW(q)?"0 0 2px #000,0 0 2px #000,0 0 3px #000":"none"}d.onclick=()=>cClick(i);E.appendChild(d)});
+if(!over)$("cInfo").textContent=(turn?"White":"Black")+" to move"}
+function cClick(i){if(over)return;const q=B[i];
+if(sel>=0&&mv(sel).includes(i)){const cap=B[i];B[i]=B[sel];B[sel]="";if(B[i]=="P"&&i<8)B[i]="Q";if(B[i]=="p"&&i>55)B[i]="q";sel=-1;
+if(cap.toLowerCase()=="k"){over=true;$("cInfo").textContent=(turn?"White":"Black")+" wins! 🏴‍☠️"}else turn=!turn;cDraw();return}
+sel=q&&isW(q)==turn?i:-1;cDraw()}
+$("cReset").onclick=cReset;
+
+trivia();cReset();show("trivia");
+</script></body></html>

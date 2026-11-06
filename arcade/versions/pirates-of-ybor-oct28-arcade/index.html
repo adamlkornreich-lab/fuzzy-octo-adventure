@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pirates of Ybor</title>
+<style>
+:root{--bg:#f4ead5;--fg:#2a1d0f;--card:#fff8e6;--ac:#a8321e;--gold:#b8860b;--l:#ecd9ae;--d:#a9784a;--bd:#d7c294;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#10161f;--fg:#f1e6cf;--card:#1a2332;--ac:#e0553c;--gold:#e8b94a;--l:#d9c08c;--d:#8a5a34;--bd:#33415a}}
+:root[data-theme="dark"]{--bg:#10161f;--fg:#f1e6cf;--card:#1a2332;--ac:#e0553c;--gold:#e8b94a;--l:#d9c08c;--d:#8a5a34;--bd:#33415a}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:Georgia,"Times New Roman",serif;line-height:1.4}
+main{max-width:480px;margin:0 auto;padding:16px}
+h1{margin:4px 0;text-align:center;font-size:1.7rem}
+.sub{text-align:center;margin:0 0 12px;opacity:.8}
+nav{display:flex;gap:6px;margin-bottom:12px}
+nav button{flex:1;padding:10px 4px;border:1px solid var(--bd);background:var(--card);color:var(--fg);border-radius:10px;font:inherit;font-size:.9rem}
+nav button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px}
+.opt{display:block;width:100%;margin:8px 0;padding:12px;text-align:left;border:1px solid var(--bd);background:var(--bg);color:var(--fg);border-radius:10px;font:inherit}
+.opt.ok{background:#2e7d32;color:#fff}.opt.no{background:#b3261e;color:#fff}
+.btn{padding:10px 16px;border:0;border-radius:10px;background:var(--gold);color:#1a1205;font:inherit;font-weight:bold}
+.msg{min-height:1.5em;margin:8px 0;font-weight:bold}
+#sea{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+#sea button{aspect-ratio:1;border:1px solid var(--bd);border-radius:8px;background:var(--l);font-size:1.4rem;color:#2a1d0f}
+#bd{display:grid;grid-template-columns:repeat(8,1fr);border:3px solid var(--d);border-radius:6px;overflow:hidden}
+#bd div{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(22px,8vw,38px);color:#000;user-select:none}
+#bd .sel{outline:3px solid var(--ac);outline-offset:-3px}
+#bd .mv::after{content:"";width:28%;height:28%;border-radius:50%;background:rgba(168,50,30,.6)}
+footer{margin-top:18px;text-align:center;font-size:.78rem;opacity:.8}
+</style></head><body><main>
+<h1>☠ Pirates of Ybor</h1>
+<p class="sub">Pops &amp; Pippy’s treasure arcade</p>
+<nav id="nav"><button data-t="tv" class="on">🎬 Trivia</button><button data-t="th">💰 Treasure</button><button data-t="ch">♞ Chess</button></nav>
+
+<section id="tv" class="card"></section>
+<section id="th" class="card" hidden>
+<p>Dig for the chest! You have 8 digs. Hot means close, cold means far.</p>
+<div id="sea"></div><div class="msg" id="thm"></div><button class="btn" id="thr">New map</button></section>
+<section id="ch" class="card" hidden>
+<div class="msg" id="chm"></div><div id="bd"></div><p style="margin:10px 0 0"><button class="btn" id="chr">New game</button> You sail white, the Black Fleet answers.</p></section>
+
+<footer>© 2026 Adam Kornreich / R.A. Consulting ❤ Pops &amp; Pippy. All rights reserved.<br>Thanks to Captain Shiller and Co-Navigator Shere and family.</footer>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{
+ document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("on",x===b));
+ ["tv","th","ch"].forEach(id=>$("#"+id).hidden=id!==b.dataset.t);
+});
+const shuf=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+
+/* ---------- MOVIE TRIVIA ---------- */
+const Q=[
+["Who plays Captain Jack Sparrow in Pirates of the Caribbean?",["Johnny Depp","Orlando Bloom","Geoffrey Rush","Brad Pitt"],0],
+["What is the name of Jack Sparrow’s ship?",["Flying Dutchman","Black Pearl","Queen Anne’s Revenge","Interceptor"],1],
+["Which 2003 film started the Pirates of the Caribbean series?",["Dead Man’s Chest","On Stranger Tides","The Curse of the Black Pearl","At World’s End"],2],
+["Who wrote the novel Treasure Island?",["Mark Twain","Robert Louis Stevenson","J. M. Barrie","Jules Verne"],1],
+["Disney’s Treasure Planet is a space version of which story?",["Peter Pan","Moby-Dick","Treasure Island","Robinson Crusoe"],2],
+["In The Goonies, whose treasure are the kids hunting?",["One-Eyed Willy","Long John Silver","Blackbeard","Captain Hook"],0],
+["Which 1995 Kevin Costner film is set on a flooded Earth?",["Waterworld","Dances with Wolves","The Postman","Open Range"],0],
+["Who plays Long John Silver in Muppet Treasure Island?",["Michael Caine","Tim Curry","Jim Henson","Kermit"],1],
+["Which pirate legend is Tampa’s Gasparilla festival named for?",["Jean Lafitte","José Gaspar","Blackbeard","Anne Bonny"],1],
+["What is Ybor City’s famous nickname?",["Sun City","Cigar City","Pirate Port","Gator Town"],1]
+];
+let qi,sc,qs;
+function startTV(){qs=shuf(Q);qi=0;sc=0;showQ();}
+function showQ(){
+ const t=$("#tv");
+ if(qi>=qs.length){t.innerHTML=`<h2>Voyage over!</h2><p>You scored ${sc} of ${qs.length}. ${sc>7?"Ye be a true captain!":"Keep sailing, matey!"}</p><button class="btn" id="again">Play again</button>`;$("#again").onclick=startTV;return;}
+ const [q,o,a]=qs[qi];
+ t.innerHTML=`<small>Question ${qi+1} of ${qs.length} · Score ${sc}</small><h2>${q}</h2>`;
+ shuf(o.map((x,i)=>[x,i])).forEach(([x,i])=>{
+  const b=document.createElement("button");b.className="opt";b.textContent=x;
+  b.onclick=()=>{
+   t.querySelectorAll(".opt").forEach(z=>z.disabled=true);
+   if(i===a){sc++;b.classList.add("ok");}else b.classList.add("no");
+   setTimeout(()=>{qi++;showQ();},900);
+  };
+  t.appendChild(b);
+ });
+}
+startTV();
+
+/* ---------- TREASURE HUNT ---------- */
+let tx,ty,digs,over;
+function newMap(){
+ tx=Math.floor(Math.random()*6);ty=Math.floor(Math.random()*6);digs=8;over=false;
+ $("#thm").textContent="Arr, where be the chest?";
+ const s=$("#sea");s.innerHTML="";
+ for(let y=0;y<6;y++)for(let x=0;x<6;x++){
+  const b=document.createElement("button");b.textContent="🏝";
+  b.onclick=()=>{
+   if(over||b.disabled)return;b.disabled=true;digs--;
+   const d=Math.abs(x-tx)+Math.abs(y-ty);
+   if(d===0){b.textContent="💰";over=true;$("#thm").textContent="Ye found the treasure! 🏆";return;}
+   b.textContent=d<=1?"🔥":d<=3?"🌤":"🧊";
+   if(digs===0){over=true;$("#thm").textContent="Out of digs! The chest was hidden elsewhere.";}
+   else $("#thm").textContent=(d<=1?"Scorching hot!":d<=3?"Gettin’ warm.":"Ice cold.")+" Digs left: "+digs;
+  };
+  s.appendChild(b);
+ }
+}
+$("#thr").onclick=newMap;newMap();
+
+/* ---------- PIRATE CHESS ---------- */
+const G={K:"♔",Q:"♕",R:"♖",B:"♗",N:"♘",P:"♙",k:"♚",q:"♛",r:"♜",b:"♝",n:"♞",p:"♟"};
+const V={p:1,n:3,b:3,r:5,q:9,k:100};
+const isW=c=>c&&c===c.toUpperCase();
+const side=c=>c?(isW(c)?"w":"b"):null;
+function start(){
+ const back="rnbqkbnr";
+ return [...back.split(""),..."pppppppp",...Array(32).fill(""),..."PPPPPPPP",...back.toUpperCase().split("")];
+}
+const N8=[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]];
+const K8=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
+function gen(b,s){
+ const out=[];
+ for(let i=0;i<64;i++){
+  const p=b[i];if(!p||side(p)!==s)continue;
+  const t=p.toLowerCase(),r=i>>3,c=i&7;
+  const add=(rr,cc)=>{if(rr<0||rr>7||cc<0||cc>7)return false;const j=rr*8+cc;if(!b[j]){out.push([i,j]);return true;}if(side(b[j])!==s)out.push([i,j]);return false;};
+  if(t==="p"){
+   const d=s==="w"?-1:1,sr=s==="w"?6:1;
+   if(r+d>=0&&r+d<8){
+    if(!b[(r+d)*8+c]){out.push([i,(r+d)*8+c]);if(r===sr&&!b[(r+2*d)*8+c])out.push([i,(r+2*d)*8+c]);}
+    for(const dc of[-1,1]){const cc=c+dc;if(cc>=0&&cc<8){const j=(r+d)*8+cc;if(b[j]&&side(b[j])!==s)out.push([i,j]);}}
+   }
+  }else if(t==="n"){N8.forEach(([a,e])=>add(r+a,c+e));}
+  else if(t==="k"){K8.forEach(([a,e])=>add(r+a,c+e));}
+  else{
+   const dirs=t==="r"?K8.slice(0,4):t==="b"?K8.slice(4):K8;
+   dirs.forEach(([a,e])=>{let rr=r+a,cc=c+e;while(add(rr,cc)){rr+=a;cc+=e;}});
+  }
+ }
+ return out;
+}
+function apply(b,[f,t]){
+ const n=b.slice();n[t]=n[f];n[f]="";
+ if(n[t]==="P"&&t<8)n[t]="Q";
+ if(n[t]==="p"&&t>55)n[t]="q";
+ return n;
+}
+function inCheck(b,s){
+ const k=b.indexOf(s==="w"?"K":"k");if(k<0)return true;
+ return gen(b,s==="w"?"b":"w").some(m=>m[1]===k);
+}
+const legal=(b,s)=>gen(b,s).filter(m=>!inCheck(apply(b,m),s));
+function mat(b){let x=0;b.forEach(p=>{if(p){const v=V[p.toLowerCase()];x+=isW(p)?v:-v;}});return x;}
+function aiMove(b){
+ const ms=legal(b,"b");let best=null,bs=1e9;
+ for(const m of ms){
+  const nb=apply(b,m);const rs=legal(nb,"w");
+  let worst=-1e9;
+  if(!rs.length)worst=inCheck(nb,"w")?-1000:0;
+  else for(const r of rs){const v=mat(apply(nb,r));if(v>worst)worst=v;}
+  const sc=worst+Math.random()*.4;
+  if(sc<bs){bs=sc;best=m;}
+ }
+ return best;
+}
+let B,sel,tg,turn,done;
+function newChess(){B=start();sel=null;tg=[];turn="w";done=false;draw("Your move, Captain!");}
+function draw(msg){
+ const bd=$("#bd");bd.innerHTML="";
+ B.forEach((p,i)=>{
+  const d=document.createElement("div");
+  d.style.background=((i>>3)+(i&7))%2?"var(--d)":"var(--l)";
+  d.textContent=p?G[p]:"";
+  if(i===sel)d.className="sel";
+  if(tg.includes(i))d.classList.add("mv");
+  d.onclick=()=>click(i);bd.appendChild(d);
+ });
+ $("#chm").textContent=msg;
+}
+function end(s){
+ const ms=legal(B,s);
+ if(ms.length)return null;
+ return inCheck(B,s)?(s==="b"?"Checkmate! Ye win, Captain! 🏴‍☠️":"Checkmate. The Black Fleet wins."):"Stalemate. Honors even.";
+}
+function click(i){
+ if(done||turn!=="w")return;
+ if(sel!==null&&tg.includes(i)){
+  B=apply(B,[sel,i]);sel=null;tg=[];turn="b";
+  let e=end("b");
+  if(e){done=true;return draw(e);}
+  draw(inCheck(B,"b")?"Check! The Black Fleet thinks…":"The Black Fleet be thinkin’…");
+  setTimeout(()=>{
+   const m=aiMove(B);B=apply(B,m);turn="w";
+   e=end("w");
+   if(e){done=true;return draw(e);}
+   draw(inCheck(B,"w")?"Yer king be in check!":"Yer move, Captain!");
+  },350);
+  return;
+ }
+ if(B[i]&&side(B[i])==="w"){
+  sel=i;tg=legal(B,"w").filter(m=>m[0]===i).map(m=>m[1]);
+ }else{sel=null;tg=[];}
+ draw($("#chm").textContent);
+}
+$("#chr").onclick=newChess;newChess();
+</script></body></html>
